@@ -1,7 +1,17 @@
 # Part Lifecycle Transaction Tracker (HTA Macro) – Requirements & Technical Specification
 
 ## 1. Overview
-A Windows HTA (HTML Application) + VBScript tool to inspect, analyze, and print the lifecycle of part inventory transactions (receipts, transfers, shipments, adjustments) from a Visual/VMFG (SQL Server) database. It provides a modernized UI (Windows 11 inspired) or an optional dark legacy theme and replaces CSV export with in-browser print formatting.
+Starting over (clean slate) design. A Windows HTA (HTML Application) + single supporting VBScript file `PartLifecycleTracker.vbs` (code-behind) to inspect, analyze, and print the lifecycle of part inventory transactions (receipts, transfers, shipments, adjustments) from a Visual/VMFG (SQL Server) database. It provides a modernized UI (Windows 11 inspired) or an optional dark legacy theme and replaces CSV export with in-browser print formatting.
+
+## 0. File Structure (Clean Rebuild Target)
+| File | Purpose |
+|------|---------|
+| `PartLifecycleTracker.hta` | UI container (HTML/CSS) + minimal VBScript glue (only window events & element wiring). |
+| `PartLifecycleTracker.vbs` | All business logic: data loading, lifecycle reconstruction, sorting, printing helpers, constants, sentinel. |
+| `Database.config` (optional) | Plaintext or simple key=value lines for default server / catalog (optional; falls back to prompts). |
+| `README.md` (generated later) | Quick start, troubleshooting, version history. |
+
+Important: The legacy names (`PartLifecycleCore.vbs`, `PartLifecycleCoreClean.vbs`) are retired to avoid confusion and caching issues under mshta.
 
 ## 2. Primary Objectives
 - Rapidly look up a Part ID and view its recent transactions.
@@ -10,7 +20,7 @@ A Windows HTA (HTML Application) + VBScript tool to inspect, analyze, and print 
 - Provide a “Today’s Transactions” mode with day navigation.
 - Allow sorting, row selection, lifecycle drill-down, and printing of the currently displayed dataset.
 - Offer minimal friction authentication (SQL username/password) at launch.
-- Keep implementation self‑contained: `*.hta` + `*.vbs` + optional `Database.config`.
+- Keep implementation self‑contained: `PartLifecycleTracker.hta` + `PartLifecycleTracker.vbs` + optional `Database.config`.
 
 ## 3. Scope (Inclusions)
 - Authentication prompts (username & password) via InputBox.
@@ -51,6 +61,7 @@ A Windows HTA (HTML Application) + VBScript tool to inspect, analyze, and print 
 - Load all transactions for “today” by default (target date = today + offset).
 - Provide navigation (Previous / Next Day) adjusting an internal `todayOffset`.
 - Distinguish visually from part-specific mode (status prefix or panel title change).
+
 
 ### 5.4 Data Model (tableData Baseline)
 Suggested columns (customizable):
@@ -105,7 +116,8 @@ Suggested columns (customizable):
 
 ### 5.12 Versioning & Sentinel
 - Maintain `CORE_VERSION` constant and append to status line.
-- Optionally define `Dim CORE_LOADED : CORE_LOADED = True` at end of successful parse.
+- In `PartLifecycleTracker.vbs` always `Dim CORE_LOADED` near the top; set `CORE_LOADED = True` as the last executable line (parse success sentinel).
+- HTA `Window_OnLoad` checks `IsEmpty(CORE_LOADED)`; if empty, show a fatal load dialog and abort further initialization.
 
 ### 5.13 Error Handling
 - Wrap ADO open/execute in `On Error Resume Next` + explicit checks.
@@ -117,6 +129,7 @@ Suggested columns (customizable):
 
 ### 5.15 Export (Deprecated)
 - Prior CSV export replaced by Print; future: optional CSV/clipboard re-add with explicit user request.
+- Initial rebuild will implement only Print; CSV left for backlog.
 
 ## 6. Non-Functional Requirements
 | Category | Requirement |
@@ -130,8 +143,8 @@ Suggested columns (customizable):
 | Portability | Runs on Windows 10/11 with built-in mshta (IE11 engine). |
 | Observability | Clear status messages; optional temporary debug MsgBoxes gated by a debug flag. |
 
-## 7. Core Function Inventory (Target Set)
-- `Core_Window_OnLoad`
+## 7. Tracker Script Function Inventory (Target Set in `PartLifecycleTracker.vbs`)
+- `Core_Window_OnLoad` (invoked from HTA `Window_OnLoad`)
 - `Core_LoadData`
 - `Core_LoadTodaysTransactions`
 - `Core_DayPrevious` / `Core_DayForward` (day navigation)
@@ -140,7 +153,7 @@ Suggested columns (customizable):
 - Lifecycle builders: `BuildLifecycleFromDB` (SQL CTE approach) and/or `BuildLifecycleInMemory`
 - `Core_ExportData` (Print wrapper)
 - Panel toggles: `Core_ToggleLifecycle`, `Core_ToggleResults`
-- Utility: `SqlSafe`, `ToSqlDate`, `EnsureCapacity`, comparators
+- Helper / utility: `SqlSafe`, `ToSqlDate`, `EnsureCapacity`, comparators, selection re-map.
 
 ## 8. User Flows
 ### 8.1 Standard Lookup
@@ -183,9 +196,10 @@ Group duplicates within same minute for split detection; annotate current transa
 | Core not loaded | "Core script failed to load / parse." |
 
 ## 13. Deployment & Launch
-- Files: `PartLifecycleTracker.hta`, `PartLifecycleCore.vbs`, optional `Database.config`.
-- Launch via double-click or a launcher script (`LaunchPartLifecycleTracker.vbs`).
-- Ensure file encoding ANSI or UTF-8 without BOM for VBScript includes.
+- Files: `PartLifecycleTracker.hta`, `PartLifecycleTracker.vbs`, optional `Database.config`.
+- Launch via double-click or a launcher script (`LaunchPartLifecycleTracker.vbs`) which only resolves absolute path & executes `mshta`.
+- Ensure `PartLifecycleTracker.vbs` saved ANSI or UTF-8 (no BOM) to avoid legacy parser issues.
+- During development set `SINGLEINSTANCE="no"` in the HTA to prevent stale caching; switch to `yes` for production if desired.
 
 ## 14. Logging & Diagnostics (Optional Enhancements)
 - Debug flag enabling MsgBox checkpoints or `document.title` tag updates.
@@ -200,31 +214,43 @@ Group duplicates within same minute for split detection; annotate current transa
 - Lifecycle graph visualization (simple ASCII Gantt or HTML timeline).
 - Configurable color themes at runtime.
 
-## 16. Compatibility & Pitfalls to Avoid
+## 16. Compatibility & Pitfalls to Avoid (Clean Rebuild Focus)
 | Pitfall | Explanation | Mitigation |
 |---------|-------------|------------|
-| Duplicate `Option Explicit` & mixed fragments | Corrupted file with repeated blocks can cause silent parse aborts. | Maintain single authoritative core file; code reviews before replacing. |
-| Non-VBScript comments (`//`) | Not valid; halts or partially aborts parsing. | Use only `'` or `Rem` comments. |
-| Undeclared sentinel under `Option Explicit` | Assigning undeclared `CORE_LOADED` raises error. | Always `Dim CORE_LOADED` first. |
-| Overly defensive fallback stubs | Fake subs hide real “undefined” problems; UI appears inert. | Fail fast—surface errors instead of stubbing. |
-| HTA caching with `SINGLEINSTANCE="yes"` | Old script stays in memory; modifications ignored. | Use `SINGLEINSTANCE="no"` during development; restart between builds. |
-| Filename mismatch (`PartLifecycleCoreClean.vbs` vs expected) | HTA keeps referencing old name; new logic never runs. | Keep consistent include name or update HTA reliably. |
-| `VBScript:` prefix inconsistencies in `onclick` | In some HTA contexts plain `onclick="SubName"` is more reliable. | Use plain sub name for simplicity. |
-| Silent ADO errors | Without checking `Err`, UI stalls. | Wrap open/execute and surface `Err.Description`. |
-| Mixed encodings / BOM | UTF-8 BOM can confuse legacy parser. | Save without BOM or ANSI. |
-| Zone-blocked files (downloaded) | Windows may mark file as blocked, script not executed properly. | Right-click → Properties → Unblock. |
-| Large monolithic patches causing corruption | Manual merges introduce duplicate subs. | Use smaller, verified diffs; keep backups (`*_backup.vbs`). |
-| Sorting losing selection | Index-based selection invalid after reorder. | Re-map by unique TransactionID if preserving selection is required. |
-| Over-reliance on InputBox for creds | User mistypes with no validation. | (Future) add masked credential modal or retry loop. |
+| Legacy corrupted core remnants | Old `PartLifecycleCore.vbs` fragments may linger and get accidentally included. | Remove / archive legacy files outside working folder before starting. |
+| Duplicate `Option Explicit` blocks | Repeated headers in merged files quietly break execution. | Keep a single definitive script (`PartLifecycleTracker.vbs`). |
+| Non-VBScript `//` comments | Not valid in VBScript; can stop parsing. | Use `'` or `Rem` only. |
+| Sentinel undeclared | `CORE_LOADED` assignment fails under `Option Explicit`. | `Dim CORE_LOADED` near top; set it last. |
+| Overuse of silent `On Error Resume Next` | Masks root cause; UI appears frozen. | Limit scope; immediately check `Err` and clear. |
+| Fallback stub subs | Hide true missing-function errors. | Let missing subs fail loudly during development. |
+| HTA instance caching | Edits ignored when `SINGLEINSTANCE="yes"`. | Use `SINGLEINSTANCE="no"` until stable. |
+| Mismatched include filename | HTA still points to old filename, new script never runs. | Standardize on `PartLifecycleTracker.vbs`. |
+| `VBScript:` prefix variability | Some HTA builds handle plain names more consistently. | Prefer `onclick="Core_LoadData"` form. |
+| UTF-8 BOM issues | BOM can confuse legacy engine sporadically. | Save without BOM. |
+| Zone security block | Downloaded files flagged, blocking execution. | Unblock via file Properties dialog. |
+| Selection lost after sort | Index-based highlight invalid. | Track by transaction ID and re-find after sort. |
+| Credential typos unhandled | Single failed attempt yields misleading state. | Provide retry loop or clear status & reprompt. |
+| Large unbounded queries | Performance drag & UI freeze. | Cap row count (e.g., 500/1000) + show count. |
+| Inefficient DOM rebuilding | Excess per-row writes slower in IE engine. | Build string buffer then single `innerHTML` update. |
+| Mixed date filter semantics | Off-by-one day errors with BETWEEN vs `< nextDay`. | Standardize on `>= from` and `< to + 1 day`. |
+| Lifecycle SQL drift | DB schema changes break CTE silently. | Wrap each union part with test query during dev; version comments. |
+| Print formatting bleed | Dark theme colors unreadable on paper. | Apply print media override with high-contrast neutrals. |
+| Accidental password logging | Debug prints may expose credentials. | Never concatenate password into status/log strings. |
+| Time zone ambiguity | Server vs client date mismatch in "today" mode. | Base "today" on server date if exposed (future enhancement). |
 
-## 17. Acceptance Criteria (Representative)
+### 16.1 Additional Cross-Version Considerations
+- Use a single version constant updated per release to aid user support.
+- Keep a CHANGELOG section in `README.md` (not in script) to avoid re-parsing cost.
+- Consider a minimal self-test routine (optional hidden button) verifying DB connectivity + sentinel.
+
+## 17. Acceptance Criteria (Representative – Clean Rebuild)
 - Launch always produces credential prompts (unless user cancels deliberately).
 - Loading valid part returns ≥1 row when DB has data; status reflects count.
 - Sorting toggles direction and updates arrow or status hint (optional).
 - Selecting a row opens lifecycle panel (placeholder acceptable initial, fully reconstructed in final release).
 - Print hides controls and produces legible transactional output.
 - Transfer split scenarios visibly marked where applicable.
-- No undefined function errors in console / no silent failure states.
+- No undefined function errors (no silent fallbacks); sentinel load check passes; user sees credential prompts on every fresh launch (unless cancelled).
 - Core load failure yields explicit user-facing message.
 
 ## 18. Glossary
