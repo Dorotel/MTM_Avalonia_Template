@@ -17,8 +17,12 @@ For AI agents
 
 Modes
 - Online: Read Visual via server projections (Toolkit-backed); write app DB via API; confirm immediately.
+  - Visual master data cached: PART (30-char IDs), LOCATION (15-char IDs), WAREHOUSE (15-char IDs), SHOP_RESOURCE (15-char IDs)
+  - Relationships validated: LOCATION→WAREHOUSE (FK Line: 427), PART_LOCATION links (FK Lines: 459-460)
 - Degraded: Visual offline → use cached master; warn user; continue app writes queued.
+  - Cache validation against last sync timestamp; aged data flagged with warnings
 - Offline: Queue app writes; restrict features that cannot validate safely; present clear banners.
+  - Part/Location validation uses last cached snapshot from Visual
 
 Conflict resolution
 - Server authoritative; client retries on 409 with user guidance.

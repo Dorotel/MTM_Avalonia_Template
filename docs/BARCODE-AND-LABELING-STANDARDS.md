@@ -19,10 +19,11 @@ Scanning rules
 - Supported symbologies: GS1-128, Code128, QR (expandable).
 - Content parsing:
   - GS1 AIs for lot (e.g., 10), quantity (e.g., 30), expiry (e.g., 17), serial where applicable.
-  - Part number mapping: authoritative field per Visual dictionary (cite: Visual Data Table.csv, Line: <to be filled>) and toolkit guide (Reference-{File Name} - {Chapter/Section/Page}).
+  - Part number mapping: PART.ID nvarchar(30) is authoritative field (Visual Data Table.csv Line: 5780) and toolkit guide (Reference-Inventory - {Chapter/Section/Page}).
+  - Location code mapping: LOCATION.ID nvarchar(15) (Visual Data Table.csv Line: 5247; Reference-Inventory - {Chapter/Section/Page}).
 - Validation:
-  - Part numbers and lots validated against Visual cache (offline) or via projection (online).
-  - Quantities must respect UoM and decimal places policy.
+  - Part numbers (max 30 chars) and lots (max 30 chars from TRACE.ID) validated against Visual cache (offline) or via projection (online).
+  - Quantities must respect UoM field (PART.STOCK_UM nvarchar(15), Visual Data Table.csv Line: 5791) and decimal(18,5) precision policy.
 
 Labeling rules
 - Printer language: ZPL (primary), PDF fallback on non-Zebra devices.

@@ -21,9 +21,18 @@ Endpoint categories
   - Refresh: rotate tokens; revoke on logout.
 - Visual projections (read-only; Toolkit-backed only)
   - GET /api/visual/items?query=...&page=...&size=...
+    - Returns: id (max 30 chars), description (max 255 chars), stockUm (max 15 chars), activeFlag (1 char)
+    - Source: PART table (Visual Data Table.csv Lines: 5779-5888)
   - GET /api/visual/locations?query=...&page=...&size=...
+    - Returns: id (max 15 chars), warehouseId (max 15 chars), description (max 80 chars)
+    - Source: LOCATION table (Visual Data Table.csv Lines: 5246-5263)
+  - GET /api/visual/warehouses?warehouseId=...
+    - Returns: id (max 15 chars), description (max 50 chars), siteId (max 15 chars)
+    - Source: WAREHOUSE table (Visual Data Table.csv Lines: 14262-14288)
   - GET /api/visual/workcenters?query=...&page=...&size=...
-  - Constraints: Sources defined by Visual CSV dictionaries; citations required: Reference-{File Name} - {Chapter/Section/Page}. Never expose raw tables directly; never execute direct SQL.
+    - Returns: id (max 15 chars), description (max 50 chars), activeFlag (1 char)
+    - Source: SHOP_RESOURCE table (Visual Data Table.csv Lines: 9299-9343)
+  - Constraints: Sources defined by Visual CSV dictionaries (MTMFG Tables.csv: 14796 fields, Visual Data Table.csv: 14776 field definitions, MTMFG Relationships.csv: 1266 FK relationships); citations required: Reference-{File Name} - {Chapter/Section/Page}. Never expose raw tables directly; never execute direct SQL.
 - Operational data (app-owned, MySQL)
   - GET/POST transactions (receive/move/issue/adjust) with server-side validation against Visual projections.
   - GET sequences (next IDs), audit logs, user settings.

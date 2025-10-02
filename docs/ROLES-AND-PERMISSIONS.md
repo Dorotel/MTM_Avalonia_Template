@@ -17,8 +17,14 @@ For AI agents
 
 Policy examples (Visual read-only enforced everywhere)
 - Clerk: Receive (standard), Move/Issue (standard), cannot approve over-receipts.
+  - Can read: PART (30-char ID), LOCATION (15-char ID), WAREHOUSE (15-char ID) via cached projections
+  - Can write: App DB inventory transactions only (not Visual)
 - Supervisor: Can approve over-receipts and negative adjustments.
-- Admin: Manage templates, manage users (app-level), view all reports.
+  - Additional permissions for exception handling and adjustments
+  - Same Visual read-only access as Clerk (no Visual writes)
+- Admin: Manage templates, manage users (app-level via APPLICATION_USER table, not Visual roles), view all reports.
+  - Visual access remains read-only even for admins
+  - User management: APPLICATION_USER.NAME nvarchar(20), IS_ADMIN flag (Visual Data Table.csv Line: 574)
 
 Clarification questions
 - Q: Which transactions require Supervisor approval?

@@ -17,9 +17,16 @@ For AI agents
 
 Sections
 - Visual offline or Toolkit error:
-  - Check credentials (validated locally first); confirm Toolkit endpoint reachability; review allowlist; use cached master; notify IT.
+  - Check credentials (APPLICATION_USER.NAME nvarchar(20), Visual Data Table.csv Line: 565) validated locally first
+  - Confirm Toolkit endpoint reachability; review allowlist (PART: 30-char max, LOCATION: 15-char max)
+  - Use cached master data (last sync timestamp shown in banner)
+  - Verify read-only access: no writes to Visual tables (PART, LOCATION, WAREHOUSE, SHOP_RESOURCE, SITE)
+  - Check foreign key relationships cache: LOCATION→WAREHOUSE (FK Line: 427), PART_LOCATION (FK Lines: 459-460)
+  - Notify IT with specific table/field reference if projection fails
 - MySQL unavailable:
-  - Confirm MAMP running and port; switch to API for tests; review firewall.
+  - Confirm MAMP running and port (default 3306); check MySQL service status
+  - Switch to API for tests; review firewall rules
+  - Verify local app database (not Visual) is the target
 - Android can’t reach API:
   - Use 10.0.2.2 for emulator; check TLS certificates; firewall rules.
 - Scanning fails:

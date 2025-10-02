@@ -17,6 +17,8 @@ For AI agents
 Flow (no code; steps only)
 1) User inputs Visual username/password in the app.
 2) App validates locally in MAMP MySQL (salted+stretched hash) over a secure channel (no plaintext storage).
+   - Visual username stored in APPLICATION_USER.NAME nvarchar(20) (Visual Data Table.csv Line: 565)
+   - Password hash stored in APPLICATION_USER.USER_PWD nvarchar(90) (Visual Data Table.csv Line: 576)
 3) On success, establish Visual API Toolkit session under read-only role.
 4) Proceed with read-only Visual operations (Toolkit commands only), respecting allowlist and citations.
 5) On logout/timeout, destroy session; purge any sensitive tokens.

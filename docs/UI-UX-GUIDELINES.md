@@ -18,7 +18,12 @@ For AI agents
 Guidelines
 - Touch targets ≥ 44x44 px; large type.
 - Scan-first workflows; minimize free text.
-- Clear state banners: Online, Degraded (Visual cache), Offline (queued).
+  - Part number input: 30-char max (PART.ID constraint from Visual)
+  - Location code input: 15-char max (LOCATION.ID constraint from Visual)
+  - Lot number input: 30-char max (TRACE.ID constraint from Visual)
+- Clear state banners: Online, Degraded (Visual cache age), Offline (queued transactions count).
+  - Show last Visual sync timestamp in Degraded mode
+  - Display queue depth in Offline mode
 - Timers and blocking actions show cancellable progress.
 - Accessibility: Color contrast, focus states, keyboard support on desktop.
 

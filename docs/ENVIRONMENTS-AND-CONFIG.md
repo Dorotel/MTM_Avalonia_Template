@@ -20,10 +20,16 @@ Key settings
   - Toolkit endpoints: base URL, auth method, timeouts, retry/backoff.
   - Read-only enforce flag: Visual.ReadOnly=true (non-negotiable).
   - Poll cadence for master caches (e.g., 30 min) with maintenance windows.
+  - Table size awareness for caching:
+    - PART table: ~117 fields (MTMFG Tables.csv Lines: 1657-1773)
+    - LOCATION table: ~14 fields (MTMFG Tables.csv Lines: 1513-1526)
+    - WAREHOUSE table: ~16 fields (MTMFG Tables.csv Lines: 4229-4244)
+    - SHOP_RESOURCE table: ~42 fields (MTMFG Tables.csv Lines: 3452-3493)
   - Citations required for any toolkit command: Reference-{File Name} - {Chapter/Section/Page}.
 - Credentials flow:
-  - Visual username/password validated locally against MAMP MySQL hash records before any server connection.
+  - Visual username/password validated locally against MAMP MySQL hash records (APPLICATION_USER.USER_PWD nvarchar(90)) before any server connection.
   - No plaintext secrets in logs or files.
+  - Field constraints: USERNAME max 20 chars, PASSWORD_HASH 90 chars
 - API (your app server):
   - Base URL per environment, TLS on, timeouts, retry policy, rate limits.
 - MySQL (MAMP, desktop-only direct):

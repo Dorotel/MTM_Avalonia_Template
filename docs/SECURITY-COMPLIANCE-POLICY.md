@@ -20,6 +20,12 @@ Policies
   - Access via Infor Visual API Toolkit only; never direct SQL.
   - Read-only enforced at Visual role and at repository surfaces (no write methods).
   - Android devices never hold Visual credentials; mobile uses API only.
+  - Schema References:
+    - PART table (Visual Data Table.csv, Line: 5779-5888): ID field nvarchar(30)
+    - LOCATION table (Visual Data Table.csv, Line: 5246-5263): ID field nvarchar(15)
+    - WAREHOUSE table (Visual Data Table.csv, Line: 14262-14288): ID field nvarchar(15)
+    - SITE table (Visual Data Table.csv, Line: 9398-9443): ID field nvarchar(15)
+    - Relationships documented in MTMFG Relationships.csv (1266 foreign key relationships)
 - Credentials:
   - Visual username/password stored as salted+stretched hashes in MAMP MySQL; validated locally before any Visual session; no plaintext at rest.
 - Transport:

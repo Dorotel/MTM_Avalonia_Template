@@ -15,23 +15,41 @@ For AI agents
 - Non-functionals: Easy to update on schema changes; auditable.
 - Priority: Critical.
 
-Allowlist structure (examples with placeholders)
+Allowlist structure (with specific Visual schema references)
 - Items/Parts:
-  - Toolkit Command = <from Reference-{File} - {Chapter/Section/Page}>
-  - Dataset Fields = PartNumber, Description, UoM, IsActive (minimal set)
-  - CSV: MTMFG Tables.csv (Line: <to be filled>), Visual Data Table.csv (Line: <to be filled>)
+  - Toolkit Command = <from Reference-Inventory - {Chapter/Section/Page}>
+  - Dataset Fields = ID nvarchar(30), DESCRIPTION nvarchar(255), STOCK_UM nvarchar(15), ACTIVE_FLAG nchar(1) (minimal set)
+  - CSV: MTMFG Tables.csv (Lines: 1657-1773 - 117 PART fields), Visual Data Table.csv (Lines: 5779-5888 - PART table definition)
+  - Primary Key: PART.ID (Line: 5780)
 - Locations/Racks:
-  - Toolkit Command = <Reference-{File} - {Chapter/Section/Page}>
-  - Fields = LocationCode, Zone, IsActive
-  - CSV: MTMFG Tables.csv (Line: <to be filled>)
-- WorkCenters:
-  - Toolkit Command = <Reference-{File} - {Chapter/Section/Page}>
-  - Fields = Code, Name, IsActive
-  - CSV: Visual Data Table.csv (Line: <to be filled>)
+  - Toolkit Command = <Reference-Inventory - {Chapter/Section/Page}>
+  - Dataset Fields = ID nvarchar(15), WAREHOUSE_ID nvarchar(15), DESCRIPTION nvarchar(80)
+  - CSV: MTMFG Tables.csv (Lines: 1513-1526 - 14 LOCATION fields), Visual Data Table.csv (Lines: 5246-5263 - LOCATION table definition)
+  - Primary Key: LOCATION.ID (Line: 5247)
+  - Foreign Key: LOCATION.WAREHOUSE_ID → WAREHOUSE.ID (MTMFG Relationships.csv Line: 427)
+- Warehouses:
+  - Toolkit Command = <Reference-Inventory - {Chapter/Section/Page}>
+  - Dataset Fields = ID nvarchar(15), DESCRIPTION nvarchar(50), SITE_ID nvarchar(15)
+  - CSV: MTMFG Tables.csv (Lines: 4229-4244 - 16 WAREHOUSE fields), Visual Data Table.csv (Lines: 14262-14288 - WAREHOUSE table definition)
+  - Primary Key: WAREHOUSE.ID (Line: 14263)
+- WorkCenters/Resources:
+  - Toolkit Command = <Reference-Shop Floor - {Chapter/Section/Page}>
+  - Dataset Fields = ID nvarchar(15), DESCRIPTION nvarchar(50), ACTIVE_FLAG nchar(1)
+  - CSV: MTMFG Tables.csv (Lines: 3452-3493 - 42 SHOP_RESOURCE fields), Visual Data Table.csv (Lines: 9299-9343 - SHOP_RESOURCE table definition)
+  - Primary Key: SHOP_RESOURCE.ID (Line: 9299)
+- Sites:
+  - Toolkit Command = <Reference-Core - {Chapter/Section/Page}>
+  - Dataset Fields = ID nvarchar(15), DESCRIPTION nvarchar(50), ENTITY_ID nvarchar(15)
+  - CSV: MTMFG Tables.csv (Lines: 3382-3425 - 44 SITE fields), Visual Data Table.csv (Lines: 9398-9443 - SITE table definition)
+  - Primary Key: SITE.ID (Line: 9399)
 - Approved Read-Only Operations (Toolkit only):
-  - <OperationName> — Reference-{File} - {Chapter/Section/Page}
-- Relationships:
-  - Item↔Location relationship path — MTMFG Relationships.csv (Line: <to be filled>); Toolkit cross-reference: Reference-{File} - {Chapter/Section/Page}
+  - GetItemByID — Reference-Inventory - {Chapter/Section/Page}
+  - GetLocationsByWarehouse — Reference-Inventory - {Chapter/Section/Page}
+  - GetWorkCenterByID — Reference-Shop Floor - {Chapter/Section/Page}
+- Relationships (from MTMFG Relationships.csv - 1266 total FK relationships):
+  - LOCATION.WAREHOUSE_ID → WAREHOUSE.ID (Line: 427: FKEY0117,LOCATION,WAREHOUSE_ID,WAREHOUSE,ID)
+  - PART_LOCATION (Links: PART_ID→PART.ID Line: 459, WAREHOUSE_ID→LOCATION.WAREHOUSE_ID Line: 460, LOCATION_ID→LOCATION.ID Line: 460)
+  - INVENTORY_TRANS.SITE_ID → SITE.ID (Line: 412: FK_INVTRANS_TO_SITE,INVENTORY_TRANS,SITE_ID,SITE,ID)
 
 Change control
 - Any additions require citing CSV source+line and confirming read-only nature plus a valid Toolkit citation.
