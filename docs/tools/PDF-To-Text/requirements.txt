@@ -1,0 +1,6 @@
+# Pinned versions compatible with Python 3.7
+pypdf==3.17.1
+pdfminer.six==20221105
+PyMuPDF==1.21.1
+pytesseract==0.3.10
+pillow==9.5.0
