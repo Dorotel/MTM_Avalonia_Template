@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using MTM_Template_Application.Models.Diagnostics;
@@ -23,12 +24,12 @@ public class DiagnosticsTests
             new DiagnosticResult
             {
                 CheckName = "Storage",
-                Status = "Pass",
+                Status = DiagnosticStatus.Passed,
                 Message = "Storage available",
                 DurationMs = 50
             }
         };
-        diagnosticsService.RunAllChecksAsync().Returns(mockResults);
+        diagnosticsService.RunAllChecksAsync(Arg.Any<CancellationToken>()).Returns(mockResults);
         
         // Act
         var results = await diagnosticsService.RunAllChecksAsync();

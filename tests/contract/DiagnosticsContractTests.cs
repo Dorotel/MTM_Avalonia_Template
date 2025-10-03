@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using MTM_Template_Application.Services.Diagnostics;
@@ -24,7 +25,7 @@ public class DiagnosticsContractTests
         // Assert
         result.Should().NotBeNull();
         result.CheckName.Should().Be("Storage");
-        result.Status.Should().NotBeNullOrEmpty();
+        result.Status.Should().BeDefined();
     }
 
     [Fact]
