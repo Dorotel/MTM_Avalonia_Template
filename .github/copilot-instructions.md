@@ -33,10 +33,10 @@ When working with specifications, always reference:
 
 ### Core Stack (001-boot-sequence-splash)
 - **Framework**: C# .NET 9.0 with nullable reference types enabled
-- **UI**: Avalonia 11.3+
-- **MVVM**: CommunityToolkit.Mvvm 8.3+
+- **UI Framework**: Avalonia 11.3+
+- **MVVM Toolkit**: CommunityToolkit.Mvvm 8.3+
 - **Database**: MySQL.Data (MAMP MySQL 5.7)
-- **HTTP**: HttpClient (Visual API Toolkit integration)
+- **HTTP Client**: HttpClient (Visual API Toolkit integration)
 - **Observability**: Serilog + OpenTelemetry
 - **Resilience**: Polly
 - **Mapping**: AutoMapper
@@ -65,7 +65,8 @@ MTM_Avalonia_Template/
 │   │   ├── Models/                     # Domain models
 │   │   ├── Services/                   # Business logic & API clients
 │   │   ├── Infrastructure/             # Database, caching, logging
-│   │   └── App.axaml                   # Application entry
+│   │   ├── App.axaml                   # Application entry
+│   │   └── Program.cs                  # Entry point
 │   └── MTM_Avalonia_Template.Core/     # Shared/core logic (if needed)
 ├── tests/
 │   ├── MTM_Avalonia_Template.Tests/    # Unit tests
@@ -92,12 +93,12 @@ MTM_Avalonia_Template/
 public class UserService
 {
     private readonly ILogger<UserService>? _logger;
-    
+
     public async Task<User?> GetUserAsync(string? userId)
     {
         if (string.IsNullOrWhiteSpace(userId))
             return null;
-            
+
         var user = await _repository.FindAsync(userId);
         _logger?.LogInformation("Retrieved user {UserId}", userId);
         return user;
@@ -113,120 +114,214 @@ public async Task<User> GetUserAsync(string userId)
 
 #### MVVM with CommunityToolkit.Mvvm
 - Use `[ObservableProperty]` for bindable properties
-- Use `[RelayCommand]` for commands
-- ViewModels inherit from `ObservableObject`
+- Use `[RelayCommand]` for commands (supports async with `[RelayCommand(CanExecute = nameof(MethodName))]`)
+- ViewModels inherit from `ObservableObject` or `ObservableRecipient`
 - Use `partial` classes for source generators
+- Commands automatically support `CanExecute` when suffixed with `CanExecuteMethodName`
 
 ```csharp
-// ✅ Good
+// ✅ Good - Modern CommunityToolkit.Mvvm pattern
 public partial class MainViewModel : ObservableObject
 {
     [ObservableProperty]
     private string? _userName;
-    
+
     [ObservableProperty]
     private bool _isLoading;
-    
-    [RelayCommand]
-    private async Task LoadDataAsync()
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(LoadDataCommand))]
+    private bool _canLoad = true;
+
+    [RelayCommand(CanExecute = nameof(CanLoadData))]
+    private async Task LoadDataAsync(CancellationToken cancellationToken)
     {
         IsLoading = true;
+        CanLoad = false;
         try
         {
-            // Load data
+            // Load data with cancellation support
+            await Task.Delay(1000, cancellationToken);
         }
         finally
         {
             IsLoading = false;
+            CanLoad = true;
         }
     }
+
+    private bool CanLoadData() => CanLoad && !IsLoading;
 }
 ```
 
-#### Avalonia XAML Conventions
-- Use `x:DataType` for compiled bindings
-- Prefer `CompiledBinding` over `Binding`
-- Use design-time data: `Design.DataContext`
+#### Avalonia XAML Conventions (CRITICAL)
+
+**Always use CompiledBinding** - This is the recommended and performant approach:
 
 ```xml
-<!-- ✅ Good -->
+<!-- ✅ CORRECT - Use x:DataType and CompiledBinding -->
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:MTM_Avalonia_Template.ViewModels"
         x:Class="MTM_Avalonia_Template.Views.MainWindow"
         x:DataType="vm:MainViewModel"
+        x:CompileBindings="True"
         Design.Width="800" Design.Height="450">
-    
-    <TextBlock Text="{CompiledBinding UserName}" />
+
+    <StackPanel>
+        <TextBlock Text="{CompiledBinding UserName}" />
+        <Button Content="Load" Command="{CompiledBinding LoadDataCommand}" />
+        <ProgressBar IsVisible="{CompiledBinding IsLoading}" />
+    </StackPanel>
 </Window>
+
+<!-- ❌ WRONG - Don't use Binding without x:CompileBindings -->
+<TextBlock Text="{Binding UserName}" />
+
+<!-- ⚠️ Only use ReflectionBinding if absolutely necessary (slower, runtime errors) -->
+<TextBlock Text="{ReflectionBinding UserName}" />
+```
+
+**Key Avalonia XAML Rules:**
+- **Always** set `x:DataType` on Window/UserControl root
+- **Always** set `x:CompileBindings="True"` for compile-time binding validation
+- Use `CompiledBinding` syntax (Avalonia 11.0+)
+- Use `Design.DataContext` for design-time preview
+- Use `Design.Width` and `Design.Height` for previewer
+
+```xml
+<!-- ✅ Complete example with design-time support -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:MTM_Avalonia_Template.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="MTM_Avalonia_Template.Views.MainView"
+             x:DataType="vm:MainViewModel"
+             x:CompileBindings="True">
+    <Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*">
+        <TextBlock Grid.Row="0" Text="{CompiledBinding Title}" />
+        <ListBox Grid.Row="1" ItemsSource="{CompiledBinding Items}" />
+    </Grid>
+</UserControl>
+```
+
+#### Avalonia Styles & Resources
+- Define styles in separate `.axaml` files
+- Use `StyleInclude` to import styles
+- Follow Avalonia's resource dictionary conventions
+
+```xml
+<!-- App.axaml -->
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="MTM_Avalonia_Template.App">
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="/Styles/CustomStyles.axaml" />
+    </Application.Styles>
+</Application>
 ```
 
 #### Async/Await Patterns
 - Always use `async`/`await` for I/O operations
-- Use `ConfigureAwait(false)` in library code
+- Use `ConfigureAwait(false)` in library code (not UI code)
 - Suffix async methods with `Async`
 - Use `ValueTask<T>` for hot paths when appropriate
+- **Always** provide `CancellationToken` parameters for async operations
 
 ```csharp
-// ✅ Good
-public async Task<List<Order>> GetOrdersAsync(CancellationToken ct = default)
+// ✅ Good - Proper async pattern with cancellation
+public async Task<List<Order>> GetOrdersAsync(CancellationToken cancellationToken = default)
 {
+    using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+    cts.CancelAfter(TimeSpan.FromSeconds(30));
+
     return await _httpClient
-        .GetFromJsonAsync<List<Order>>("/api/orders", ct)
+        .GetFromJsonAsync<List<Order>>("/api/orders", cts.Token)
         .ConfigureAwait(false);
+}
+
+// ❌ Bad - No cancellation support
+public async Task<List<Order>> GetOrdersAsync()
+{
+    return await _httpClient.GetFromJsonAsync<List<Order>>("/api/orders");
 }
 ```
 
-#### Dependency Injection
+#### Dependency Injection (Avalonia-specific)
+- Register services in `Program.cs` using the `AppBuilder`
 - Use constructor injection
-- Register services in `Program.cs` or startup
 - Use interfaces for testability
 
 ```csharp
-// ✅ Good
-public class OrderService : IOrderService
+// ✅ Good - Program.cs with DI setup
+public static AppBuilder BuildAvaloniaApp()
 {
-    private readonly IHttpClient _httpClient;
-    private readonly ILogger<OrderService> _logger;
-    
-    public OrderService(IHttpClient httpClient, ILogger<OrderService> logger)
-    {
-        _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    return AppBuilder.Configure<App>()
+        .UsePlatformDetect()
+        .LogToTrace()
+        .WithInterFont()
+        .ConfigureServices(services =>
+        {
+            // Register ViewModels
+            services.AddTransient<MainViewModel>();
+            services.AddTransient<SettingsViewModel>();
+
+            // Register Services
+            services.AddSingleton<IOrderService, OrderService>();
+            services.AddSingleton<ILogger<OrderService>>(
+                LoggerFactory.Create(b => b.AddSerilog()).CreateLogger<OrderService>()
+            );
+        });
 }
 ```
 
 #### Error Handling with Polly
 - Use retry policies for transient failures
 - Use circuit breakers for cascading failures
-- Log all retry attempts
+- Log all retry attempts with Serilog
 
 ```csharp
 // ✅ Good
-private static readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy = 
+private static readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy =
     Policy<HttpResponseMessage>
         .Handle<HttpRequestException>()
         .OrResult(r => !r.IsSuccessStatusCode)
-        .WaitAndRetryAsync(3, retryAttempt => 
-            TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+        .WaitAndRetryAsync(
+            retryCount: 3,
+            sleepDurationProvider: retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
+            onRetry: (outcome, timespan, retryCount, context) =>
+            {
+                Log.Warning("Retry {RetryCount} after {Delay}ms", retryCount, timespan.TotalMilliseconds);
+            });
 ```
 
-#### Logging with Serilog
+#### Logging with Serilog (Avalonia Context)
 - Use structured logging
-- Use log levels appropriately
+- Log to file and console for desktop apps
 - Include correlation IDs for distributed tracing
 
 ```csharp
-// ✅ Good
+// ✅ Good - Serilog configuration for Avalonia
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.File("logs/app-.txt", rollingInterval: RollingInterval.Day)
+    .Enrich.FromLogContext()
+    .Enrich.WithProperty("Application", "MTM_Avalonia_Template")
+    .CreateLogger();
+
 _logger.LogInformation(
-    "Processing order {OrderId} for customer {CustomerId}", 
-    orderId, 
+    "Processing order {OrderId} for customer {CustomerId}",
+    orderId,
     customerId
 );
-
-// ❌ Bad
-_logger.LogInformation($"Processing order {orderId}");
 ```
 
 #### Validation with FluentValidation
@@ -243,10 +338,14 @@ public class OrderValidator : AbstractValidator<Order>
         RuleFor(x => x.OrderId)
             .NotEmpty()
             .WithMessage("Order ID is required");
-            
+
         RuleFor(x => x.Amount)
             .GreaterThan(0)
             .WithMessage("Amount must be positive");
+
+        RuleFor(x => x.CustomerEmail)
+            .EmailAddress()
+            .WithMessage("Valid email required");
     }
 }
 ```
@@ -256,27 +355,86 @@ public class OrderValidator : AbstractValidator<Order>
 - Use transactions for multi-step operations
 - Close connections properly (use `using` statements)
 - Connection strings stored in OS-native credential storage
+- Use async methods: `OpenAsync()`, `ExecuteReaderAsync()`, etc.
 
 ```csharp
 // ✅ Good
-using var connection = new MySqlConnection(_connectionString);
-await connection.OpenAsync();
+await using var connection = new MySqlConnection(_connectionString);
+await connection.OpenAsync(cancellationToken);
 
-using var command = new MySqlCommand(
-    "SELECT * FROM orders WHERE customer_id = @customerId", 
+await using var command = new MySqlCommand(
+    "SELECT * FROM orders WHERE customer_id = @customerId",
     connection
 );
 command.Parameters.AddWithValue("@customerId", customerId);
+
+await using var reader = await command.ExecuteReaderAsync(cancellationToken);
 ```
 
 ### Testing Standards
-- Unit tests for business logic
+- Unit tests for business logic and ViewModels
 - Integration tests for API/database operations
-- Use xUnit or NUnit
-- Mock external dependencies with Moq or NSubstitute
+- Use **xUnit** (recommended for .NET)
+- Mock external dependencies with **NSubstitute** or Moq
 - Aim for >80% code coverage on critical paths
+- Test ViewModels without UI dependencies
+
+```csharp
+// ✅ Good - ViewModel unit test
+public class MainViewModelTests
+{
+    [Fact]
+    public async Task LoadDataCommand_ShouldSetIsLoading()
+    {
+        // Arrange
+        var mockService = Substitute.For<IDataService>();
+        var viewModel = new MainViewModel(mockService);
+
+        // Act
+        await viewModel.LoadDataCommand.ExecuteAsync(null);
+
+        // Assert
+        Assert.False(viewModel.IsLoading); // Should be false after completion
+    }
+}
+```
+
+## Avalonia-Specific Best Practices
+
+### Performance Optimization
+- Use `VirtualizingStackPanel` for large lists
+- Use `ItemsRepeater` for custom virtualization
+- Avoid binding to complex properties in tight loops
+- Use `x:CompileBindings` for compile-time validation and performance
+
+### Cross-Platform Considerations
+- Test on Windows, Linux, and macOS
+- Use `RuntimeInformation.IsOSPlatform()` for platform-specific code
+- Use Avalonia's platform abstractions (don't P/Invoke directly)
+
+```csharp
+// ✅ Good - Platform detection
+if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+{
+    // Windows-specific code
+}
+else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+{
+    // Linux-specific code
+}
+```
+
+### Avalonia Community Packages
+Consider using these vetted packages:
+- `Avalonia.Controls.DataGrid` - Official DataGrid control
+- `Avalonia.Controls.TreeDataGrid` - TreeView + DataGrid hybrid
+- `AvaloniaEdit` - Code/text editor control
+- `Avalonia.Xaml.Behaviors` - Behaviors library (like WPF)
+- `Material.Avalonia` or `Citrus.Avalonia` - Material/Fluent themes
 
 ## Recent Changes
+- **2025-10-03**: Added Avalonia-specific best practices from AvaloniaUI organization
+- **2025-10-03**: Corrected XAML binding syntax to use `CompiledBinding` with `x:DataType`
 - **2025-10-03**: Enhanced Copilot instructions with spec-kit integration
 - **001-boot-sequence-splash**: Added full observability stack (Serilog, OpenTelemetry)
 - **001-boot-sequence-splash**: Added resilience patterns (Polly)
@@ -288,11 +446,12 @@ command.Parameters.AddWithValue("@customerId", customerId);
 - Implement connection pooling for MySQL
 - Use `IMemoryCache` for frequently accessed data
 - Profile with dotMemory/dotTrace before optimizing
+- Use CompiledBinding (not ReflectionBinding) for best XAML performance
 
 ## Security Guidelines
 - Store credentials in OS-native storage (Windows Credential Manager, macOS Keychain, Linux Secret Service)
 - Never log sensitive data (passwords, tokens, PII)
-- Validate all user inputs
+- Validate all user inputs with FluentValidation
 - Use HTTPS for all external API calls
 - Implement rate limiting for API endpoints
 
@@ -302,19 +461,23 @@ command.Parameters.AddWithValue("@customerId", customerId);
 3. Run appropriate spec-kit command (`/specify`, `/plan`, etc.)
 4. Parse JSON output from scripts before using file paths
 5. Follow MVVM pattern: Model → ViewModel → View
-6. Write tests before implementation (TDD)
-7. Update this file if new technologies are introduced
+6. **Always use `x:DataType` and `CompiledBinding` in XAML**
+7. Write tests before implementation (TDD)
+8. Update this file if new technologies are introduced
 
 ## Common Pitfalls to Avoid
-- Don't use `!` null-forgiving operator without clear justification
-- Don't mix UI logic in ViewModels (keep ViewModels testable)
-- Don't use string concatenation for SQL (use parameterized queries)
-- Don't ignore cancellation tokens in async methods
-- Don't catch generic `Exception` without rethrowing or logging
-- Don't block async code with `.Result` or `.Wait()`
+- ❌ Don't use `!` null-forgiving operator without clear justification
+- ❌ Don't mix UI logic in ViewModels (keep ViewModels testable)
+- ❌ Don't use string concatenation for SQL (use parameterized queries)
+- ❌ Don't ignore cancellation tokens in async methods
+- ❌ Don't catch generic `Exception` without rethrowing or logging
+- ❌ Don't block async code with `.Result` or `.Wait()`
+- ❌ **Don't use `{Binding}` without `x:CompileBindings`** - always use `{CompiledBinding}`
+- ❌ Don't forget `x:DataType` on root XAML elements
+- ❌ Don't use `ConfigureAwait(false)` in UI code (only in libraries)
 
 <!-- MANUAL ADDITIONS START -->
-## User: John Koll (GitHub UserName: Dorotel)
+## User: John Koll (GitHub Username: Dorotel)
 ## Current Date: 2025-10-03
 
 ## Additional Project Notes
@@ -322,5 +485,7 @@ command.Parameters.AddWithValue("@customerId", customerId);
 - Visual ERP API Toolkit requires read-only access token
 - LZ4 compression ratio target: ~3:1 for cached JSON payloads
 - OpenTelemetry exports to local Jaeger instance (optional)
+- Avalonia version: 11.3+ (ensure latest stable)
+- Use FluentTheme or Material.Avalonia for theming
 
 <!-- MANUAL ADDITIONS END -->
