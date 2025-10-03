@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using MTM_Template_Application.Models.Secrets;
 using Microsoft.Extensions.Logging;
@@ -23,8 +24,9 @@ public class WindowsSecretsService : ISecretsService
         _logger = logger;
     }
 
-    public Task StoreSecretAsync(string key, string value)
+    public Task StoreSecretAsync(string key, string value, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(value);
 
@@ -66,8 +68,9 @@ public class WindowsSecretsService : ISecretsService
         }
     }
 
-    public Task<string?> RetrieveSecretAsync(string key)
+    public Task<string?> RetrieveSecretAsync(string key, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(key);
 
         try
@@ -101,8 +104,9 @@ public class WindowsSecretsService : ISecretsService
         }
     }
 
-    public Task DeleteSecretAsync(string key)
+    public Task DeleteSecretAsync(string key, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(key);
 
         try
@@ -118,8 +122,9 @@ public class WindowsSecretsService : ISecretsService
         }
     }
 
-    public Task RotateSecretAsync(string key, string newValue)
+    public Task RotateSecretAsync(string key, string newValue, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(newValue);
 
