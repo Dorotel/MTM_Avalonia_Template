@@ -40,51 +40,51 @@
 **All models support TDD - create before tests reference them**
 
 ### Boot Orchestration Models (3 entities)
-- [ ] T016 [P] BootMetrics model in MTM_Template_Application/Models/Boot/BootMetrics.cs (TotalDurationMs, StageMetrics[], MemoryUsageMB, ServicesInitialized, ErrorsEncountered)
-- [ ] T017 [P] StageMetrics model in MTM_Template_Application/Models/Boot/StageMetrics.cs (StageNumber, Name, StartTimeUtc, DurationMs, Status, ServicesStarted[], Errors[])
-- [ ] T018 [P] ServiceMetrics model in MTM_Template_Application/Models/Boot/ServiceMetrics.cs (ServiceName, StartTimeUtc, DurationMs, InitializationStatus, Dependencies[], ErrorMessage?)
+- [x] T016 [P] BootMetrics model in MTM_Template_Application/Models/Boot/BootMetrics.cs (TotalDurationMs, StageMetrics[], MemoryUsageMB, ServicesInitialized, ErrorsEncountered)
+- [x] T017 [P] StageMetrics model in MTM_Template_Application/Models/Boot/StageMetrics.cs (StageNumber, Name, StartTimeUtc, DurationMs, Status, ServicesStarted[], Errors[])
+- [x] T018 [P] ServiceMetrics model in MTM_Template_Application/Models/Boot/ServiceMetrics.cs (ServiceName, StartTimeUtc, DurationMs, InitializationStatus, Dependencies[], ErrorMessage?)
 
 ### Configuration Models (3 entities)
-- [ ] T019 [P] ConfigurationProfile model in MTM_Template_Application/Models/Configuration/ConfigurationProfile.cs (ProfileName, IsActive, Settings[], FeatureFlags[], LastModifiedUtc)
-- [ ] T020 [P] ConfigurationSetting model in MTM_Template_Application/Models/Configuration/ConfigurationSetting.cs (Key, Value, Source, Precedence, IsEncrypted)
-- [ ] T021 [P] FeatureFlag model in MTM_Template_Application/Models/Configuration/FeatureFlag.cs (Name, IsEnabled, Environment, RolloutPercentage, EvaluatedAt)
+- [x] T019 [P] ConfigurationProfile model in MTM_Template_Application/Models/Configuration/ConfigurationProfile.cs (ProfileName, IsActive, Settings[], FeatureFlags[], LastModifiedUtc)
+- [x] T020 [P] ConfigurationSetting model in MTM_Template_Application/Models/Configuration/ConfigurationSetting.cs (Key, Value, Source, Precedence, IsEncrypted)
+- [x] T021 [P] FeatureFlag model in MTM_Template_Application/Models/Configuration/FeatureFlag.cs (Name, IsEnabled, Environment, RolloutPercentage, EvaluatedAt)
 
 ### Secrets Models (1 entity)
-- [ ] T022 [P] SecretEntry model in MTM_Template_Application/Models/Secrets/SecretEntry.cs (Key, EncryptedValue, CreatedUtc, LastAccessedUtc, ExpiresAtUtc?, Metadata)
+- [x] T022 [P] SecretEntry model in MTM_Template_Application/Models/Secrets/SecretEntry.cs (Key, EncryptedValue, CreatedUtc, LastAccessedUtc, ExpiresAtUtc?, Metadata)
 
 ### Logging Models (2 entities)
-- [ ] T023 [P] LogEntry model in MTM_Template_Application/Models/Logging/LogEntry.cs (Timestamp, Level, Message, TraceId, SpanId, Attributes, Resource, Scope) - OpenTelemetry format
-- [ ] T024 [P] TelemetryBatch model in MTM_Template_Application/Models/Logging/TelemetryBatch.cs (BatchId, Entries[], CreatedUtc, Status)
+- [x] T023 [P] LogEntry model in MTM_Template_Application/Models/Logging/LogEntry.cs (Timestamp, Level, Message, TraceId, SpanId, Attributes, Resource, Scope) - OpenTelemetry format
+- [x] T024 [P] TelemetryBatch model in MTM_Template_Application/Models/Logging/TelemetryBatch.cs (BatchId, Entries[], CreatedUtc, Status)
 
 ### Diagnostics Models (3 entities)
-- [ ] T025 [P] DiagnosticResult model in MTM_Template_Application/Models/Diagnostics/DiagnosticResult.cs (CheckName, Status, Message, Details, Timestamp, DurationMs)
-- [ ] T026 [P] HardwareCapabilities model in MTM_Template_Application/Models/Diagnostics/HardwareCapabilities.cs (TotalMemoryMB, AvailableMemoryMB, ProcessorCount, Platform, ScreenResolution, HasCamera, HasBarcodeScanner)
-- [ ] T027 [P] DiagnosticIssue model in MTM_Template_Application/Models/Diagnostics/DiagnosticIssue.cs (Severity, Category, Description, ResolutionSteps[], DetectedAt)
+- [x] T025 [P] DiagnosticResult model in MTM_Template_Application/Models/Diagnostics/DiagnosticResult.cs (CheckName, Status, Message, Details, Timestamp, DurationMs)
+- [x] T026 [P] HardwareCapabilities model in MTM_Template_Application/Models/Diagnostics/HardwareCapabilities.cs (TotalMemoryMB, AvailableMemoryMB, ProcessorCount, Platform, ScreenResolution, HasCamera, HasBarcodeScanner)
+- [x] T027 [P] DiagnosticIssue model in MTM_Template_Application/Models/Diagnostics/DiagnosticIssue.cs (Severity, Category, Description, ResolutionSteps[], DetectedAt)
 
 ### Data Layer Models (2 entities)
-- [ ] T028 [P] ConnectionPoolMetrics model in MTM_Template_Application/Models/DataLayer/ConnectionPoolMetrics.cs (PoolName, ActiveConnections, IdleConnections, MaxPoolSize, AverageAcquireTimeMs, WaitingRequests)
-- [ ] T029 [P] CircuitBreakerState model in MTM_Template_Application/Models/DataLayer/CircuitBreakerState.cs (ServiceName, State, FailureCount, LastFailureUtc, NextRetryUtc, OpenedAt?)
+- [x] T028 [P] ConnectionPoolMetrics model in MTM_Template_Application/Models/DataLayer/ConnectionPoolMetrics.cs (PoolName, ActiveConnections, IdleConnections, MaxPoolSize, AverageAcquireTimeMs, WaitingRequests)
+- [x] T029 [P] CircuitBreakerState model in MTM_Template_Application/Models/DataLayer/CircuitBreakerState.cs (ServiceName, State, FailureCount, LastFailureUtc, NextRetryUtc, OpenedAt?)
 
 ### Cache Models (2 entities)
-- [ ] T030 [P] CacheEntry model in MTM_Template_Application/Models/Cache/CacheEntry.cs (Key, CompressedValue, UncompressedSizeBytes, CreatedUtc, ExpiresAtUtc, LastAccessedUtc, AccessCount, EntityType)
-- [ ] T031 [P] CacheStatistics model in MTM_Template_Application/Models/Cache/CacheStatistics.cs (TotalEntries, HitCount, MissCount, HitRate, TotalSizeBytes, CompressionRatio, EvictionCount)
+- [x] T030 [P] CacheEntry model in MTM_Template_Application/Models/Cache/CacheEntry.cs (Key, CompressedValue, UncompressedSizeBytes, CreatedUtc, ExpiresAtUtc, LastAccessedUtc, AccessCount, EntityType)
+- [x] T031 [P] CacheStatistics model in MTM_Template_Application/Models/Cache/CacheStatistics.cs (TotalEntries, HitCount, MissCount, HitRate, TotalSizeBytes, CompressionRatio, EvictionCount)
 
 ### Core Services Models (2 entities)
-- [ ] T032 [P] MessageEnvelope model in MTM_Template_Application/Models/Core/MessageEnvelope.cs (MessageId, Type, Payload, Timestamp, CorrelationId, DeliveryCount, ExpiresAt?)
-- [ ] T033 [P] ValidationRuleMetadata model in MTM_Template_Application/Models/Core/ValidationRuleMetadata.cs (RuleName, PropertyName, Severity, ErrorMessage, ValidatorType)
+- [x] T032 [P] MessageEnvelope model in MTM_Template_Application/Models/Core/MessageEnvelope.cs (MessageId, Type, Payload, Timestamp, CorrelationId, DeliveryCount, ExpiresAt?)
+- [x] T033 [P] ValidationRuleMetadata model in MTM_Template_Application/Models/Core/ValidationRuleMetadata.cs (RuleName, PropertyName, Severity, ErrorMessage, ValidatorType)
 
 ### Localization Models (2 entities)
-- [ ] T034 [P] LocalizationSetting model in MTM_Template_Application/Models/Localization/LocalizationSetting.cs (Culture, IsActive, FallbackCulture, SupportedLanguages[], DateFormat, NumberFormat)
-- [ ] T035 [P] MissingTranslation model in MTM_Template_Application/Models/Localization/MissingTranslation.cs (Key, Culture, FallbackValue, ReportedAt, Frequency)
+- [x] T034 [P] LocalizationSetting model in MTM_Template_Application/Models/Localization/LocalizationSetting.cs (Culture, IsActive, FallbackCulture, SupportedLanguages[], DateFormat, NumberFormat)
+- [x] T035 [P] MissingTranslation model in MTM_Template_Application/Models/Localization/MissingTranslation.cs (Key, Culture, FallbackValue, ReportedAt, Frequency)
 
 ### Theme Models (1 entity)
-- [ ] T036 [P] ThemeConfiguration model in MTM_Template_Application/Models/Theme/ThemeConfiguration.cs (ThemeMode, IsDarkMode, AccentColor, FontSize, HighContrast, LastChangedUtc)
+- [x] T036 [P] ThemeConfiguration model in MTM_Template_Application/Models/Theme/ThemeConfiguration.cs (ThemeMode, IsDarkMode, AccentColor, FontSize, HighContrast, LastChangedUtc)
 
 ### Navigation Models (1 entity)
-- [ ] T037 [P] NavigationHistoryEntry model in MTM_Template_Application/Models/Navigation/NavigationHistoryEntry.cs (ViewName, NavigatedAtUtc, Parameters, CanGoBack, CanGoForward)
+- [x] T037 [P] NavigationHistoryEntry model in MTM_Template_Application/Models/Navigation/NavigationHistoryEntry.cs (ViewName, NavigatedAtUtc, Parameters, CanGoBack, CanGoForward)
 
 ### Error Handling Models (1 entity)
-- [ ] T038 [P] ErrorReport model in MTM_Template_Application/Models/ErrorHandling/ErrorReport.cs (ErrorId, Message, StackTrace, Severity, Category, OccurredAt, DiagnosticBundle?)
+- [x] T038 [P] ErrorReport model in MTM_Template_Application/Models/ErrorHandling/ErrorReport.cs (ErrorId, Message, StackTrace, Severity, Category, OccurredAt, DiagnosticBundle?)
 
 ---
 
