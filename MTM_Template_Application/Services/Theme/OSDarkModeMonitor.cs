@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Threading;
 
 namespace MTM_Template_Application.Services.Theme;
@@ -18,7 +20,7 @@ public class OSDarkModeMonitor : IDisposable
     public OSDarkModeMonitor(TimeSpan? pollingInterval = null)
     {
         _lastKnownDarkMode = IsOSDarkMode();
-        
+
         // Poll for changes (OS doesn't always provide real-time notifications)
         var interval = pollingInterval ?? TimeSpan.FromSeconds(5);
         _pollingTimer = new Timer(CheckForChanges, null, interval, interval);
@@ -61,13 +63,16 @@ public class OSDarkModeMonitor : IDisposable
         }
     }
 
+    [SupportedOSPlatform("windows")]
+    [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Method is only called when running on Windows platform")]
     private bool IsWindowsDarkMode()
     {
+#pragma warning disable CA1416 // Validate platform compatibility
         try
         {
             using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
                 @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
-            
+
             var value = key?.GetValue("AppsUseLightTheme");
             return value is int intValue && intValue == 0;
         }
@@ -75,6 +80,7 @@ public class OSDarkModeMonitor : IDisposable
         {
             return false;
         }
+#pragma warning restore CA1416
     }
 
     private bool IsMacOSDarkMode()

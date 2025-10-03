@@ -1,6 +1,9 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
+
+#pragma warning disable CA1416 // Validate platform compatibility
 
 namespace MTM_Template_Application.Services.Secrets;
 
@@ -9,6 +12,7 @@ namespace MTM_Template_Application.Services.Secrets;
 /// </summary>
 public class SecretsServiceFactory
 {
+    [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Runtime check for Android platform is performed before instantiation")]
     public static ISecretsService Create(ILoggerFactory loggerFactory)
     {
         ArgumentNullException.ThrowIfNull(loggerFactory);

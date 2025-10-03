@@ -1,7 +1,8 @@
 using System;
-using System.Threading;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MTM_Template_Application.Models.Cache;
 
@@ -26,21 +27,25 @@ public class CacheStalenessDetector
     /// <summary>
     /// Detect all stale cache entries
     /// </summary>
-    public async Task<List<StaleEntry>> DetectStaleEntriesAsync()
+#pragma warning disable CS1998 // Async method lacks 'await' operators
+    public Task<List<StaleEntry>> DetectStaleEntriesAsync()
+#pragma warning restore CS1998
     {
         var staleEntries = new List<StaleEntry>();
         var now = DateTimeOffset.UtcNow;
 
         // Get all cache entries (in a real implementation, this would use internal cache access)
         // For now, this is a placeholder that would need access to the cache internals
-        
-        return staleEntries;
+
+        return Task.FromResult(staleEntries);
     }
 
     /// <summary>
     /// Get entries nearing expiration
     /// </summary>
-    public async Task<List<StaleEntry>> GetEntriesNearExpirationAsync()
+#pragma warning disable CS1998 // Async method lacks 'await' operators
+    public Task<List<StaleEntry>> GetEntriesNearExpirationAsync()
+#pragma warning restore CS1998
     {
         var nearExpiration = new List<StaleEntry>();
         var now = DateTimeOffset.UtcNow;
@@ -48,8 +53,8 @@ public class CacheStalenessDetector
 
         // Get all cache entries nearing expiration
         // This would need access to cache internals
-        
-        return nearExpiration;
+
+        return Task.FromResult(nearExpiration);
     }
 
     /// <summary>

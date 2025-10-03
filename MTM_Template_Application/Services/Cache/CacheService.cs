@@ -30,7 +30,7 @@ public class CacheService : ICacheService
     /// <summary>
     /// Get cached item
     /// </summary>
-    public async Task<T?> GetAsync<T>(string key)
+    public Task<T?> GetAsync<T>(string key)
     {
         ArgumentNullException.ThrowIfNull(key);
 
@@ -43,7 +43,7 @@ public class CacheService : ICacheService
                 _cache.TryRemove(key, out _);
                 IncrementMiss();
                 IncrementEviction();
-                return default;
+                return Task.FromResult<T?>(default);
             }
 
             // Update access metrics
@@ -54,17 +54,17 @@ public class CacheService : ICacheService
 
             // Decompress and deserialize
             var json = _compressionHandler.Decompress(entry.CompressedValue);
-            return JsonSerializer.Deserialize<T>(json);
+            return Task.FromResult(JsonSerializer.Deserialize<T>(json));
         }
 
         IncrementMiss();
-        return default;
+        return Task.FromResult<T?>(default);
     }
 
     /// <summary>
     /// Set cached item
     /// </summary>
-    public async Task SetAsync<T>(string key, T value, TimeSpan? expiration = null)
+    public Task SetAsync<T>(string key, T value, TimeSpan? expiration = null)
     {
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(value);
@@ -86,12 +86,13 @@ public class CacheService : ICacheService
         };
 
         _cache[key] = entry;
+        return Task.CompletedTask;
     }
 
     /// <summary>
     /// Remove cached item
     /// </summary>
-    public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
+    public Task RemoveAsync(string key, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(key);
@@ -100,12 +101,13 @@ public class CacheService : ICacheService
         {
             IncrementEviction();
         }
+        return Task.CompletedTask;
     }
 
     /// <summary>
     /// Clear all cached items
     /// </summary>
-    public async Task ClearAsync(CancellationToken cancellationToken = default)
+    public Task ClearAsync(CancellationToken cancellationToken = default)
     {
         var count = _cache.Count;
         _cache.Clear();
@@ -114,6 +116,7 @@ public class CacheService : ICacheService
         {
             _evictionCount += count;
         }
+        return Task.CompletedTask;
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
@@ -23,7 +24,8 @@ public class AndroidSecretsService : ISecretsService
         _logger = logger;
     }
 
-    public async Task StoreSecretAsync(string key, string value, CancellationToken cancellationToken = default)
+    [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Using placeholder implementation - will be replaced with actual Android KeyStore in production")]
+    public Task StoreSecretAsync(string key, string value, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(key);
@@ -55,6 +57,7 @@ public class AndroidSecretsService : ISecretsService
 
             SecretCache.Instance.Store(key, entry);
             _logger.LogInformation("Secret {Key} stored in Android KeyStore", key);
+            return Task.CompletedTask;
         }
         catch (Exception ex)
         {
@@ -63,6 +66,7 @@ public class AndroidSecretsService : ISecretsService
         }
     }
 
+    [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "Using placeholder implementation - will be replaced with actual Android KeyStore in production")]
     public Task<string?> RetrieveSecretAsync(string key, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();

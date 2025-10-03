@@ -16,7 +16,7 @@ public class StorageDiagnostic : IDiagnosticCheck
     private const long MinimumFreeSpaceBytes = 100 * 1024 * 1024; // 100MB minimum
     private const long RecommendedFreeSpaceBytes = 1024 * 1024 * 1024; // 1GB recommended
 
-    public async Task<DiagnosticResult> RunAsync(CancellationToken cancellationToken = default)
+    public Task<DiagnosticResult> RunAsync(CancellationToken cancellationToken = default)
     {
         var stopwatch = Stopwatch.StartNew();
         var details = new Dictionary<string, object>();
@@ -44,7 +44,7 @@ public class StorageDiagnostic : IDiagnosticCheck
             // Determine status
             if (availableSpace < MinimumFreeSpaceBytes)
             {
-                return new DiagnosticResult
+                return Task.FromResult(new DiagnosticResult
                 {
                     CheckName = nameof(StorageDiagnostic),
                     Status = DiagnosticStatus.Failed,
@@ -52,11 +52,11 @@ public class StorageDiagnostic : IDiagnosticCheck
                     Details = details,
                     Timestamp = DateTimeOffset.UtcNow,
                     DurationMs = stopwatch.ElapsedMilliseconds
-                };
+                });
             }
             else if (availableSpace < RecommendedFreeSpaceBytes)
             {
-                return new DiagnosticResult
+                return Task.FromResult(new DiagnosticResult
                 {
                     CheckName = nameof(StorageDiagnostic),
                     Status = DiagnosticStatus.Warning,
@@ -64,11 +64,11 @@ public class StorageDiagnostic : IDiagnosticCheck
                     Details = details,
                     Timestamp = DateTimeOffset.UtcNow,
                     DurationMs = stopwatch.ElapsedMilliseconds
-                };
+                });
             }
             else
             {
-                return new DiagnosticResult
+                return Task.FromResult(new DiagnosticResult
                 {
                     CheckName = nameof(StorageDiagnostic),
                     Status = DiagnosticStatus.Passed,
@@ -76,7 +76,7 @@ public class StorageDiagnostic : IDiagnosticCheck
                     Details = details,
                     Timestamp = DateTimeOffset.UtcNow,
                     DurationMs = stopwatch.ElapsedMilliseconds
-                };
+                });
             }
         }
         catch (Exception ex)
@@ -84,7 +84,7 @@ public class StorageDiagnostic : IDiagnosticCheck
             stopwatch.Stop();
             details["Exception"] = ex.ToString();
 
-            return new DiagnosticResult
+            return Task.FromResult(new DiagnosticResult
             {
                 CheckName = nameof(StorageDiagnostic),
                 Status = DiagnosticStatus.Failed,
@@ -92,7 +92,7 @@ public class StorageDiagnostic : IDiagnosticCheck
                 Details = details,
                 Timestamp = DateTimeOffset.UtcNow,
                 DurationMs = stopwatch.ElapsedMilliseconds
-            };
+            });
         }
     }
 }
