@@ -2,7 +2,6 @@
   // ============================================================================
   // GitHub Copilot Configuration
   // ============================================================================
-  
   "github.copilot.chat.codeGeneration.useInstructionFiles": true,
   "github.copilot.chat.followUps": "off",
   "github.copilot.referencesSearch.enableSearch": true,
@@ -10,7 +9,6 @@
   "github.copilot.chat.scopeSelection": true,
   "github.copilot.editor.enableAutoCompletions": true,
   "github.copilot.chat.search.semanticTextResults": 20,
-  
   "github.copilot.chat.codeGeneration.instructions": [
     {
       "text": "Always check .specify/features/ for existing specs and memory/constitution.md for project principles before generating code."
@@ -28,7 +26,6 @@
       "text": "Spec-kit scripts output JSON. Always parse JSON output before using file paths or branch names."
     }
   ],
-  
   "github.copilot.chat.testGeneration.instructions": [
     {
       "text": "Use xUnit for tests. Mock dependencies with NSubstitute. Test ViewModels without UI dependencies."
@@ -37,41 +34,37 @@
       "text": "Integration tests should use TestContainers for MySQL if available, or in-memory alternatives."
     }
   ],
-  
   "github.copilot.chat.terminal.commandAutoApprove": {
     "/.*/": true,
-    "/[\\s\\S]*/": { "approve": true, "matchCommandLine": true },
+    "/[\\s\\S]*/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
     "/^pwsh(\\.exe)?\\b/i": true,
     "/^powershell(\\.exe)?\\b/i": true,
-    "/\\.ps1\\b/i": { "approve": true, "matchCommandLine": true },
+    "/\\.ps1\\b/i": {
+      "approve": true,
+      "matchCommandLine": true
+    },
     "/^bash\\b/i": true,
     "/^sh\\b/i": true,
-    "/\\.sh\\b/i": { "approve": true, "matchCommandLine": true },
+    "/\\.sh\\b/i": {
+      "approve": true,
+      "matchCommandLine": true
+    },
     "/^dotnet\\b/i": true,
     "/^git\\b/i": true
   },
-  
   // ============================================================================
   // C# / .NET Configuration
   // ============================================================================
-  
   "dotnet.defaultSolution": "MTM_Avalonia_Template.sln",
   "omnisharp.enableRoslynAnalyzers": true,
   "omnisharp.enableEditorConfigSupport": true,
-  "omnisharp.enableImportCompletion": true,
-  "omnisharp.organizeImportsOnFormat": true,
-  
   "csharp.semanticHighlighting.enabled": true,
-  "csharp.inlayHints.parameters.enabled": true,
-  "csharp.inlayHints.parameters.forLiteralParameters": true,
-  "csharp.inlayHints.parameters.forObjectCreationParameters": true,
-  "csharp.inlayHints.types.enabled": true,
-  "csharp.inlayHints.types.forImplicitVariableTypes": true,
-  
   // ============================================================================
   // File Associations & Language Configuration
   // ============================================================================
-  
   "files.associations": {
     "*.axaml": "xml",
     "*.md": "markdown",
@@ -88,14 +81,12 @@
     "**/.specify/features/PLAN_*.md": "markdown",
     "**/.specify/features/TASKS_*.md": "markdown"
   },
-  
   "files.exclude": {
     "**/bin": true,
     "**/obj": true,
     "**/.vs": true,
     "**/.idea": true
   },
-  
   "files.watcherExclude": {
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
@@ -106,18 +97,18 @@
     "**/__pycache__/**": true,
     "**/.specify/features/**": false
   },
-  
   // ============================================================================
   // Editor Configuration
   // ============================================================================
-  
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
     "source.fixAll": "explicit"
   },
-  "editor.rulers": [120],
+  "editor.rulers": [
+    120
+  ],
   "editor.bracketPairColorization.enabled": true,
   "editor.guides.bracketPairs": true,
   "editor.inlineSuggest.enabled": true,
@@ -126,11 +117,9 @@
     "comments": true,
     "strings": true
   },
-  
   // ============================================================================
   // Search Configuration
   // ============================================================================
-  
   "search.exclude": {
     "**/.git": true,
     "**/node_modules": true,
@@ -140,64 +129,57 @@
     "**/__pycache__": true
   },
   "search.useIgnoreFiles": false,
-  
   // ============================================================================
   // Markdown Configuration
   // ============================================================================
-  
   "markdown.extension.toc.levels": "2..6",
   "markdown.validate.enabled": true,
   "markdown.updateLinksOnFileMove.enabled": "always",
-  
   // ============================================================================
   // XML/AXAML Configuration (Avalonia)
   // ============================================================================
-  
   "xml.format.enabled": true,
   "xml.format.splitAttributes": false,
   "xml.format.joinCDATALines": false,
   "xml.format.joinCommentLines": false,
   "xml.format.joinContentLines": false,
   "xml.completion.autoCloseTags": true,
-  
   // ============================================================================
   // Terminal Configuration
   // ============================================================================
-  
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminal.integrated.defaultProfile.linux": "bash",
   "terminal.integrated.defaultProfile.osx": "zsh",
   "terminal.integrated.cwd": "${workspaceFolder}",
-  
   // ============================================================================
   // Git Configuration
   // ============================================================================
-  
   "git.autofetch": true,
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
   "git.suggestSmartCommit": true,
-  
   // ============================================================================
   // Problem Matchers & Diagnostics
   // ============================================================================
-  
   "problems.showCurrentInStatus": true,
   "problems.sortOrder": "severity",
-  
   // ============================================================================
   // Testing Configuration
   // ============================================================================
-  
   "dotnet-test-explorer.testProjectPath": "tests/**/*.csproj",
   "dotnet-test-explorer.enableTelemetry": false,
   "dotnet-test-explorer.runInParallel": true,
-  
   // ============================================================================
   // Performance & Caching
   // ============================================================================
-  
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
-  "files.trimFinalNewlines": true
+  "files.trimFinalNewlines": true,
+  "dotnet.inlayHints.enableInlayHintsForParameters": true,
+  "dotnet.inlayHints.enableInlayHintsForLiteralParameters": true,
+  "dotnet.inlayHints.enableInlayHintsForObjectCreationParameters": true,
+  "csharp.inlayHints.enableInlayHintsForTypes": true,
+  "csharp.inlayHints.enableInlayHintsForImplicitVariableTypes": true,
+  "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
+  "dotnet.formatting.organizeImportsOnFormat": true
 }

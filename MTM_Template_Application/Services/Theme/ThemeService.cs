@@ -54,8 +54,9 @@ public class ThemeService : IThemeService
 
         OnThemeChanged?.Invoke(this, new ThemeChangedEventArgs
         {
-            OldTheme = oldTheme,
-            NewTheme = _currentTheme
+            OldTheme = oldTheme.ThemeMode,
+            NewTheme = _currentTheme.ThemeMode,
+            IsDarkMode = _currentTheme.IsDarkMode
         });
     }
 
@@ -98,8 +99,9 @@ public class ThemeService : IThemeService
 
             OnThemeChanged?.Invoke(this, new ThemeChangedEventArgs
             {
-                OldTheme = oldTheme,
-                NewTheme = _currentTheme
+                OldTheme = oldTheme.ThemeMode,
+                NewTheme = _currentTheme.ThemeMode,
+                IsDarkMode = _currentTheme.IsDarkMode
             });
         }
     }
