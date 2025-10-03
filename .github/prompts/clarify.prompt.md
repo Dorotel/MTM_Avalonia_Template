@@ -76,39 +76,69 @@ Execution steps:
    - Clarification would not materially change implementation or validation strategy
    - Information is better deferred to planning phase (note internally)
 
-3. Generate (internally) a prioritized queue of candidate clarification questions (maximum 5). Do NOT output them all at once. Apply these constraints:
-    - Maximum of 5 total questions across the whole session.
+3. Generate (internally) a prioritized queue of candidate clarification questions (maximum 10). Do NOT output them all at once. Apply these constraints:
+    - Maximum of 10 total questions across the whole session.
     - Each question must be answerable with EITHER:
-       * A short multiple‑choice selection (2–5 distinct, mutually exclusive options), OR
+       * A short multiple‑choice selection (5–10 distinct, mutually exclusive options), OR
        * A one-word / short‑phrase answer (explicitly constrain: "Answer in <=5 words").
    - Only include questions whose answers materially impact architecture, data modeling, task decomposition, test design, UX behavior, operational readiness, or compliance validation.
    - Ensure category coverage balance: attempt to cover the highest impact unresolved categories first; avoid asking two low-impact questions when a single high-impact area (e.g., security posture) is unresolved.
    - Exclude questions already answered, trivial stylistic preferences, or plan-level execution details (unless blocking correctness).
    - Favor clarifications that reduce downstream rework risk or prevent misaligned acceptance tests.
    - If more than 5 categories remain unresolved, select the top 5 by (Impact * Uncertainty) heuristic.
+   - **If more than 5 questions are generated**: Instead of posting questions to chat, create a Markdown file at `{FEATURE_DIR}/clarify/outstanding-questions-{YYYY-MM-DD}.md` containing all questions in a structured format (numbered list with options/format for each). Inform the user of the file location and suggest they review it, then re-run `/clarify` after addressing high-priority items in the spec. Exit the clarification loop after file creation.
 
 4. Sequential questioning loop (interactive):
-    - Present EXACTLY ONE question at a time.
-    - For multiple‑choice questions render options as a Markdown table:
+    - **Pre-loop check**: If the prioritized queue contains MORE than 5 questions:
+       * Create directory `{FEATURE_DIR}/clarify/` if it doesn't exist.
+       * Create file `{FEATURE_DIR}/clarify/outstanding-questions-{YYYY-MM-DD}.md` with all questions formatted as:
+         ```markdown
+         # Outstanding Clarification Questions - {YYYY-MM-DD}
 
-       | Option | Description |
-       |--------|-------------|
-       | A | <Option A description> |
-       | B | <Option B description> |
-       | C | <Option C description> | (add D/E as needed up to 5)
-       | Short | Provide a different short answer (<=5 words) | (Include only if free-form alternative is appropriate)
+         Generated from feature specification analysis. Review and address high-priority items, then re-run `/clarify`.
 
-    - For short‑answer style (no meaningful discrete options), output a single line after the question: `Format: Short answer (<=5 words)`.
-    - After the user answers:
-       * Validate the answer maps to one option or fits the <=5 word constraint.
-       * If ambiguous, ask for a quick disambiguation (count still belongs to same question; do not advance).
-       * Once satisfactory, record it in working memory (do not yet write to disk) and move to the next queued question.
-    - Stop asking further questions when:
-       * All critical ambiguities resolved early (remaining queued items become unnecessary), OR
-       * User signals completion ("done", "good", "no more"), OR
-       * You reach 5 asked questions.
-    - Never reveal future queued questions in advance.
-    - If no valid questions exist at start, immediately report no critical ambiguities.
+         ## Questions
+
+         ### Q1: [Category] - [Question text]
+         **Impact**: [High/Medium/Low]
+         **Category**: [Functional Scope/Data Model/etc.]
+
+         [For multiple choice:]
+         | Option | Description |
+         |--------|-------------|
+         | A | ... |
+         | B | ... |
+
+         [For short answer:]
+         Format: Short answer (<=5 words)
+
+         ---
+         [Repeat for each question]
+         ```
+       * Inform user: "Generated {N} clarification questions (exceeds interactive limit of 5). Created file at: {filepath}. Please review and address high-priority questions in the spec, then re-run `/clarify` to continue."
+       * Exit clarification loop (do not ask any questions interactively).
+    - **If 5 or fewer questions**, proceed with interactive loop:
+       * Present EXACTLY ONE question at a time.
+       * For multiple‑choice questions render options as a Markdown table:
+
+          | Option | Description |
+          |--------|-------------|
+          | A | <Option A description> |
+          | B | <Option B description> |
+          | C | <Option C description> | (add D/E as needed up to 5)
+          | Short | Provide a different short answer (<=5 words) | (Include only if free-form alternative is appropriate)
+
+       * For short‑answer style (no meaningful discrete options), output a single line after the question: `Format: Short answer (<=5 words)`.
+       * After the user answers:
+          - Validate the answer maps to one option or fits the <=5 word constraint.
+          - If ambiguous, ask for a quick disambiguation (count still belongs to same question; do not advance).
+          - Once satisfactory, record it in working memory (do not yet write to disk) and move to the next queued question.
+       * Stop asking further questions when:
+          - All critical ambiguities resolved early (remaining queued items become unnecessary), OR
+          - User signals completion ("done", "good", "no more"), OR
+          - You reach 5 asked questions.
+       * Never reveal future queued questions in advance.
+       * If no valid questions exist at start, immediately report no critical ambiguities.
 
 5. Integration after EACH accepted answer (incremental update approach):
     - Maintain in-memory representation of the spec (loaded once at start) plus the raw file contents.
@@ -150,9 +180,10 @@ Behavior rules:
 - If no meaningful ambiguities found (or all potential questions would be low-impact), respond: "No critical ambiguities detected worth formal clarification." and suggest proceeding.
 - If spec file missing, instruct user to run `/specify` first (do not create a new spec here).
 - Never exceed 5 total asked questions (clarification retries for a single question do not count as new questions).
+- If more than 5 questions generated, create the outstanding questions file at `{FEATURE_DIR}/clarify/outstanding-questions-{YYYY-MM-DD}.md` and exit instead of asking interactively.
 - Avoid speculative tech stack questions unless the absence blocks functional clarity.
 - Respect user early termination signals ("stop", "done", "proceed").
- - If no questions asked due to full coverage, output a compact coverage summary (all categories Clear) then suggest advancing.
- - If quota reached with unresolved high-impact categories remaining, explicitly flag them under Deferred with rationale.
+- If no questions asked due to full coverage, output a compact coverage summary (all categories Clear) then suggest advancing.
+- If quota reached with unresolved high-impact categories remaining, explicitly flag them under Deferred with rationale.
 
 Context for prioritization: $ARGUMENTS
