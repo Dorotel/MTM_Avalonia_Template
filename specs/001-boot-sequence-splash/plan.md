@@ -10,14 +10,19 @@ The Boot Sequence feature implements a three-stage initialization system (Stage 
 
 ## Technical Context
 
-**Language/Version**: C# .NET 9.0 with nullable reference types enabled  
-**Primary Dependencies**: Avalonia 11.3+, CommunityToolkit.Mvvm 8.3+, MySQL.Data, HttpClient, Serilog + OpenTelemetry, Polly, AutoMapper, FluentValidation  
-**Storage**: MySQL 5.7 (MAMP), Visual ERP (read-only via API Toolkit), Local cache (LZ4 compressed), OS-native credential storage  
-**Testing**: xUnit, FluentAssertions, NSubstitute, Contract + Integration + Unit tests  
-**Target Platform**: Desktop (Windows/macOS/Linux via Avalonia), Android (warehouse tablets)  
-**Project Type**: Mobile + Desktop (Avalonia cross-platform)  
-**Performance Goals**: Stage 1 <3s, Total boot <10s, Memory <100MB, Network check 5s timeout  
-**Constraints**: Read-only Visual access (API Toolkit only), Android no direct Visual connection, Offline-capable with cached-only mode  
+**Language/Version**: C# .NET 9.0 with nullable reference types enabled
+**Primary Dependencies**: Avalonia 11.3+, CommunityToolkit.Mvvm 8.3+, MySQL.Data, HttpClient, Serilog + OpenTelemetry, Polly, AutoMapper, FluentValidation
+**Storage**: MySQL 5.7 (MAMP), Visual ERP (read-only via API Toolkit), Local cache (LZ4 compressed), OS-native credential storage
+**Testing**: xUnit, FluentAssertions, NSubstitute, Contract + Integration + Unit tests
+**Target Platform**: Desktop (Windows/macOS/Linux via Avalonia), Android (warehouse tablets)
+**Project Type**: Mobile + Desktop (Avalonia cross-platform)
+**Performance Goals**: Stage 1 <3s, Total boot <10s, Memory <100MB, Network check 5s timeout
+**Memory Allocation Budget** (100MB peak during boot):
+  - Initial cache population: ~40MB (compressed with LZ4, Parts + Locations + Warehouses + Work Centers)
+  - Core services: ~30MB (DI container, logging buffers, connection pools, message bus, validation/mapping)
+  - Framework overhead: ~30MB (Avalonia UI, .NET runtime, platform services)
+  - Monitoring: Track actual allocation via T161 performance test with memory profiling
+**Constraints**: Read-only Visual access (API Toolkit only), Android no direct Visual connection, Offline-capable with cached-only mode
 **Scale/Scope**: 160 functional requirements, 13 subsystems, 12+ core services, 23 entities, 4 cached entity types
 
 ## Constitution Check ✅ PASS
@@ -75,7 +80,7 @@ specs/001-boot-sequence-splash/
 MTM_Template_Application/           # Shared Avalonia application
 ├── Services/
 │   ├── Boot/                       # Boot orchestration services
-│   ├── Configuration/              # Configuration management  
+│   ├── Configuration/              # Configuration management
 │   ├── Secrets/                    # Credential management (OS-native)
 │   ├── Logging/                    # Structured logging (OpenTelemetry)
 │   ├── Diagnostics/                # System health checks
@@ -286,11 +291,15 @@ Based on Phase 1 artifacts, tasks will include:
 
 - Infrastructure: ~15 tasks
 - Entity models: ~23 tasks (from data-model.md)
-- Service interfaces: ~15 tasks
-- Service implementations: ~25 tasks
-- Testing: ~50 tasks (contract + integration + unit)
-- UI: ~10 tasks
-- **Total: ~138 tasks** (updated after entity count correction)
+- Service interfaces: ~16 tasks
+- Service implementations: ~59 tasks
+- Testing: ~24 tasks (contract + integration + unit tests)
+- UI: ~4 tasks
+- Platform: ~5 tasks
+- Error handling: ~4 tasks
+- Unit tests: ~21 tasks
+- Polish: ~13 tasks
+- **Total: 171 tasks** (final count from tasks.md)
 
 ### Parallelization Opportunities
 
@@ -349,5 +358,5 @@ Tasks marked [P] can be executed in parallel:
 
 ---
 
-*Based on Constitution v1.0.0 - See `.specify/memory/constitution.md`*  
+*Based on Constitution v1.0.0 - See `.specify/memory/constitution.md`*
 *Plan complete. Ready for `/tasks` command execution.*

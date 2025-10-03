@@ -4,10 +4,12 @@
 **Prerequisites**: plan.md ✅, research.md ✅, data-model.md ✅, quickstart.md ✅, how-to-use.md ✅
 
 ## Format: `[ID] [P?] Description`
+
 - **[P]**: Can run in parallel (different files, no dependencies)
 - Include exact file paths in descriptions
 
 ## Path Conventions
+
 - **Shared project**: `MTM_Template_Application/` (Avalonia cross-platform)
 - **Desktop entry**: `MTM_Template_Application.Desktop/`
 - **Android entry**: `MTM_Template_Application.Android/`
@@ -37,53 +39,70 @@
 
 ## Phase 3.2: Entity Models (Data Model from data-model.md) ⚠️ FOUNDATION
 
-**All models support TDD - create before tests reference them**
+### All models support TDD - create before tests reference them
 
 ### Boot Orchestration Models (3 entities)
+
 - [x] T016 [P] BootMetrics model in MTM_Template_Application/Models/Boot/BootMetrics.cs (TotalDurationMs, StageMetrics[], MemoryUsageMB, ServicesInitialized, ErrorsEncountered)
 - [x] T017 [P] StageMetrics model in MTM_Template_Application/Models/Boot/StageMetrics.cs (StageNumber, Name, StartTimeUtc, DurationMs, Status, ServicesStarted[], Errors[])
+
 - [x] T018 [P] ServiceMetrics model in MTM_Template_Application/Models/Boot/ServiceMetrics.cs (ServiceName, StartTimeUtc, DurationMs, InitializationStatus, Dependencies[], ErrorMessage?)
 
 ### Configuration Models (3 entities)
+
 - [x] T019 [P] ConfigurationProfile model in MTM_Template_Application/Models/Configuration/ConfigurationProfile.cs (ProfileName, IsActive, Settings[], FeatureFlags[], LastModifiedUtc)
+
 - [x] T020 [P] ConfigurationSetting model in MTM_Template_Application/Models/Configuration/ConfigurationSetting.cs (Key, Value, Source, Precedence, IsEncrypted)
 - [x] T021 [P] FeatureFlag model in MTM_Template_Application/Models/Configuration/FeatureFlag.cs (Name, IsEnabled, Environment, RolloutPercentage, EvaluatedAt)
 
 ### Secrets Models (1 entity)
+
 - [x] T022 [P] SecretEntry model in MTM_Template_Application/Models/Secrets/SecretEntry.cs (Key, EncryptedValue, CreatedUtc, LastAccessedUtc, ExpiresAtUtc?, Metadata)
 
 ### Logging Models (2 entities)
+
 - [x] T023 [P] LogEntry model in MTM_Template_Application/Models/Logging/LogEntry.cs (Timestamp, Level, Message, TraceId, SpanId, Attributes, Resource, Scope) - OpenTelemetry format
 - [x] T024 [P] TelemetryBatch model in MTM_Template_Application/Models/Logging/TelemetryBatch.cs (BatchId, Entries[], CreatedUtc, Status)
 
 ### Diagnostics Models (3 entities)
+
 - [x] T025 [P] DiagnosticResult model in MTM_Template_Application/Models/Diagnostics/DiagnosticResult.cs (CheckName, Status, Message, Details, Timestamp, DurationMs)
 - [x] T026 [P] HardwareCapabilities model in MTM_Template_Application/Models/Diagnostics/HardwareCapabilities.cs (TotalMemoryMB, AvailableMemoryMB, ProcessorCount, Platform, ScreenResolution, HasCamera, HasBarcodeScanner)
+
 - [x] T027 [P] DiagnosticIssue model in MTM_Template_Application/Models/Diagnostics/DiagnosticIssue.cs (Severity, Category, Description, ResolutionSteps[], DetectedAt)
 
 ### Data Layer Models (2 entities)
+
 - [x] T028 [P] ConnectionPoolMetrics model in MTM_Template_Application/Models/DataLayer/ConnectionPoolMetrics.cs (PoolName, ActiveConnections, IdleConnections, MaxPoolSize, AverageAcquireTimeMs, WaitingRequests)
+
 - [x] T029 [P] CircuitBreakerState model in MTM_Template_Application/Models/DataLayer/CircuitBreakerState.cs (ServiceName, State, FailureCount, LastFailureUtc, NextRetryUtc, OpenedAt?)
 
 ### Cache Models (2 entities)
+
 - [x] T030 [P] CacheEntry model in MTM_Template_Application/Models/Cache/CacheEntry.cs (Key, CompressedValue, UncompressedSizeBytes, CreatedUtc, ExpiresAtUtc, LastAccessedUtc, AccessCount, EntityType)
 - [x] T031 [P] CacheStatistics model in MTM_Template_Application/Models/Cache/CacheStatistics.cs (TotalEntries, HitCount, MissCount, HitRate, TotalSizeBytes, CompressionRatio, EvictionCount)
 
 ### Core Services Models (2 entities)
+
 - [x] T032 [P] MessageEnvelope model in MTM_Template_Application/Models/Core/MessageEnvelope.cs (MessageId, Type, Payload, Timestamp, CorrelationId, DeliveryCount, ExpiresAt?)
+
 - [x] T033 [P] ValidationRuleMetadata model in MTM_Template_Application/Models/Core/ValidationRuleMetadata.cs (RuleName, PropertyName, Severity, ErrorMessage, ValidatorType)
 
 ### Localization Models (2 entities)
+
 - [x] T034 [P] LocalizationSetting model in MTM_Template_Application/Models/Localization/LocalizationSetting.cs (Culture, IsActive, FallbackCulture, SupportedLanguages[], DateFormat, NumberFormat)
 - [x] T035 [P] MissingTranslation model in MTM_Template_Application/Models/Localization/MissingTranslation.cs (Key, Culture, FallbackValue, ReportedAt, Frequency)
 
 ### Theme Models (1 entity)
+
 - [x] T036 [P] ThemeConfiguration model in MTM_Template_Application/Models/Theme/ThemeConfiguration.cs (ThemeMode, IsDarkMode, AccentColor, FontSize, HighContrast, LastChangedUtc)
 
 ### Navigation Models (1 entity)
+
 - [x] T037 [P] NavigationHistoryEntry model in MTM_Template_Application/Models/Navigation/NavigationHistoryEntry.cs (ViewName, NavigatedAtUtc, Parameters, CanGoBack, CanGoForward)
 
 ### Error Handling Models (1 entity)
+
 - [x] T038 [P] ErrorReport model in MTM_Template_Application/Models/ErrorHandling/ErrorReport.cs (ErrorId, Message, StackTrace, Severity, Category, OccurredAt, DiagnosticBundle?)
 
 ---
@@ -138,6 +157,7 @@
 ### Contract Tests (API Validation)
 
 - [x] T072 [P] Contract test: Visual API Toolkit whitelist validation in tests/contract/VisualApiContractTests.cs - Validate only whitelisted commands accepted (see visual-whitelist.md)
+- [ ] T072A [P] Integration test: Boot cancellation during Stage 1 in tests/integration/BootSequenceTests.cs - Validate cancellation support (FR-009, FR-122): initiate boot sequence, invoke cancel during Stage 1 service initialization, verify CancellationToken propagated to all async operations, confirm resources released (connections closed, temp files cleaned), validate clean exit without exceptions, verify boot metrics recorded cancellation event
 - [x] T073 [P] Contract test: Visual API Toolkit authentication in tests/contract/VisualApiContractTests.cs - Validate device certificate + user credentials (Android)
 - [x] T074 [P] Contract test: Visual API Toolkit schema dictionary in tests/contract/VisualApiContractTests.cs - Validate table/column name resolution
 - [x] T075 [P] Contract test: HTTP API endpoint availability in tests/contract/HttpApiContractTests.cs - Validate Android HTTP API endpoints respond
@@ -171,7 +191,7 @@
 
 ### Diagnostics Service Implementation
 
-- [x] T089 DiagnosticsService implementation in MTM_Template_Application/Services/Diagnostics/DiagnosticsService.cs - Orchestrate all diagnostic checks
+- [x] T089A DiagnosticsService implementation in MTM_Template_Application/Services/Diagnostics/DiagnosticsService.cs - Orchestrate all diagnostic checks
 - [x] T090 [P] StorageDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/StorageDiagnostic.cs - Verify storage availability, free space
 - [x] T091 [P] PermissionsDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/PermissionsDiagnostic.cs - Verify file system, camera, network permissions
 - [x] T092 [P] NetworkDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/NetworkDiagnostic.cs - Verify network connectivity (5s timeout)
@@ -281,6 +301,7 @@
 - [ ] T152 [P] Unit tests for MappingService in tests/unit/MappingServiceTests.cs - Test AutoMapper integration, profile discovery
 - [ ] T153 [P] Unit tests for LocalizationService in tests/unit/LocalizationServiceTests.cs - Test culture switching, missing translations, fallback
 - [ ] T154 [P] Unit tests for ThemeService in tests/unit/ThemeServiceTests.cs - Test theme switching, OS dark mode detection
+
 - [ ] T155 [P] Unit tests for NavigationService in tests/unit/NavigationServiceTests.cs - Test navigation stack, history, deep linking, unsaved changes guard
 - [ ] T156 [P] Unit tests for BootOrchestrator in tests/unit/BootOrchestratorTests.cs - Test stage execution, progress calculation, timeout enforcement, error recovery
 - [ ] T157 [P] Unit tests for ExponentialBackoffPolicy in tests/unit/ExponentialBackoffPolicyTests.cs - Test retry delays, jitter, max retries
@@ -292,10 +313,12 @@
 
 - [ ] T159 Performance test: Boot time <10s in tests/integration/PerformanceTests.cs - Measure actual boot time, verify target met
 - [ ] T160 Performance test: Stage 1 <3s in tests/integration/PerformanceTests.cs - Measure Stage 1 duration, verify target met
-- [ ] T161 Performance test: Memory <100MB in tests/integration/PerformanceTests.cs - Measure memory usage during boot, verify target met
+- [ ] T161 Performance test: Memory <100MB in tests/integration/PerformanceTests.cs - Measure memory usage during boot, verify target met. Include memory profiling subtasks: (a) measure peak memory at end of each stage, (b) validate allocation breakdown (cache ~40MB compressed, core services ~30MB, framework overhead ~30MB), (c) identify top 10 memory consumers, (d) verify no memory leaks during boot sequence, (e) export memory profile for documentation
 - [ ] T162 Accessibility audit: Screen reader in manual testing - Verify splash screen announcements, progress updates
 - [ ] T163 Accessibility audit: Keyboard navigation in manual testing - Verify splash screen keyboard accessible
+
 - [ ] T164 Accessibility audit: High contrast in manual testing - Verify splash screen visible in high contrast mode
+
 - [ ] T165 Code review: Remove duplication in codebase - Identify and refactor duplicate code
 - [ ] T166 Code review: Null safety audit in codebase - Verify ArgumentNullException.ThrowIfNull usage, nullable annotations
 - [ ] T167 Documentation: Update docs/BOOT-SEQUENCE.md - Document final boot sequence implementation
@@ -309,7 +332,9 @@
 ## Dependencies
 
 ### Critical Path (Sequential)
+
 1. **Setup (T001-T015)** blocks all other tasks
+
 2. **Entity Models (T016-T038)** blocks tests and services that reference them
 3. **Service Interfaces (T039-T054)** blocks service implementations and tests
 4. **Integration Tests (T055-T071)** MUST be written before corresponding implementations
@@ -318,6 +343,7 @@
 7. **Secrets (T082-T085)** blocks services that need credentials
 8. **Logging (T086-T089)** blocks all services (all services log)
 9. **Data Layer (T094-T099)** blocks cache and Visual integration
+
 10. **Cache (T101-T105)** blocks cached-only mode
 11. **Boot Orchestration (T117-T124)** blocks platform entry points
 12. **Splash UI (T125-T128)** blocks platform entry points
@@ -325,6 +351,7 @@
 14. **Polish (T159-T171)** after implementation complete
 
 ### Parallelization Opportunities
+
 - Entity models (T016-T038): All independent, can run in parallel
 - Service interfaces (T039-T054): All independent, can run in parallel
 - Integration tests (T055-T071): Independent scenarios, can run in parallel
@@ -333,28 +360,34 @@
 - Unit tests (T138-T158): Independent services, can run in parallel
 
 ### Dependency Graph (Key Relationships)
+
 ```
 T001-T015 (Setup)
     ↓
 T016-T038 (Models) [P]
     ↓
+
 T039-T054 (Interfaces) [P]
     ↓
 T055-T078 (Tests) [P]
     ↓
 T079-T081 (Configuration)
     ↓
+
 T082-T085 (Secrets) + T086-T089 (Logging) [P]
     ↓
 T090-T093 (Diagnostics) [P] + T094-T099 (DataLayer) + T106-T109 (Core) [P]
     ↓
 T101-T105 (Cache) + T110-T116 (App Services) [P]
+
+
     ↓
 T117-T124 (Boot Orchestration)
     ↓
 T125-T128 (Splash UI) [P]
     ↓
 T129-T133 (Platform Entry) + T134-T137 (Error Handling) [P]
+
     ↓
 T138-T158 (Unit Tests) [P]
     ↓
@@ -366,24 +399,28 @@ T159-T171 (Polish)
 ## Parallel Execution Examples
 
 ### Phase 1: Entity Models (All Parallel)
+
 ```
 Launch T016-T038 together (23 model files, all independent)
 Example: "Create BootMetrics model in MTM_Template_Application/Models/Boot/BootMetrics.cs"
 ```
 
 ### Phase 2: Service Interfaces (All Parallel)
+
 ```
 Launch T039-T054 together (16 interface files, all independent)
 Example: "Create IBootOrchestrator interface in MTM_Template_Application/Services/Boot/IBootOrchestrator.cs"
 ```
 
 ### Phase 3: Integration Tests (All Parallel)
+
 ```
 Launch T055-T071 together (17 test scenarios, all independent)
 Example: "Integration test: Normal boot sequence in tests/integration/BootSequenceTests.cs"
 ```
 
 ### Phase 4: Unit Tests (All Parallel)
+
 ```
 Launch T138-T158 together (21 test suites, all independent)
 Example: "Unit tests for ConfigurationService in tests/unit/ConfigurationServiceTests.cs"
@@ -417,13 +454,16 @@ Example: "Unit tests for ConfigurationService in tests/unit/ConfigurationService
 - **Error handling**: Circuit breakers (5 failures), exponential backoff (1s→16s), diagnostic bundles
 - **Caching**: LZ4 compression, TTLs (Parts 24h, Others 7d), delta sync, staleness detection
 - **Logging**: OpenTelemetry format, structured JSON, PII redaction, 10MB/7 days rotation
-- **Deferred requirements**: FR-132 (admin dashboard) and FR-134 (API docs) are marked POST-MVP/DEFERRED in spec.md and will be addressed in separate feature branches after MVP release. Initial release uses log file review and XML documentation comments.
+- **Deferred requirements**:
+  - **FR-132 (Admin Monitoring Dashboard)**: DEFERRED to post-MVP feature branch `002-admin-dashboard`. Initial release uses log file review for service monitoring. Includes tasks for: service status UI, real-time metrics dashboard, health check aggregation panel, alerting configuration.
+  - **FR-134 (API Documentation Generation)**: DEFERRED to polish phase (Phase 4+). Current approach: XML documentation comments in code + optional DocFX generation. Will be addressed when team size >5 OR external contributors join. Includes tasks for: DocFX configuration, CI/CD integration, GitHub Pages deployment.
 
 ---
 
-**Total Tasks**: 171 (Setup: 15, Models: 23, Interfaces: 16, Tests: 24, Implementation: 59, UI: 4, Platform: 5, Error Handling: 4, Unit Tests: 21, Polish: 13)
+**Total Tasks**: 172 (Setup: 15, Models: 23, Interfaces: 16, Tests: 25, Implementation: 59, UI: 4, Platform: 5, Error Handling: 4, Unit Tests: 21, Polish: 13)
 
-**Estimated Duration**: 
+**Estimated Duration**:
+
 - Setup: ~2 days
 - Models + Interfaces: ~3 days (parallel)
 - Tests: ~4 days (parallel)
