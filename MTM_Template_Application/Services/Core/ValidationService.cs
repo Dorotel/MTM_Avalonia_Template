@@ -30,11 +30,11 @@ public class ValidationService : IValidationService
         if (!_validators.TryGetValue(typeof(T), out var validatorObj))
         {
             // Try to auto-discover validator
-            var validator = DiscoverValidator<T>();
-            if (validator != null)
+            var discoveredValidator = DiscoverValidator<T>();
+            if (discoveredValidator != null)
             {
-                _validators[typeof(T)] = validator;
-                validatorObj = validator;
+                _validators[typeof(T)] = discoveredValidator;
+                validatorObj = discoveredValidator;
             }
             else
             {
