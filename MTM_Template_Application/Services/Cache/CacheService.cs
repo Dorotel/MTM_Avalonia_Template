@@ -1,7 +1,7 @@
 using System;
-using System.Threading;
 using System.Collections.Concurrent;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using MTM_Template_Application.Models.Cache;
 
@@ -109,7 +109,7 @@ public class CacheService : ICacheService
     {
         var count = _cache.Count;
         _cache.Clear();
-        
+
         lock (_statsLock)
         {
             _evictionCount += count;
@@ -132,13 +132,13 @@ public class CacheService : ICacheService
                 totalUncompressed += entry.UncompressedSizeBytes;
             }
 
-            var compressionRatio = totalUncompressed > 0 
-                ? (double)totalSize / totalUncompressed 
+            var compressionRatio = totalUncompressed > 0
+                ? (double)totalSize / totalUncompressed
                 : 0;
 
             var totalRequests = _hitCount + _missCount;
-            var hitRate = totalRequests > 0 
-                ? (double)_hitCount / totalRequests 
+            var hitRate = totalRequests > 0
+                ? (double)_hitCount / totalRequests
                 : 0;
 
             return new CacheStatistics

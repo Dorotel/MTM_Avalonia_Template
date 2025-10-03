@@ -30,10 +30,10 @@ public class DiagnosticsTests
             }
         };
         diagnosticsService.RunAllChecksAsync(Arg.Any<CancellationToken>()).Returns(mockResults);
-        
+
         // Act
         var results = await diagnosticsService.RunAllChecksAsync();
-        
+
         // Assert
         results.Should().NotBeEmpty();
         results.Should().Contain(r => r.CheckName == "Storage");
@@ -44,10 +44,10 @@ public class DiagnosticsTests
     {
         // Arrange
         var diagnosticsService = Substitute.For<IDiagnosticsService>();
-        
+
         // Act
         var result = await diagnosticsService.RunCheckAsync("Network");
-        
+
         // Assert
         result.Should().NotBeNull();
         result.CheckName.Should().Be("Network");
@@ -67,10 +67,10 @@ public class DiagnosticsTests
             Platform = "Windows"
         };
         diagnosticsService.GetHardwareCapabilities().Returns(mockCapabilities);
-        
+
         // Act
         var capabilities = diagnosticsService.GetHardwareCapabilities();
-        
+
         // Assert
         capabilities.Should().NotBeNull();
         capabilities.TotalMemoryMB.Should().BeGreaterThan(0);
