@@ -139,7 +139,7 @@ public class LoggingService : ILoggingService
     {
         if (args == null || args.Length == 0)
         {
-            return args;
+            return args ?? Array.Empty<object>();
         }
 
         var redactedArgs = new object[args.Length];
