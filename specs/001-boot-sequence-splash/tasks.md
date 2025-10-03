@@ -157,7 +157,7 @@
 ### Contract Tests (API Validation)
 
 - [x] T072 [P] Contract test: Visual API Toolkit whitelist validation in tests/contract/VisualApiContractTests.cs - Validate only whitelisted commands accepted (see visual-whitelist.md)
-- [ ] T072A [P] Integration test: Boot cancellation during Stage 1 in tests/integration/BootSequenceTests.cs - Validate cancellation support (FR-009, FR-122): initiate boot sequence, invoke cancel during Stage 1 service initialization, verify CancellationToken propagated to all async operations, confirm resources released (connections closed, temp files cleaned), validate clean exit without exceptions, verify boot metrics recorded cancellation event
+- [x] T072A [P] Integration test: Boot cancellation during Stage 1 in tests/integration/BootSequenceTests.cs - Validate cancellation support (FR-009, FR-122): initiate boot sequence, invoke cancel during Stage 1 service initialization, verify CancellationToken propagated to all async operations, confirm resources released (connections closed, temp files cleaned), validate clean exit without exceptions, verify boot metrics recorded cancellation event
 - [x] T073 [P] Contract test: Visual API Toolkit authentication in tests/contract/VisualApiContractTests.cs - Validate device certificate + user credentials (Android)
 - [x] T074 [P] Contract test: Visual API Toolkit schema dictionary in tests/contract/VisualApiContractTests.cs - Validate table/column name resolution
 - [x] T075 [P] Contract test: HTTP API endpoint availability in tests/contract/HttpApiContractTests.cs - Validate Android HTTP API endpoints respond
@@ -273,10 +273,10 @@
 
 ## Phase 3.9: Error Handling and Recovery
 
-- [ ] T134 GlobalExceptionHandler in MTM_Template_Application/Services/ErrorHandling/GlobalExceptionHandler.cs - Catch unhandled exceptions, log, create diagnostic bundle
-- [ ] T135 ErrorCategorizer in MTM_Template_Application/Services/ErrorHandling/ErrorCategorizer.cs - Categorize errors (network, config, storage, permission)
-- [ ] T136 RecoveryStrategy in MTM_Template_Application/Services/ErrorHandling/RecoveryStrategy.cs - Determine recovery action based on error category
-- [ ] T137 DiagnosticBundleGenerator in MTM_Template_Application/Services/ErrorHandling/DiagnosticBundleGenerator.cs - Collect logs, config, system info into zip bundle
+- [x] T134 GlobalExceptionHandler in MTM_Template_Application/Services/ErrorHandling/GlobalExceptionHandler.cs - Catch unhandled exceptions, log, create diagnostic bundle
+- [x] T135 ErrorCategorizer in MTM_Template_Application/Services/ErrorHandling/ErrorCategorizer.cs - Categorize errors (network, config, storage, permission)
+- [x] T136 RecoveryStrategy in MTM_Template_Application/Services/ErrorHandling/RecoveryStrategy.cs - Determine recovery action based on error category
+- [x] T137 DiagnosticBundleGenerator in MTM_Template_Application/Services/ErrorHandling/DiagnosticBundleGenerator.cs - Collect logs, config, system info into zip bundle
 
 ---
 
@@ -284,16 +284,16 @@
 
 **Test each service implementation**
 
-- [ ] T138 [P] Unit tests for ConfigurationService in tests/unit/ConfigurationServiceTests.cs - Test precedence, hot-reload, profile switching
+- [x] T138 [P] Unit tests for ConfigurationService in tests/unit/ConfigurationServiceTests.cs - Test precedence, hot-reload, profile switching (7 tests)
 - [ ] T139 [P] Unit tests for WindowsSecretsService in tests/unit/WindowsSecretsServiceTests.cs - Test DPAPI encryption, storage, retrieval (mock DPAPI)
 - [ ] T140 [P] Unit tests for MacOSSecretsService in tests/unit/MacOSSecretsServiceTests.cs - Test Keychain integration (mock Keychain)
 - [ ] T141 [P] Unit tests for AndroidSecretsService in tests/unit/AndroidSecretsServiceTests.cs - Test KeyStore integration (mock KeyStore)
 - [ ] T142 [P] Unit tests for LoggingService in tests/unit/LoggingServiceTests.cs - Test structured logging, PII redaction, rotation
 - [ ] T143 [P] Unit tests for DiagnosticsService in tests/unit/DiagnosticsServiceTests.cs - Test diagnostic checks, issue detection, hardware capabilities
-- [ ] T144 [P] Unit tests for MySqlClient in tests/unit/MySqlClientTests.cs - Test connection pooling, query execution, metrics (mock MySqlConnection)
+- [x] T144 [P] Unit tests for MySqlClient in tests/unit/MySqlClientTests.cs - Test connection pooling, query execution, metrics (mock MySqlConnection) (9 tests)
 - [ ] T145 [P] Unit tests for VisualApiClient in tests/unit/VisualApiClientTests.cs - Test whitelist enforcement, authentication, circuit breaker (mock HttpClient)
 - [ ] T146 [P] Unit tests for HttpApiClient in tests/unit/HttpApiClientTests.cs - Test retry policy, circuit breaker, timeout (mock HttpClient)
-- [ ] T147 [P] Unit tests for CacheService in tests/unit/CacheServiceTests.cs - Test LZ4 compression, TTL enforcement, statistics
+- [x] T147 [P] Unit tests for CacheService in tests/unit/CacheServiceTests.cs - Test LZ4 compression, TTL enforcement, statistics (9 tests)
 - [ ] T148 [P] Unit tests for VisualMasterDataSync in tests/unit/VisualMasterDataSyncTests.cs - Test initial population, delta sync, background refresh
 - [ ] T149 [P] Unit tests for CachedOnlyModeManager in tests/unit/CachedOnlyModeManagerTests.cs - Test mode detection, reconnection, feature limitations
 - [ ] T150 [P] Unit tests for MessageBus in tests/unit/MessageBusTests.cs - Test pub/sub, delivery guarantees, unsubscribe
@@ -301,11 +301,15 @@
 - [ ] T152 [P] Unit tests for MappingService in tests/unit/MappingServiceTests.cs - Test AutoMapper integration, profile discovery
 - [ ] T153 [P] Unit tests for LocalizationService in tests/unit/LocalizationServiceTests.cs - Test culture switching, missing translations, fallback
 - [ ] T154 [P] Unit tests for ThemeService in tests/unit/ThemeServiceTests.cs - Test theme switching, OS dark mode detection
+- [x] T154A [P] Unit tests for GlobalExceptionHandler in tests/unit/GlobalExceptionHandlerTests.cs - Test exception handling, logging, diagnostic bundle generation
+- [x] T154B [P] Unit tests for ErrorCategorizer in tests/unit/ErrorCategorizerTests.cs - Test error categorization, transient detection, criticality assessment
+- [x] T154C [P] Unit tests for RecoveryStrategy in tests/unit/RecoveryStrategyTests.cs - Test recovery action determination and execution
+- [x] T154D [P] Unit tests for DiagnosticBundleGenerator in tests/unit/DiagnosticBundleGeneratorTests.cs - Test bundle generation, compression, decompression
 
 - [ ] T155 [P] Unit tests for NavigationService in tests/unit/NavigationServiceTests.cs - Test navigation stack, history, deep linking, unsaved changes guard
-- [ ] T156 [P] Unit tests for BootOrchestrator in tests/unit/BootOrchestratorTests.cs - Test stage execution, progress calculation, timeout enforcement, error recovery
-- [ ] T157 [P] Unit tests for ExponentialBackoffPolicy in tests/unit/ExponentialBackoffPolicyTests.cs - Test retry delays, jitter, max retries
-- [ ] T158 [P] Unit tests for CircuitBreakerPolicy in tests/unit/CircuitBreakerPolicyTests.cs - Test failure threshold, recovery delay, state transitions
+- [x] T156 [P] Unit tests for BootOrchestrator in tests/unit/BootOrchestratorTests.cs - Test stage execution, progress calculation, timeout enforcement, error recovery (9 tests)
+- [x] T157 [P] Unit tests for ExponentialBackoffPolicy in tests/unit/ExponentialBackoffPolicyTests.cs - Test retry delays, jitter, max retries (5 tests)
+- [x] T158 [P] Unit tests for CircuitBreakerPolicy in tests/unit/CircuitBreakerPolicyTests.cs - Test failure threshold, recovery delay, state transitions (8 tests)
 
 ---
 
