@@ -6,6 +6,8 @@
         xmlns:views="clr-namespace:MTM_Template_Application.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="MTM_Template_Application.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        x:CompileBindings="True"
         Icon="/Assets/avalonia-logo.ico"
         Title="MTM_Template_Application">
         <views:MainView />
