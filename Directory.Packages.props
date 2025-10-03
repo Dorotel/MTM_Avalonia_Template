@@ -14,8 +14,15 @@
         <PackageVersion Include="Avalonia.iOS" Version="11.3.6" />
         <PackageVersion Include="Avalonia.Browser" Version="11.3.6" />
         <PackageVersion Include="Avalonia.Android" Version="11.3.6" />
+        <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="11.3.0.6" />
 
         <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+
+        <!-- Dependency Injection -->
+        <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+        <PackageVersion Include="Serilog.Extensions.Logging" Version="8.0.0" />
 
         <!-- Logging and Telemetry -->
         <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />

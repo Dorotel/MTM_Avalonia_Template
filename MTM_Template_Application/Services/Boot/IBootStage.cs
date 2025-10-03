@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MTM_Template_Application.Services.Boot;
@@ -20,10 +21,10 @@ public interface IBootStage
     /// <summary>
     /// Execute the stage
     /// </summary>
-    Task ExecuteAsync();
+    Task ExecuteAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Validate preconditions before executing the stage
     /// </summary>
-    Task<bool> ValidatePreconditions();
+    void ValidatePreconditions();
 }

@@ -241,31 +241,31 @@
 
 ## Phase 3.6: Boot Orchestration
 
-- [ ] T117 BootOrchestrator implementation in MTM_Template_Application/Services/Boot/BootOrchestrator.cs - Execute Stage 0→1→2, progress tracking, timeout enforcement, error recovery
-- [ ] T118 Stage0Bootstrap implementation in MTM_Template_Application/Services/Boot/Stages/Stage0Bootstrap.cs - Splash window, watchdog (10s timeout), minimal services
-- [ ] T119 Stage1ServicesInitialization implementation in MTM_Template_Application/Services/Boot/Stages/Stage1ServicesInitialization.cs - Initialize all core services (60s timeout), parallel start where possible
-- [ ] T120 Stage2ApplicationReady implementation in MTM_Template_Application/Services/Boot/Stages/Stage2ApplicationReady.cs - Application shell, navigation, user session (15s timeout)
-- [ ] T121 BootProgressCalculator in MTM_Template_Application/Services/Boot/BootProgressCalculator.cs - Calculate progress percentage based on service weights
-- [ ] T122 BootWatchdog in MTM_Template_Application/Services/Boot/BootWatchdog.cs - Monitor stage timeouts, force failure on timeout, collect diagnostic bundle
-- [ ] T123 ServiceDependencyResolver in MTM_Template_Application/Services/Boot/ServiceDependencyResolver.cs - Resolve service initialization order based on dependencies
-- [ ] T124 ParallelServiceStarter in MTM_Template_Application/Services/Boot/ParallelServiceStarter.cs - Start independent services in parallel for performance
+- [x] T117 BootOrchestrator implementation in MTM_Template_Application/Services/Boot/BootOrchestrator.cs - Execute Stage 0→1→2, progress tracking, timeout enforcement, error recovery
+- [x] T118 Stage0Bootstrap implementation in MTM_Template_Application/Services/Boot/Stages/Stage0Bootstrap.cs - Splash window, watchdog (10s timeout), minimal services
+- [x] T119 Stage1ServicesInitialization implementation in MTM_Template_Application/Services/Boot/Stages/Stage1ServicesInitialization.cs - Initialize all core services (60s timeout), parallel start where possible
+- [x] T120 Stage2ApplicationReady implementation in MTM_Template_Application/Services/Boot/Stages/Stage2ApplicationReady.cs - Application shell, navigation, user session (15s timeout)
+- [x] T121 BootProgressCalculator in MTM_Template_Application/Services/Boot/BootProgressCalculator.cs - Calculate progress percentage based on service weights
+- [x] T122 BootWatchdog in MTM_Template_Application/Services/Boot/BootWatchdog.cs - Monitor stage timeouts, force failure on timeout, collect diagnostic bundle
+- [x] T123 ServiceDependencyResolver in MTM_Template_Application/Services/Boot/ServiceDependencyResolver.cs - Resolve service initialization order based on dependencies
+- [x] T124 ParallelServiceStarter in MTM_Template_Application/Services/Boot/ParallelServiceStarter.cs - Start independent services in parallel for performance
 
 ---
 
 ## Phase 3.7: Splash Screen UI
 
-- [ ] T125 SplashViewModel in MTM_Template_Application/ViewModels/SplashViewModel.cs - [ObservableObject], [ObservableProperty] for progress/status/stage, [RelayCommand] for cancel (MVVM Toolkit)
-- [ ] T126 SplashWindow.axaml in MTM_Template_Application/Views/SplashWindow.axaml - Theme-less XAML, progress bar, status text, accessibility support (no Theme V2 tokens)
-- [ ] T127 SplashWindow.axaml.cs code-behind in MTM_Template_Application/Views/SplashWindow.axaml.cs - Wire up ViewModel, handle window events
-- [ ] T128 ProgressAnimationBehavior in MTM_Template_Application/Behaviors/ProgressAnimationBehavior.cs - Smooth progress bar animation (avoid jitter)
+- [x] T125 SplashViewModel in MTM_Template_Application/ViewModels/SplashViewModel.cs - [ObservableObject], [ObservableProperty] for progress/status/stage, [RelayCommand] for cancel (MVVM Toolkit)
+- [x] T126 SplashWindow.axaml in MTM_Template_Application/Views/SplashWindow.axaml - Theme-less XAML, progress bar, status text, accessibility support (no Theme V2 tokens)
+- [x] T127 SplashWindow.axaml.cs code-behind in MTM_Template_Application/Views/SplashWindow.axaml.cs - Wire up ViewModel, handle window events
+- [x] T128 ProgressAnimationBehavior in MTM_Template_Application/Behaviors/ProgressAnimationBehavior.cs - Smooth progress bar animation (avoid jitter)
 
 ---
 
 ## Phase 3.8: Platform Entry Points
 
-- [ ] T129 Update Program.cs in MTM_Template_Application.Desktop/Program.cs - Initialize DI container, register services, launch BootOrchestrator
+- [x] T129 Update Program.cs in MTM_Template_Application.Desktop/Program.cs - Initialize DI container, register services, launch BootOrchestrator
 - [ ] T130 Update MainActivity.cs in MTM_Template_Application.Android/MainActivity.cs - Initialize DI container, register platform services, launch BootOrchestrator
-- [ ] T131 ServiceCollectionExtensions in MTM_Template_Application/Extensions/ServiceCollectionExtensions.cs - Extension methods for service registration (AddBootServices, AddDataLayer, AddCaching, etc.)
+- [x] T131 ServiceCollectionExtensions in MTM_Template_Application/Extensions/ServiceCollectionExtensions.cs - Extension methods for service registration (AddBootServices, AddDataLayer, AddCaching, etc.)
 - [ ] T132 Platform-specific service registration in MTM_Template_Application.Desktop/Services/DesktopServiceRegistration.cs - Register Windows/macOS-specific services
 - [ ] T133 Platform-specific service registration in MTM_Template_Application.Android/Services/AndroidServiceRegistration.cs - Register Android-specific services (KeyStore, device certificate)
 

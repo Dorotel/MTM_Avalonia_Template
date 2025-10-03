@@ -18,17 +18,17 @@ $ARGUMENTS
    - **IF EXISTS**: Read research.md for technical decisions and constraints
    - **IF EXISTS**: Read quickstart.md for integration scenarios
    - **IF EXISTS**: Read clarify/ folder for clarification decisions:
-     * Load all `{FEATURE_DIR}/clarify/outstanding-questions-*.md` files
-     * Extract answered questions and reasoning (look for `**Answer:` or `Answer:` patterns)
-     * Use clarification answers to guide implementation choices:
+     - Load all `{FEATURE_DIR}/clarify/outstanding-questions-*.md` files
+     - Extract answered questions and reasoning (look for `**Answer:` or `Answer:` patterns)
+     - Use clarification answers to guide implementation choices:
        - Configuration precedence rules
        - Retry policies and backoff strategies
        - Authentication mechanisms
        - Performance thresholds
        - Error handling patterns
        - User experience behaviors
-     * When making design decisions during implementation, reference specific clarifications
-     * If implementation conflicts with a clarification answer, flag it for review
+     - When making design decisions during implementation, reference specific clarifications
+     - If implementation conflicts with a clarification answer, flag it for review
 
 3. Parse tasks.md structure and extract:
    - **Task phases**: Setup, Tests, Core, Integration, Polish
@@ -38,7 +38,7 @@ $ARGUMENTS
 
 4. Execute implementation following the task plan:
    - **Phase-by-phase execution**: Complete each phase before moving to the next
-   - **Respect dependencies**: Run sequential tasks in order, parallel tasks [P] can run together  
+   - **Respect dependencies**: Run sequential tasks in order, parallel tasks [P] can run together
    - **Follow TDD approach**: Execute test tasks before their corresponding implementation tasks
    - **File-based coordination**: Tasks affecting the same files must run sequentially
    - **Validation checkpoints**: Verify each phase completion before proceeding
