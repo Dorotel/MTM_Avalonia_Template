@@ -94,6 +94,7 @@ public class BootMetrics
 /// </summary>
 public enum BootStatus
 {
+    InProgress,
     Success,
     Failed,
     Cancelled,

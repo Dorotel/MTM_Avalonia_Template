@@ -11,6 +11,11 @@ namespace MTM_Template_Application.Services.Boot;
 public interface IBootOrchestrator
 {
     /// <summary>
+    /// Execute the complete boot sequence (all stages)
+    /// </summary>
+    Task<BootMetrics> ExecuteBootSequenceAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Execute Stage 0: Splash screen and minimal initialization
     /// </summary>
     Task ExecuteStage0Async(CancellationToken cancellationToken = default);
