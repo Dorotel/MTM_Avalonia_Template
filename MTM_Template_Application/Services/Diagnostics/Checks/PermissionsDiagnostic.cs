@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -14,7 +15,7 @@ namespace MTM_Template_Application.Services.Diagnostics.Checks;
 /// </summary>
 public class PermissionsDiagnostic : IDiagnosticCheck
 {
-    public async Task<DiagnosticResult> RunAsync()
+    public async Task<DiagnosticResult> RunAsync(CancellationToken cancellationToken = default)
     {
         var stopwatch = Stopwatch.StartNew();
         var details = new Dictionary<string, object>();

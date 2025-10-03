@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MTM_Template_Application.Models.Configuration;
 using Microsoft.Extensions.Logging;
+using MTM_Template_Application.Models.Configuration;
 
 namespace MTM_Template_Application.Services.Configuration;
 
@@ -16,7 +16,7 @@ public class ConfigurationService : IConfigurationService
     private readonly ILogger<ConfigurationService> _logger;
     private readonly Dictionary<string, ConfigurationSetting> _settings = new();
     private readonly object _lock = new();
-    
+
     public event EventHandler<ConfigurationChangedEventArgs>? OnConfigurationChanged;
 
     public ConfigurationService(ILogger<ConfigurationService> logger)
@@ -66,7 +66,7 @@ public class ConfigurationService : IConfigurationService
         lock (_lock)
         {
             var oldValue = _settings.TryGetValue(key, out var existing) ? existing.Value : null;
-            
+
             var setting = new ConfigurationSetting
             {
                 Key = key,
@@ -77,9 +77,9 @@ public class ConfigurationService : IConfigurationService
             };
 
             _settings[key] = setting;
-            
+
             _logger.LogInformation("Configuration setting {Key} updated", key);
-            
+
             // Raise change event
             OnConfigurationChanged?.Invoke(this, new ConfigurationChangedEventArgs
             {
@@ -101,13 +101,13 @@ public class ConfigurationService : IConfigurationService
         lock (_lock)
         {
             _logger.LogInformation("Reloading configuration from all sources");
-            
+
             // In a full implementation, this would:
             // 1. Load from base config file
             // 2. Apply overlay config files
             // 3. Check environment variables
             // 4. Validate all settings
-            
+
             // For now, this is a placeholder that preserves existing settings
             _logger.LogInformation("Configuration reloaded successfully, {Count} settings active", _settings.Count);
         }

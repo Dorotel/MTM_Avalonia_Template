@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -90,8 +91,9 @@ public class CacheService : ICacheService
     /// <summary>
     /// Remove cached item
     /// </summary>
-    public async Task RemoveAsync(string key)
+    public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(key);
 
         if (_cache.TryRemove(key, out _))
@@ -103,7 +105,7 @@ public class CacheService : ICacheService
     /// <summary>
     /// Clear all cached items
     /// </summary>
-    public async Task ClearAsync()
+    public async Task ClearAsync(CancellationToken cancellationToken = default)
     {
         var count = _cache.Count;
         _cache.Clear();

@@ -5,8 +5,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using MTM_Template_Application.Models.Secrets;
 using Microsoft.Extensions.Logging;
+using MTM_Template_Application.Models.Secrets;
 
 namespace MTM_Template_Application.Services.Secrets;
 
@@ -35,7 +35,7 @@ public class WindowsSecretsService : ISecretsService
             // Encrypt using DPAPI (Data Protection API)
             var valueBytes = Encoding.UTF8.GetBytes(value);
             var encryptedBytes = ProtectedData.Protect(
-                valueBytes, 
+                valueBytes,
                 null, // No additional entropy
                 DataProtectionScope.CurrentUser // User-specific encryption
             );
@@ -90,7 +90,7 @@ public class WindowsSecretsService : ISecretsService
             );
 
             var value = Encoding.UTF8.GetString(decryptedBytes);
-            
+
             // Update last accessed timestamp
             entry.LastAccessedUtc = DateTimeOffset.UtcNow;
 
@@ -163,7 +163,7 @@ public class WindowsSecretsService : ISecretsService
     private static string DetermineSecretType(string key)
     {
         var lowerKey = key.ToLowerInvariant();
-        
+
         if (lowerKey.Contains("password"))
             return "Password";
         if (lowerKey.Contains("apikey") || lowerKey.Contains("api_key"))
@@ -172,7 +172,7 @@ public class WindowsSecretsService : ISecretsService
             return "ConnectionString";
         if (lowerKey.Contains("certificate") || lowerKey.Contains("cert"))
             return "Certificate";
-        
+
         return "Password"; // Default
     }
 }
@@ -188,8 +188,8 @@ internal class SecretCache
     public static SecretCache Instance => _instance.Value;
 
     public void Store(string key, SecretEntry entry) => _cache[key] = entry;
-    
+
     public SecretEntry? Retrieve(string key) => _cache.TryGetValue(key, out var entry) ? entry : null;
-    
+
     public void Delete(string key) => _cache.TryRemove(key, out _);
 }

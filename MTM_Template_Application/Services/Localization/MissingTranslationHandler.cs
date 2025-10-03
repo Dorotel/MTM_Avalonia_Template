@@ -20,7 +20,7 @@ public class MissingTranslationHandler
     public void ReportMissing(string key, string culture, string fallbackValue)
     {
         var compositeKey = $"{culture}:{key}";
-        
+
         _missingTranslations.AddOrUpdate(
             compositeKey,
             _ => new MissingTranslation

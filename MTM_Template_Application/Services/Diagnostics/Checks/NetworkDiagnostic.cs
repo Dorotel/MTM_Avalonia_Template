@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
@@ -24,7 +25,7 @@ public class NetworkDiagnostic : IDiagnosticCheck
         };
     }
 
-    public async Task<DiagnosticResult> RunAsync()
+    public async Task<DiagnosticResult> RunAsync(CancellationToken cancellationToken = default)
     {
         var stopwatch = Stopwatch.StartNew();
         var details = new Dictionary<string, object>();

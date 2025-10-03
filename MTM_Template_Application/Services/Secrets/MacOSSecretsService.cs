@@ -4,8 +4,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using MTM_Template_Application.Models.Secrets;
 using Microsoft.Extensions.Logging;
+using MTM_Template_Application.Models.Secrets;
 
 namespace MTM_Template_Application.Services.Secrets;
 

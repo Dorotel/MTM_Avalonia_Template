@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Text;
 using K4os.Compression.LZ4;
 
