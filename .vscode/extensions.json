@@ -13,6 +13,17 @@
     "yzhang.markdown-all-in-one",
     "davidanson.vscode-markdownlint",
     "ms-vscode.powershell",
-    "timonwong.shellcheck"
+    "timonwong.shellcheck",
+    "addy2142.avalonia-templates",
+    "betterthantomorrow.joyride",
+    "ejinsw.avalonia-shortcuts",
+    "esbenp.prettier-vscode",
+    "github.vscode-pull-request-github",
+    "magic5644.vscode-csharp-dependency-graph",
+    "mechatroner.rainbow-csv",
+    "microhobby.vscode-avalonia-community",
+    "ms-dotnettools.vscode-dotnet-runtime",
+    "nromanov.dotnet-meteor",
+    "przemyslawonak.pimp-my-avalonia"
   ]
 }
