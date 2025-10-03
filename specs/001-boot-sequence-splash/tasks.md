@@ -151,71 +151,71 @@
 
 ### Configuration Service Implementation
 
-- [ ] T079 ConfigurationService implementation in MTM_Template_Application/Services/Configuration/ConfigurationService.cs - Layered precedence (env vars > user > app > defaults), hot-reload support
-- [ ] T080 ConfigurationProfile persistence in MTM_Template_Application/Services/Configuration/ConfigurationPersistence.cs - Save/load profiles from local storage
-- [ ] T081 FeatureFlag evaluation in MTM_Template_Application/Services/Configuration/FeatureFlagEvaluator.cs - Environment-based flag evaluation, rollout percentage
+- [x] T079 ConfigurationService implementation in MTM_Template_Application/Services/Configuration/ConfigurationService.cs - Layered precedence (env vars > user > app > defaults), hot-reload support
+- [x] T080 ConfigurationProfile persistence in MTM_Template_Application/Services/Configuration/ConfigurationPersistence.cs - Save/load profiles from local storage
+- [x] T081 FeatureFlag evaluation in MTM_Template_Application/Services/Configuration/FeatureFlagEvaluator.cs - Environment-based flag evaluation, rollout percentage
 
 ### Secrets Service Implementation
 
-- [ ] T082 WindowsSecretsService implementation in MTM_Template_Application/Services/Secrets/WindowsSecretsService.cs - Windows DPAPI integration, credential manager API
-- [ ] T083 MacOSSecretsService implementation in MTM_Template_Application/Services/Secrets/MacOSSecretsService.cs - macOS Keychain integration
-- [ ] T084 AndroidSecretsService implementation in MTM_Template_Application/Services/Secrets/AndroidSecretsService.cs - Android KeyStore integration
-- [ ] T085 SecretsService factory in MTM_Template_Application/Services/Secrets/SecretsServiceFactory.cs - Platform detection, return appropriate implementation
+- [x] T082 WindowsSecretsService implementation in MTM_Template_Application/Services/Secrets/WindowsSecretsService.cs - Windows DPAPI integration, credential manager API
+- [x] T083 MacOSSecretsService implementation in MTM_Template_Application/Services/Secrets/MacOSSecretsService.cs - macOS Keychain integration
+- [x] T084 AndroidSecretsService implementation in MTM_Template_Application/Services/Secrets/AndroidSecretsService.cs - Android KeyStore integration
+- [x] T085 SecretsService factory in MTM_Template_Application/Services/Secrets/SecretsServiceFactory.cs - Platform detection, return appropriate implementation
 
 ### Logging Service Implementation
 
-- [ ] T086 LoggingService implementation in MTM_Template_Application/Services/Logging/LoggingService.cs - Serilog + OpenTelemetry integration, structured JSON format
-- [ ] T087 PII redaction middleware in MTM_Template_Application/Services/Logging/PiiRedactionMiddleware.cs - Detect and redact sensitive data (SSN, credit cards, passwords)
-- [ ] T088 Log rotation policy in MTM_Template_Application/Services/Logging/LogRotationPolicy.cs - 10MB max file size, 7 days retention
-- [ ] T089 Telemetry batch processor in MTM_Template_Application/Services/Logging/TelemetryBatchProcessor.cs - Batch telemetry for efficient transmission
+- [x] T086 LoggingService implementation in MTM_Template_Application/Services/Logging/LoggingService.cs - Serilog + OpenTelemetry integration, structured JSON format
+- [x] T087 PII redaction middleware in MTM_Template_Application/Services/Logging/PiiRedactionMiddleware.cs - Detect and redact sensitive data (SSN, credit cards, passwords)
+- [x] T088 Log rotation policy in MTM_Template_Application/Services/Logging/LogRotationPolicy.cs - 10MB max file size, 7 days retention
+- [x] T089 Telemetry batch processor in MTM_Template_Application/Services/Logging/TelemetryBatchProcessor.cs - Batch telemetry for efficient transmission
 
 ### Diagnostics Service Implementation
 
-- [ ] T089 DiagnosticsService implementation in MTM_Template_Application/Services/Diagnostics/DiagnosticsService.cs - Orchestrate all diagnostic checks
-- [ ] T090 [P] StorageDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/StorageDiagnostic.cs - Verify storage availability, free space
-- [ ] T091 [P] PermissionsDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/PermissionsDiagnostic.cs - Verify file system, camera, network permissions
-- [ ] T092 [P] NetworkDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/NetworkDiagnostic.cs - Verify network connectivity (5s timeout)
-- [ ] T093 [P] HardwareDetection service in MTM_Template_Application/Services/Diagnostics/HardwareDetection.cs - Detect memory, CPU, screen resolution, peripherals
+- [x] T089 DiagnosticsService implementation in MTM_Template_Application/Services/Diagnostics/DiagnosticsService.cs - Orchestrate all diagnostic checks
+- [x] T090 [P] StorageDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/StorageDiagnostic.cs - Verify storage availability, free space
+- [x] T091 [P] PermissionsDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/PermissionsDiagnostic.cs - Verify file system, camera, network permissions
+- [x] T092 [P] NetworkDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/NetworkDiagnostic.cs - Verify network connectivity (5s timeout)
+- [x] T093 [P] HardwareDetection service in MTM_Template_Application/Services/Diagnostics/HardwareDetection.cs - Detect memory, CPU, screen resolution, peripherals
 
 ### Data Layer Implementation
 
-- [ ] T094 MySqlClient implementation in MTM_Template_Application/Services/DataLayer/MySqlClient.cs - Connection pooling (Desktop: 2-10, Android: 1-5), query execution, role-based access
-- [ ] T095 VisualApiClient implementation in MTM_Template_Application/Services/DataLayer/VisualApiClient.cs - HTTP client wrapper, command whitelist enforcement, authentication
-- [ ] T096 HttpApiClient implementation in MTM_Template_Application/Services/DataLayer/HttpApiClient.cs - Generic HTTP client with retry/circuit breaker
-- [ ] T097 ExponentialBackoffPolicy in MTM_Template_Application/Services/DataLayer/Policies/ExponentialBackoffPolicy.cs - 1s, 2s, 4s, 8s, 16s with ±25% jitter (Polly)
-- [ ] T098 CircuitBreakerPolicy in MTM_Template_Application/Services/DataLayer/Policies/CircuitBreakerPolicy.cs - 5 consecutive failures, exponential recovery 30s→10m (Polly)
-- [ ] T099 ConnectionPoolMonitor in MTM_Template_Application/Services/DataLayer/ConnectionPoolMonitor.cs - Track pool metrics, emit telemetry
+- [x] T094 MySqlClient implementation in MTM_Template_Application/Services/DataLayer/MySqlClient.cs - Connection pooling (Desktop: 2-10, Android: 1-5), query execution, role-based access
+- [x] T095 VisualApiClient implementation in MTM_Template_Application/Services/DataLayer/VisualApiClient.cs - HTTP client wrapper, command whitelist enforcement, authentication
+- [x] T096 HttpApiClient implementation in MTM_Template_Application/Services/DataLayer/HttpApiClient.cs - Generic HTTP client with retry/circuit breaker
+- [x] T097 ExponentialBackoffPolicy in MTM_Template_Application/Services/DataLayer/Policies/ExponentialBackoffPolicy.cs - 1s, 2s, 4s, 8s, 16s with ±25% jitter (Polly)
+- [x] T098 CircuitBreakerPolicy in MTM_Template_Application/Services/DataLayer/Policies/CircuitBreakerPolicy.cs - 5 consecutive failures, exponential recovery 30s→10m (Polly)
+- [x] T099 ConnectionPoolMonitor in MTM_Template_Application/Services/DataLayer/ConnectionPoolMonitor.cs - Track pool metrics, emit telemetry
 
 ### Cache Service Implementation
 
-- [ ] T101 CacheService implementation in MTM_Template_Application/Services/Cache/CacheService.cs - In-memory cache with LZ4 compression, TTL enforcement
-- [ ] T102 LZ4CompressionHandler in MTM_Template_Application/Services/Cache/LZ4CompressionHandler.cs - Compress/decompress cache entries
-- [ ] T103 VisualMasterDataSync in MTM_Template_Application/Services/Cache/VisualMasterDataSync.cs - Initial population, delta sync, background refresh
-- [ ] T104 CacheStalenessDetector in MTM_Template_Application/Services/Cache/CacheStalenessDetector.cs - Detect expired entries (Parts 24h, Others 7d), trigger refresh
-- [ ] T105 CachedOnlyModeManager in MTM_Template_Application/Services/Cache/CachedOnlyModeManager.cs - Detect Visual unavailability, enable cached-only mode, reconnection detection
+- [x] T101 CacheService implementation in MTM_Template_Application/Services/Cache/CacheService.cs - In-memory cache with LZ4 compression, TTL enforcement
+- [x] T102 LZ4CompressionHandler in MTM_Template_Application/Services/Cache/LZ4CompressionHandler.cs - Compress/decompress cache entries
+- [x] T103 VisualMasterDataSync in MTM_Template_Application/Services/Cache/VisualMasterDataSync.cs - Initial population, delta sync, background refresh
+- [x] T104 CacheStalenessDetector in MTM_Template_Application/Services/Cache/CacheStalenessDetector.cs - Detect expired entries (Parts 24h, Others 7d), trigger refresh
+- [x] T105 CachedOnlyModeManager in MTM_Template_Application/Services/Cache/CachedOnlyModeManager.cs - Detect Visual unavailability, enable cached-only mode, reconnection detection
 
 ### Core Services Implementation
 
-- [ ] T106 MessageBus implementation in MTM_Template_Application/Services/Core/MessageBus.cs - In-memory pub/sub, delivery guarantees, correlation IDs
-- [ ] T107 ValidationService implementation in MTM_Template_Application/Services/Core/ValidationService.cs - FluentValidation integration, rule discovery (attributes + conventions + config)
-- [ ] T108 MappingService implementation in MTM_Template_Application/Services/Core/MappingService.cs - AutoMapper integration, profile discovery
-- [ ] T109 HealthCheckService in MTM_Template_Application/Services/Core/HealthCheckService.cs - Aggregate health checks from all services
+- [x] T106 MessageBus implementation in MTM_Template_Application/Services/Core/MessageBus.cs - In-memory pub/sub, delivery guarantees, correlation IDs
+- [x] T107 ValidationService implementation in MTM_Template_Application/Services/Core/ValidationService.cs - FluentValidation integration, rule discovery (attributes + conventions + config)
+- [x] T108 MappingService implementation in MTM_Template_Application/Services/Core/MappingService.cs - AutoMapper integration, profile discovery
+- [x] T109 HealthCheckService in MTM_Template_Application/Services/Core/HealthCheckService.cs - Aggregate health checks from all services
 
 ### Localization Service Implementation
 
-- [ ] T110 LocalizationService implementation in MTM_Template_Application/Services/Localization/LocalizationService.cs - Culture switching, resource loading, missing translation tracking
-- [ ] T111 MissingTranslationHandler in MTM_Template_Application/Services/Localization/MissingTranslationHandler.cs - Log missing translations, report to telemetry
-- [ ] T112 CultureProvider in MTM_Template_Application/Services/Localization/CultureProvider.cs - Detect OS culture, fallback chain (selected > OS > en-US)
+- [x] T110 LocalizationService implementation in MTM_Template_Application/Services/Localization/LocalizationService.cs - Culture switching, resource loading, missing translation tracking
+- [x] T111 MissingTranslationHandler in MTM_Template_Application/Services/Localization/MissingTranslationHandler.cs - Log missing translations, report to telemetry
+- [x] T112 CultureProvider in MTM_Template_Application/Services/Localization/CultureProvider.cs - Detect OS culture, fallback chain (selected > OS > en-US)
 
 ### Theme Service Implementation
 
-- [ ] T113 ThemeService implementation in MTM_Template_Application/Services/Theme/ThemeService.cs - Theme switching (Light/Dark/Auto), OS dark mode detection
-- [ ] T114 OSDarkModeMonitor in MTM_Template_Application/Services/Theme/OSDarkModeMonitor.cs - Monitor OS dark mode changes, auto-switch when Theme=Auto
+- [x] T113 ThemeService implementation in MTM_Template_Application/Services/Theme/ThemeService.cs - Theme switching (Light/Dark/Auto), OS dark mode detection
+- [x] T114 OSDarkModeMonitor in MTM_Template_Application/Services/Theme/OSDarkModeMonitor.cs - Monitor OS dark mode changes, auto-switch when Theme=Auto
 
 ### Navigation Service Implementation
 
-- [ ] T115 NavigationService implementation in MTM_Template_Application/Services/Navigation/NavigationService.cs - Stack-based navigation, history tracking, deep linking
-- [ ] T116 UnsavedChangesGuard in MTM_Template_Application/Services/Navigation/UnsavedChangesGuard.cs - Prompt before navigation when unsaved changes exist
+- [x] T115 NavigationService implementation in MTM_Template_Application/Services/Navigation/NavigationService.cs - Stack-based navigation, history tracking, deep linking
+- [x] T116 UnsavedChangesGuard in MTM_Template_Application/Services/Navigation/UnsavedChangesGuard.cs - Prompt before navigation when unsaved changes exist
 
 ---
 

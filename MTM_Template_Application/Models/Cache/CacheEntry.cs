@@ -30,7 +30,7 @@ public class CacheEntry
     /// <summary>
     /// When this entry expires
     /// </summary>
-    public DateTimeOffset ExpiresAtUtc { get; set; }
+    public DateTimeOffset? ExpiresAtUtc { get; set; }
 
     /// <summary>
     /// When this entry was last accessed

@@ -16,7 +16,7 @@ public class DiagnosticResult
     /// <summary>
     /// Check status: Pass, Warning, Fail
     /// </summary>
-    public string Status { get; set; } = string.Empty;
+    public DiagnosticStatus Status { get; set; }
 
     /// <summary>
     /// Human-readable message

@@ -1,0 +1,143 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using FluentValidation;
+using MTM_Template_Application.Models.Core;
+
+namespace MTM_Template_Application.Services.Core;
+
+/// <summary>
+/// Validation service with FluentValidation integration and rule discovery
+/// </summary>
+public class ValidationService : IValidationService
+{
+    private readonly Dictionary<Type, object> _validators;
+
+    public ValidationService()
+    {
+        _validators = new Dictionary<Type, object>();
+    }
+
+    /// <summary>
+    /// Validate an object
+    /// </summary>
+    public async Task<ValidationResult> ValidateAsync<T>(T obj) where T : class
+    {
+        ArgumentNullException.ThrowIfNull(obj);
+
+        var validatorType = typeof(IValidator<T>);
+        if (!_validators.TryGetValue(typeof(T), out var validatorObj))
+        {
+            // Try to auto-discover validator
+            var validator = DiscoverValidator<T>();
+            if (validator != null)
+            {
+                _validators[typeof(T)] = validator;
+                validatorObj = validator;
+            }
+            else
+            {
+                // No validator found - return valid result
+                return new ValidationResult
+                {
+                    IsValid = true,
+                    Errors = new List<ValidationError>()
+                };
+            }
+        }
+
+        if (validatorObj is IValidator<T> validator)
+        {
+            var context = new ValidationContext<T>(obj);
+            var result = await validator.ValidateAsync(context);
+
+            return new ValidationResult
+            {
+                IsValid = result.IsValid,
+                Errors = result.Errors.Select(e => new ValidationError
+                {
+                    PropertyName = e.PropertyName,
+                    ErrorMessage = e.ErrorMessage,
+                    Severity = e.Severity.ToString()
+                }).ToList()
+            };
+        }
+
+        throw new InvalidOperationException($"Validator for type {typeof(T).Name} is not of correct type");
+    }
+
+    /// <summary>
+    /// Register a validator for a type
+    /// </summary>
+    public void RegisterValidator<T>(object validator) where T : class
+    {
+        ArgumentNullException.ThrowIfNull(validator);
+
+        if (validator is not IValidator<T>)
+        {
+            throw new ArgumentException($"Validator must implement IValidator<{typeof(T).Name}>");
+        }
+
+        _validators[typeof(T)] = validator;
+    }
+
+    /// <summary>
+    /// Get validation rule metadata
+    /// </summary>
+    public List<ValidationRuleMetadata> GetRuleMetadata<T>() where T : class
+    {
+        var metadata = new List<ValidationRuleMetadata>();
+
+        if (_validators.TryGetValue(typeof(T), out var validatorObj))
+        {
+            if (validatorObj is IValidator<T> validator)
+            {
+                var descriptor = validator.CreateDescriptor();
+                
+                foreach (var member in descriptor.GetMembersWithValidators())
+                {
+                    foreach (var rule in descriptor.GetRulesForMember(member.Key))
+                    {
+                        metadata.Add(new ValidationRuleMetadata
+                        {
+                            RuleName = rule.GetType().Name,
+                            PropertyName = member.Key,
+                            Severity = "Error",
+                            ErrorMessage = $"Validation rule for {member.Key}",
+                            ValidatorType = validator.GetType().Name
+                        });
+                    }
+                }
+            }
+        }
+
+        return metadata;
+    }
+
+    /// <summary>
+    /// Discover validator by convention (attributes, naming, assembly scanning)
+    /// </summary>
+    private IValidator<T>? DiscoverValidator<T>() where T : class
+    {
+        // Convention: Look for class named {TypeName}Validator
+        var validatorTypeName = $"{typeof(T).Name}Validator";
+        var validatorType = typeof(T).Assembly.GetTypes()
+            .FirstOrDefault(t => t.Name == validatorTypeName && typeof(IValidator<T>).IsAssignableFrom(t));
+
+        if (validatorType != null)
+        {
+            try
+            {
+                return Activator.CreateInstance(validatorType) as IValidator<T>;
+            }
+            catch
+            {
+                // Validator constructor might require dependencies
+                return null;
+            }
+        }
+
+        return null;
+    }
+}
