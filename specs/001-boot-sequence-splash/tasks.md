@@ -92,22 +92,22 @@
 
 **Define interfaces before implementation - enables mocking in tests**
 
-- [ ] T039 [P] IBootOrchestrator interface in MTM_Template_Application/Services/Boot/IBootOrchestrator.cs (ExecuteStage0Async, ExecuteStage1Async, ExecuteStage2Async, GetBootMetrics, OnProgressChanged event)
-- [ ] T040 [P] IBootStage interface in MTM_Template_Application/Services/Boot/IBootStage.cs (StageNumber, Name, ExecuteAsync, ValidatePreconditions)
-- [ ] T041 [P] IConfigurationService interface in MTM_Template_Application/Services/Configuration/IConfigurationService.cs (GetValue<T>, SetValue, ReloadAsync, OnConfigurationChanged event)
-- [ ] T042 [P] ISecretsService interface in MTM_Template_Application/Services/Secrets/ISecretsService.cs (StoreSecretAsync, RetrieveSecretAsync, DeleteSecretAsync, RotateSecretAsync)
-- [ ] T043 [P] ILoggingService interface in MTM_Template_Application/Services/Logging/ILoggingService.cs (LogInformation, LogWarning, LogError, SetContext, FlushAsync)
-- [ ] T044 [P] IDiagnosticsService interface in MTM_Template_Application/Services/Diagnostics/IDiagnosticsService.cs (RunAllChecksAsync, RunCheckAsync, GetHardwareCapabilities)
-- [ ] T045 [P] IMySqlClient interface in MTM_Template_Application/Services/DataLayer/IMySqlClient.cs (ExecuteQueryAsync, ExecuteNonQueryAsync, ExecuteScalarAsync, GetConnectionMetrics)
-- [ ] T046 [P] IVisualApiClient interface in MTM_Template_Application/Services/DataLayer/IVisualApiClient.cs (ExecuteCommandAsync, IsServerAvailable, GetWhitelistedCommands)
-- [ ] T047 [P] IHttpApiClient interface in MTM_Template_Application/Services/DataLayer/IHttpApiClient.cs (GetAsync, PostAsync, PutAsync, DeleteAsync)
-- [ ] T048 [P] ICacheService interface in MTM_Template_Application/Services/Cache/ICacheService.cs (GetAsync<T>, SetAsync<T>, RemoveAsync, ClearAsync, GetStatistics, RefreshAsync)
-- [ ] T049 [P] IMessageBus interface in MTM_Template_Application/Services/Core/IMessageBus.cs (PublishAsync, SubscribeAsync<T>, UnsubscribeAsync)
-- [ ] T050 [P] IValidationService interface in MTM_Template_Application/Services/Core/IValidationService.cs (ValidateAsync<T>, RegisterValidator<T>, GetRuleMetadata)
-- [ ] T051 [P] IMappingService interface in MTM_Template_Application/Services/Core/IMappingService.cs (Map<TSource, TDestination>, MapAsync<TSource, TDestination>)
-- [ ] T052 [P] ILocalizationService interface in MTM_Template_Application/Services/Localization/ILocalizationService.cs (GetString, SetCulture, GetSupportedCultures, OnLanguageChanged event)
-- [ ] T053 [P] IThemeService interface in MTM_Template_Application/Services/Theme/IThemeService.cs (SetTheme, GetCurrentTheme, OnThemeChanged event)
-- [ ] T054 [P] INavigationService interface in MTM_Template_Application/Services/Navigation/INavigationService.cs (NavigateToAsync, GoBackAsync, GoForwardAsync, GetHistory)
+- [x] T039 [P] IBootOrchestrator interface in MTM_Template_Application/Services/Boot/IBootOrchestrator.cs (ExecuteStage0Async, ExecuteStage1Async, ExecuteStage2Async, GetBootMetrics, OnProgressChanged event)
+- [x] T040 [P] IBootStage interface in MTM_Template_Application/Services/Boot/IBootStage.cs (StageNumber, Name, ExecuteAsync, ValidatePreconditions)
+- [x] T041 [P] IConfigurationService interface in MTM_Template_Application/Services/Configuration/IConfigurationService.cs (GetValue<T>, SetValue, ReloadAsync, OnConfigurationChanged event)
+- [x] T042 [P] ISecretsService interface in MTM_Template_Application/Services/Secrets/ISecretsService.cs (StoreSecretAsync, RetrieveSecretAsync, DeleteSecretAsync, RotateSecretAsync)
+- [x] T043 [P] ILoggingService interface in MTM_Template_Application/Services/Logging/ILoggingService.cs (LogInformation, LogWarning, LogError, SetContext, FlushAsync)
+- [x] T044 [P] IDiagnosticsService interface in MTM_Template_Application/Services/Diagnostics/IDiagnosticsService.cs (RunAllChecksAsync, RunCheckAsync, GetHardwareCapabilities)
+- [x] T045 [P] IMySqlClient interface in MTM_Template_Application/Services/DataLayer/IMySqlClient.cs (ExecuteQueryAsync, ExecuteNonQueryAsync, ExecuteScalarAsync, GetConnectionMetrics)
+- [x] T046 [P] IVisualApiClient interface in MTM_Template_Application/Services/DataLayer/IVisualApiClient.cs (ExecuteCommandAsync, IsServerAvailable, GetWhitelistedCommands)
+- [x] T047 [P] IHttpApiClient interface in MTM_Template_Application/Services/DataLayer/IHttpApiClient.cs (GetAsync, PostAsync, PutAsync, DeleteAsync)
+- [x] T048 [P] ICacheService interface in MTM_Template_Application/Services/Cache/ICacheService.cs (GetAsync<T>, SetAsync<T>, RemoveAsync, ClearAsync, GetStatistics, RefreshAsync)
+- [x] T049 [P] IMessageBus interface in MTM_Template_Application/Services/Core/IMessageBus.cs (PublishAsync, SubscribeAsync<T>, UnsubscribeAsync)
+- [x] T050 [P] IValidationService interface in MTM_Template_Application/Services/Core/IValidationService.cs (ValidateAsync<T>, RegisterValidator<T>, GetRuleMetadata)
+- [x] T051 [P] IMappingService interface in MTM_Template_Application/Services/Core/IMappingService.cs (Map<TSource, TDestination>, MapAsync<TSource, TDestination>)
+- [x] T052 [P] ILocalizationService interface in MTM_Template_Application/Services/Localization/ILocalizationService.cs (GetString, SetCulture, GetSupportedCultures, OnLanguageChanged event)
+- [x] T053 [P] IThemeService interface in MTM_Template_Application/Services/Theme/IThemeService.cs (SetTheme, GetCurrentTheme, OnThemeChanged event)
+- [x] T054 [P] INavigationService interface in MTM_Template_Application/Services/Navigation/INavigationService.cs (NavigateToAsync, GoBackAsync, GoForwardAsync, GetHistory)
 
 ---
 
