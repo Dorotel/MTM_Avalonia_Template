@@ -1,0 +1,18 @@
+{
+  "recommendations": [
+    "github.copilot",
+    "github.copilot-chat",
+    "ms-dotnettools.csharp",
+    "ms-dotnettools.csdevkit",
+    "avaloniateam.vscode-avalonia",
+    "editorconfig.editorconfig",
+    "formulahendry.dotnet-test-explorer",
+    "jongrant.csharpsortusings",
+    "kreativ-software.csharpextensions",
+    "redhat.vscode-xml",
+    "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
+    "ms-vscode.powershell",
+    "timonwong.shellcheck"
+  ]
+}
