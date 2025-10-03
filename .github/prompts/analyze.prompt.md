@@ -27,6 +27,11 @@ Execution steps:
    - Parse plan.md: Architecture/stack choices, Data Model references, Phases, Technical constraints.
    - Parse tasks.md: Task IDs, descriptions, phase grouping, parallel markers [P], referenced file paths.
    - Load constitution `.specify/memory/constitution.md` for principle validation.
+   - **IF EXISTS**: Load clarify/ folder for clarification validation:
+     * Check for `{FEATURE_DIR}/clarify/outstanding-questions-*.md` files
+     * Extract all answered questions (look for `**Answer:` or `Answer:` patterns)
+     * Build clarification decision inventory for cross-reference
+     * Validate that clarification answers are reflected in spec.md and plan.md
 
 3. Build internal semantic models:
    - Requirements inventory: Each functional + non-functional requirement with a stable key (derive slug based on imperative phrase; e.g., "User can upload file" -> `user-can-upload-file`).
@@ -40,10 +45,12 @@ Execution steps:
    B. Ambiguity detection:
       - Flag vague adjectives (fast, scalable, secure, intuitive, robust) lacking measurable criteria.
       - Flag unresolved placeholders (TODO, TKTK, ???, <placeholder>, etc.).
+      - **IF clarify/ EXISTS**: Check if ambiguous areas have been clarified but not incorporated into spec/plan.
    C. Underspecification:
       - Requirements with verbs but missing object or measurable outcome.
       - User stories missing acceptance criteria alignment.
       - Tasks referencing files or components not defined in spec/plan.
+      - **IF clarify/ EXISTS**: Validate that clarification answers are reflected in requirements and plan sections.
    D. Constitution alignment:
       - Any requirement or plan element conflicting with a MUST principle.
       - Missing mandated sections or quality gates from constitution.
@@ -51,11 +58,17 @@ Execution steps:
       - Requirements with zero associated tasks.
       - Tasks with no mapped requirement/story.
       - Non-functional requirements not reflected in tasks (e.g., performance, security).
+      - **IF clarify/ EXISTS**: Check if clarification decisions (e.g., retry policies, thresholds) have corresponding validation tasks.
    F. Inconsistency:
       - Terminology drift (same concept named differently across files).
       - Data entities referenced in plan but absent in spec (or vice versa).
       - Task ordering contradictions (e.g., integration tasks before foundational setup tasks without dependency note).
       - Conflicting requirements (e.g., one requires to use Next.js while other says to use Vue as the framework).
+      - **IF clarify/ EXISTS**: Flag conflicts between clarification answers and spec/plan statements (clarification should take precedence).
+   G. Clarification incorporation (if clarify/ folder exists):
+      - Answered questions in clarify/ folder not reflected in spec.md or plan.md.
+      - Critical decisions (security, performance, data handling) clarified but missing from non-functional requirements.
+      - Conflicting answers between multiple clarification files (multi-feature specs).
 
 5. Severity assignment heuristic:
    - CRITICAL: Violates constitution MUST, missing core spec artifact, or requirement with zero coverage that blocks baseline functionality.

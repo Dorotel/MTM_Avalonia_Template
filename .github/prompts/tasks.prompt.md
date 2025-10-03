@@ -15,6 +15,12 @@ $ARGUMENTS
    - IF EXISTS: Read contracts/ for API endpoints
    - IF EXISTS: Read research.md for technical decisions
    - IF EXISTS: Read quickstart.md for test scenarios
+   - **IF EXISTS: Read clarify/ folder** for clarification decisions:
+     * Check for `{FEATURE_DIR}/clarify/outstanding-questions-*.md` files
+     * Extract answered questions (look for `**Answer:` or `Answer:` patterns)
+     * Use clarification answers to inform task breakdown and validation criteria
+     * Example: Retry policy clarifications inform error handling tasks
+     * Example: Performance threshold clarifications inform testing tasks
 
    Note: Not all projects have all documents. For example:
    - CLI tools might not have contracts/
