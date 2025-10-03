@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using MTM_Template_Application.Models.Navigation;
 
@@ -12,17 +13,17 @@ public interface INavigationService
     /// <summary>
     /// Navigate to a view
     /// </summary>
-    Task NavigateToAsync(string viewName, Dictionary<string, object>? parameters = null);
+    Task NavigateToAsync(string viewName, Dictionary<string, object>? parameters = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Navigate back
     /// </summary>
-    Task<bool> GoBackAsync();
+    Task<bool> GoBackAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Navigate forward
     /// </summary>
-    Task<bool> GoForwardAsync();
+    Task<bool> GoForwardAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Get navigation history

@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MTM_Template_Application.Services.Configuration;
@@ -16,12 +17,12 @@ public interface IConfigurationService
     /// <summary>
     /// Set a configuration value
     /// </summary>
-    Task SetValue(string key, object value);
+    Task SetValue(string key, object value, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Reload configuration from all sources
     /// </summary>
-    Task ReloadAsync();
+    Task ReloadAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Event raised when configuration changes
