@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using Serilog.Context;
@@ -99,8 +100,11 @@ public class LoggingService : ILoggingService
     /// <summary>
     /// Flush pending log entries
     /// </summary>
-    public async Task FlushAsync()
+    public async Task FlushAsync(CancellationToken cancellationToken = default)
     {
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cts.CancelAfter(TimeSpan.FromSeconds(5)); // 5s timeout for flush
+
         await Task.Run(() =>
         {
             if (_logger is Logger logger)

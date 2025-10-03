@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MTM_Template_Application.Models.Navigation;
 
@@ -25,8 +26,9 @@ public class NavigationService : INavigationService
         _unsavedChangesGuard = unsavedChangesGuard;
     }
 
-    public async Task NavigateToAsync(string viewName, Dictionary<string, object>? parameters = null)
+    public async Task NavigateToAsync(string viewName, Dictionary<string, object>? parameters = null, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(viewName);
 
         // Check for unsaved changes
@@ -58,8 +60,9 @@ public class NavigationService : INavigationService
         await Task.CompletedTask;
     }
 
-    public async Task<bool> GoBackAsync()
+    public async Task<bool> GoBackAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (_backStack.Count == 0)
         {
             return false;
@@ -86,8 +89,9 @@ public class NavigationService : INavigationService
         return true;
     }
 
-    public async Task<bool> GoForwardAsync()
+    public async Task<bool> GoForwardAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (_forwardStack.Count == 0)
         {
             return false;

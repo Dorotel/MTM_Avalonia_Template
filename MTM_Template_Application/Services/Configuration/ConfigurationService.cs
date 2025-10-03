@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MTM_Template_Application.Models.Configuration;
 using Microsoft.Extensions.Logging;
@@ -56,8 +57,9 @@ public class ConfigurationService : IConfigurationService
     /// <summary>
     /// Set a configuration value
     /// </summary>
-    public Task SetValue(string key, object value)
+    public Task SetValue(string key, object value, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(value);
 
@@ -93,8 +95,9 @@ public class ConfigurationService : IConfigurationService
     /// <summary>
     /// Reload configuration from all sources
     /// </summary>
-    public Task ReloadAsync()
+    public Task ReloadAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         lock (_lock)
         {
             _logger.LogInformation("Reloading configuration from all sources");
