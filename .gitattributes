@@ -1,0 +1,39 @@
+# Auto detect text files and normalize line endings
+* text=auto
+
+# C# files
+*.cs text diff=csharp
+*.csx text diff=csharp
+*.csproj text diff=csharp
+
+# Avalonia XAML
+*.axaml text diff=xml
+*.xaml text diff=xml
+
+# Scripts
+*.sh text eol=lf
+*.bash text eol=lf
+*.ps1 text eol=crlf
+*.psm1 text eol=crlf
+
+# Markdown
+*.md text linguist-detectable=true diff=markdown
+.specify/features/SPEC_*.md text linguist-language=Markdown diff=markdown
+.specify/features/PLAN_*.md text linguist-language=Markdown diff=markdown
+.specify/features/TASKS_*.md text linguist-language=Markdown diff=markdown
+memory/*.md text linguist-language=Markdown diff=markdown
+
+# JSON
+*.json text
+*.jsonc text
+
+# Binary files
+*.dll binary
+*.exe binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.db binary
+*.sqlite binary

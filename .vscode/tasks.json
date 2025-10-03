@@ -1,0 +1,108 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Solution",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["build", "${workspaceFolder}/MTM_Avalonia_Template.sln"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Clean Solution",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["clean", "${workspaceFolder}/MTM_Avalonia_Template.sln"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Restore Solution",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["restore", "${workspaceFolder}/MTM_Avalonia_Template.sln"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      }
+    },
+    {
+      "label": "Run Tests",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["test", "${workspaceFolder}/MTM_Avalonia_Template.sln", "--no-build"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Spec-Kit: List Features",
+      "type": "shell",
+      "command": "ls -1 .specify/features/ 2>/dev/null || dir .specify\\features\\ /B 2>nul || echo 'No features found'",
+      "windows": {
+        "command": "dir .specify\\features\\ /B 2>nul || echo No features found"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Spec-Kit: Show Constitution",
+      "type": "shell",
+      "command": "cat memory/constitution.md 2>/dev/null || type memory\\constitution.md 2>nul || echo 'Constitution not found'",
+      "windows": {
+        "command": "type memory\\constitution.md 2>nul || echo Constitution not found"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Spec-Kit: Validate Specs",
+      "type": "shell",
+      "command": "find .specify/features -name 'SPEC_*.md' -type f 2>/dev/null || dir .specify\\features\\SPEC_*.md /S /B 2>nul || echo 'No specs found'",
+      "windows": {
+        "command": "dir .specify\\features\\SPEC_*.md /S /B 2>nul || echo No specs found"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Main App",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["run", "--project", "${workspaceFolder}/src/MTM_Avalonia_Template/MTM_Avalonia_Template.csproj"],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}

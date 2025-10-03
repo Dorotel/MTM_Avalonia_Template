@@ -1,0 +1,132 @@
+<Window xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:MTM_Template_Application.ViewModels"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+    x:Class="MTM_Template_Application.Views.SplashWindow"
+    x:DataType="vm:SplashViewModel"
+    x:CompileBindings="True"
+    Width="600" Height="400"
+    WindowStartupLocation="CenterScreen"
+    CanResize="False"
+    ShowInTaskbar="False"
+    SystemDecorations="None"
+    TransparencyLevelHint="Transparent"
+    Background="Transparent">
+
+    <Design.DataContext>
+        <vm:SplashViewModel />
+    </Design.DataContext>
+
+    <!-- Theme-less splash screen (no Theme V2 tokens) -->
+    <!-- Uses explicit colors and styles -->
+    <Border Background="#FFFFFF"
+        BorderBrush="#E0E0E0"
+        BorderThickness="1"
+        CornerRadius="8"
+        BoxShadow="0 4 16 0 #40000000">
+
+        <Grid RowDefinitions="*, Auto, Auto, Auto, Auto, Auto, *">
+
+            <!-- Logo Area (Row 0 - takes up available space) -->
+            <Viewbox Grid.Row="0"
+                Width="120"
+                Height="120"
+                Margin="0,60,0,0"
+                VerticalAlignment="Top">
+                <Canvas Width="120" Height="120">
+                    <!-- Simple logo placeholder (blue circle with white "M") -->
+                    <Ellipse Width="120" Height="120" Fill="#2196F3" />
+                    <TextBlock Text="MTM"
+                        FontSize="48"
+                        FontWeight="Bold"
+                        Foreground="White"
+                        Canvas.Left="20"
+                        Canvas.Top="30" />
+                </Canvas>
+            </Viewbox>
+
+            <!-- Application Name (Row 1) -->
+            <TextBlock Grid.Row="1"
+                Text="MTM Template Application"
+                FontSize="24"
+                FontWeight="SemiBold"
+                Foreground="#212121"
+                HorizontalAlignment="Center"
+                Margin="0,20,0,0" />
+
+            <!-- Stage Name (Row 2) -->
+            <TextBlock Grid.Row="2"
+                Text="{CompiledBinding StageName}"
+                FontSize="14"
+                Foreground="#757575"
+                HorizontalAlignment="Center"
+                Margin="0,8,0,0" />
+
+            <!-- Status Message (Row 3) -->
+            <TextBlock Grid.Row="3"
+                Text="{CompiledBinding StatusMessage}"
+                FontSize="14"
+                Foreground="#424242"
+                HorizontalAlignment="Center"
+                Margin="0,16,0,0"
+                MaxWidth="480"
+                TextWrapping="Wrap"
+                TextAlignment="Center" />
+
+            <!-- Progress Bar (Row 4) -->
+            <ProgressBar Grid.Row="4"
+                Width="480"
+                Height="8"
+                Margin="0,16,0,0"
+                HorizontalAlignment="Center"
+                Minimum="0"
+                Maximum="100"
+                Value="{CompiledBinding ProgressPercentage}"
+                Background="#E0E0E0"
+                Foreground="#2196F3"
+                CornerRadius="4" />
+
+            <!-- Progress Percentage Text (Row 5 overlay on progress bar) -->
+            <TextBlock Grid.Row="4"
+                Text="{CompiledBinding ProgressPercentage, StringFormat='{}{0}%'}"
+                FontSize="12"
+                FontWeight="Medium"
+                Foreground="#424242"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Margin="0,16,0,0" />
+
+            <!-- Error Message (Row 5 - conditionally visible) -->
+            <TextBlock Grid.Row="5"
+                Text="{CompiledBinding ErrorMessage}"
+                FontSize="12"
+                Foreground="#D32F2F"
+                HorizontalAlignment="Center"
+                Margin="0,12,0,0"
+                MaxWidth="480"
+                TextWrapping="Wrap"
+                TextAlignment="Center"
+                IsVisible="{CompiledBinding HasError}" />
+
+            <!-- Cancel Button (Row 6 - bottom margin) -->
+            <Button Grid.Row="6"
+                Content="Cancel"
+                Command="{CompiledBinding CancelBootCommand}"
+                IsVisible="{CompiledBinding IsBootInProgress}"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Bottom"
+                Margin="0,0,0,24"
+                Padding="24,8"
+                Background="#F5F5F5"
+                Foreground="#424242"
+                BorderBrush="#E0E0E0"
+                BorderThickness="1"
+                CornerRadius="4"
+                Cursor="Hand" />
+
+        </Grid>
+    </Border>
+
+</Window>

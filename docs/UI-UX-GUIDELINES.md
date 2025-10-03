@@ -1,35 +1,46 @@
-# UI and UX Guidelines for Shop-Floor Use
-Design guidance for reliable operator experience.
+# UI & UX Guidelines for Shop-Floor Use
 
-For humans
-- Purpose: Reduce errors and speed up tasks with clear, touch-friendly screens.
-- When used: Designing or reviewing any screen.
-- Dependencies: Localization, converters/formatters, accessibility settings.
-- What depends on it: All features.
-- Priority: High.
+> **Purpose:** Reliable operator experience—reduce errors, speed up tasks, ensure clarity and touch-friendliness.
 
-For AI agents
-- Intent: Provide patterns for large targets, high-contrast themes, minimal typing (scan-first), progress and error feedback, and offline banners.
-- Dependencies: Theming (post-splash), barcode service, validation, navigation.
-- Consumers: All views.
-- Non-functionals: Low cognitive load, latency under 300 ms for critical interactions.
-- Priority: High.
+## Overview
 
-Guidelines
-- Touch targets ≥ 44x44 px; large type.
-- Scan-first workflows; minimize free text.
-  - Part number input: 30-char max (PART.ID constraint from Visual)
-  - Location code input: 15-char max (LOCATION.ID constraint from Visual)
-  - Lot number input: 30-char max (TRACE.ID constraint from Visual)
-- Clear state banners: Online, Degraded (Visual cache age), Offline (queued transactions count).
-  - Show last Visual sync timestamp in Degraded mode
-  - Display queue depth in Offline mode
-- Timers and blocking actions show cancellable progress.
-- Accessibility: Color contrast, focus states, keyboard support on desktop.
+| Audience      | Intent / Priority                                                                                                  | Dependencies / Consumers                                       | Non-Functionals                                                           |
+| ------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| **Humans**    | Clear, fast, error-resistant screens. <br> **Priority:** High                                                      | Localization, converters, accessibility                        | All features depend on these guidelines.                                  |
+| **AI Agents** | Large targets, high-contrast themes, scan-first, progress/error feedback, offline banners. <br> **Priority:** High | Theming (post-splash), barcode service, validation, navigation | All views. <br> Low cognitive load, latency < 300ms for critical actions. |
 
-Clarification questions
-- Q: Default theme after splash?
-  - Why: Comfort and safety on the floor.
-  - Suggested: Auto with user override.
-  - Reason: Adaptable with control.
-  - Options: [A] Light [B] Dark [C] Auto
+---
+
+## Design Guidelines
+
+- **Touch Targets:** ≥ 44x44 px; use large type.
+- **Scan-First Workflows:** Minimize free text input.
+  - **Part Number:** Max 30 chars (`PART.ID` constraint, Visual ERP)
+  - **Location Code:** Max 15 chars (`LOCATION.ID` constraint, Visual ERP)
+  - **Lot Number:** Max 30 chars (`TRACE.ID` constraint, Visual ERP)
+- **State Banners:**
+  - **Online:** Normal operation.
+  - **Degraded:** Show last Visual sync timestamp; indicate cache age.
+  - **Offline:** Display queued transaction count (queue depth).
+- **Progress & Blocking Actions:** Show cancellable progress indicators.
+- **Accessibility:** Ensure color contrast, visible focus states, keyboard support.
+
+---
+
+## Theming & Feedback
+
+- **Default Theme After Splash:** Auto (with user override recommended for comfort/safety).
+  - **Options:** [A] Light [B] Dark [C] Auto
+- **Banner Feedback:** Always show current state (Online/Degraded/Offline) with relevant details.
+
+---
+
+## Clarification Questions
+
+- **Q:** What is the default theme after splash?
+  - **A:** Auto, with user override.
+  - **Reason:** Comfort and safety; adaptable with control.
+
+---
+
+> **Note:** All UI/XAML must use `x:DataType` and `{CompiledBinding}` (see [Constitution VI](../.specify/memory/constitution.md)). Accessibility and scan-first patterns are mandatory for manufacturing reliability.

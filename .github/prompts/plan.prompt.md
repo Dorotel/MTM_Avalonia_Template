@@ -11,12 +11,52 @@ $ARGUMENTS
 Given the implementation details provided as an argument, do this:
 
 1. Run `.specify/scripts/powershell/setup-plan.ps1 -Json` from the repo root and parse JSON for FEATURE_SPEC, IMPL_PLAN, SPECS_DIR, BRANCH. All future file paths must be absolute.
-   - BEFORE proceeding, inspect FEATURE_SPEC for a `## Clarifications` section with at least one `Session` subheading. If missing or clearly ambiguous areas remain (vague adjectives, unresolved critical choices), PAUSE and instruct the user to run `/clarify` first to reduce rework. Only continue if: (a) Clarifications exist OR (b) an explicit user override is provided (e.g., "proceed without clarification"). Do not attempt to fabricate clarifications yourself.
+   - BEFORE proceeding, check for clarifications using this two-step approach:
+     
+     **Step 1: Check for clarify folder with answered questions**
+     - Construct clarify folder path: `{FEATURE_DIR}/clarify/` (where FEATURE_DIR is the directory containing FEATURE_SPEC)
+     - If clarify folder exists:
+       * List all `outstanding-questions-*.md` files in the directory
+       * Read each file and extract answered questions (look for `**Answer:` or `Answer:` patterns after question sections)
+       * If files contain answered questions, treat this as VALID clarification source
+       * Aggregate all answers from all clarification files for use in planning
+       * Continue to Step 2 for dual-check
+     
+     **Step 2: Check spec file for Clarifications section** (legacy/inline method)
+     - Inspect FEATURE_SPEC for a `## Clarifications` section with at least one `Session` subheading
+     - This method is used for single-feature specs that used interactive clarification
+     
+     **Proceed if EITHER:**
+     - (a) Clarify folder exists with answered question files, OR
+     - (b) Clarifications section exists in spec with Session subheadings, OR
+     - (c) Explicit user override provided (e.g., "proceed without clarification")
+     
+     **PAUSE and instruct user to run `/clarify` first if:**
+     - Neither clarify folder nor Clarifications section found, AND
+     - Clearly ambiguous areas remain (vague adjectives, unresolved critical choices), AND
+     - No explicit user override provided
+     
+     Do not attempt to fabricate clarifications yourself.
 2. Read and analyze the feature specification to understand:
    - The feature requirements and user stories
    - Functional and non-functional requirements
    - Success criteria and acceptance criteria
    - Any technical constraints or dependencies mentioned
+   
+   **If clarify folder was found in Step 1**, also read and incorporate all clarification answers:
+   - Load all `outstanding-questions-*.md` files from `{FEATURE_DIR}/clarify/`
+   - Extract answered questions in format: `**Answer: [Option] — [Description]` or `Answer: [Option] — [Description]`
+   - Parse the reasoning sections that follow each answer
+   - Build a comprehensive clarification context covering:
+     * Configuration and environment decisions
+     * Data layer and connectivity policies
+     * Security and authentication mechanisms
+     * Performance thresholds and retry strategies
+     * User experience patterns and behaviors
+     * Integration constraints and protocols
+   - Use these clarification answers to inform design decisions throughout planning
+   - Reference specific clarification answers when making architectural choices (e.g., "Per Q3 in Data Layer clarifications, using exponential backoff: 1s, 2s, 4s, 8s, 16s")
+   - If answers conflict with spec statements, clarification answers take precedence (they represent more recent decisions)
 
 3. Read the constitution at `.specify/memory/constitution.md` to understand constitutional requirements.
 

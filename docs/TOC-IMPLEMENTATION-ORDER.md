@@ -1,145 +1,156 @@
-# Implementation Order (TOC) for Your Current Files# Implementation Order (TOC) for Your Current Files
+# Implementation Order (TOC) — Constitutional Compliance
 
+_Audience: Step-by-step order, always building foundations first. Each step explains why it's next, dependencies, and what "done" means. All steps comply with the MTM Avalonia Template Constitution v1.1.0._
 
+---
 
-Audience: practical, step‑by‑step order so you always build foundations first. Each step says why it's next, what it depends on, and what "done" looks like.Audience: practical, step‑by‑step order so you always build foundations first. Each step says why it’s next, what it depends on, and what “done” looks like.
+## Major Constitutional Rules
 
+- **Cross-Platform First:** All features must work on Windows, Linux, macOS. Platform-specific code is abstracted via DI and interfaces.
+- **MVVM Community Toolkit:** All ViewModels use `[ObservableObject]`, `[ObservableProperty]`, `[RelayCommand]`, and constructor DI.
+- **CompiledBinding Only:** All XAML must use `{CompiledBinding}` with `x:DataType` and `x:CompileBindings="True"`.
+- **Test-First Development:** All features require xUnit tests before implementation; >80% coverage on critical paths.
+- **Async/Await Patterns:** All async methods require `CancellationToken` parameters.
+- **Security-First:** Credentials stored in OS-native storage; no Visual writes; audit logging enforced.
+- **Spec-Driven:** All features follow Spec-Kit workflow (`/specify`, `/plan`, `/tasks`, etc.).
 
+---
 
-Major rules to keep in mindMajor rules to keep in mind
+## Phase 1 — Security and Foundations
 
-- Security-first: Understand Visual read-only constraints before building anything to prevent rework.- Splash-first: Start with a plain loading screen that initializes services; no themes/services used by the splash itself.
+1. **`docs/SECURITY-COMPLIANCE-POLICY.md`**
 
-- Infor Visual ERP: Read‑only via API Toolkit. Never write to Visual. Login uses the current user's Visual username/password (validated locally in MAMP).- Infor Visual ERP: Read‑only via API Toolkit. Never write to Visual. Login uses the current user’s Visual username/password (validated locally in MAMP).
+- **Why:** Establish Visual read-only boundaries, credential storage, and audit requirements.
+- **Dependencies:** None
+- **Done When:** Team understands Visual read-only, credential handling (OS-native), audit logging (Serilog).
+- **Constitution:** Security guidelines, Null Safety, Error Resilience.
 
-  - Visual Schema: 14,796 fields across tables (MTMFG Tables.csv), 14,776 field definitions (Visual Data Table.csv), 1,266 FK relationships (MTMFG Relationships.csv)- Android: Never connects to Visual directly (use your API projections). Desktop may consume Visual read-only data via Toolkit if IT permits.
+2. **`docs/ENVIRONMENTS-AND-CONFIG.md`**
 
-  - Key Tables: PART (30-char ID), LOCATION (15-char ID), WAREHOUSE (15-char ID), SHOP_RESOURCE (15-char ID), SITE (15-char ID)- Spec-driven: Every feature later references acceptance criteria (AC IDs) and traceability.
+- **Why:** Manage Dev/Staging/Prod configs, feature flags, and Toolkit endpoints.
+- **Dependencies:** Security policy
+- **Done When:** Environment switching works; configs use DI; credentials not hardcoded.
+- **Constitution:** Cross-Platform, DI via AppBuilder.
 
-- Android: Never connects to Visual directly (use your API projections). Desktop may consume Visual read-only data via Toolkit if IT permits.
+3. **`docs/BOOT-SEQUENCE.md`**
 
-- Spec-driven: Every feature later references acceptance criteria (AC IDs) and traceability.Phase 1 — Absolute Foundations
+- **Why:** Predictable startup, service initialization order, splash screen.
+- **Dependencies:** Security, environment config
+- **Done When:** Splash screen initializes via DI; caches warmed; diagnostics pass.
+- **Constitution:** MVVM, DI, CompiledBinding, Async/Await.
 
-1) docs/BOOT-SEQUENCE.md
+---
 
-Phase 1 — Security and Foundations (Build Constraints First)2) docs/ENVIRONMENTS-AND-CONFIG.md
+## Phase 2 — Data and Visual Boundaries
 
-1) docs/SECURITY-COMPLIANCE-POLICY.md3) docs/SECURITY-COMPLIANCE-POLICY.md
+4. **`docs/DATA-CONTRACTS.md`**
 
-   - WHY: Establish read-only Visual boundaries and security policies before any code
+- **Why:** Stable DTOs for API, storage, and UI; exact field lengths/types from Visual.
+- **Dependencies:** Security, Visual schema
+- **Done When:** DTOs use nullable reference types; validation via FluentValidation.
+- **Constitution:** Null Safety, Validation, Test-First.
 
-   - DEPENDENCIES: NonePhase 2 — Data and Visual Boundaries
+5. **`docs/VISUAL-CREDENTIALS-FLOW.md`**
 
-   - DONE WHEN: Team understands no Visual writes, credential handling, audit requirements4) docs/DATA-CONTRACTS.md
+- **Why:** Secure credential handling before Visual access.
+- **Dependencies:** Security, data contracts
+- **Done When:** Local validation; OS-native credential storage; no plaintext.
+- **Constitution:** Security, Null Safety.
 
-   - VISUAL SCHEMA: References APPLICATION_USER table (Lines: 564-592), Visual read-only enforcement rules5) docs/VISUAL-WHITELIST.md
+6. **`docs/VISUAL-WHITELIST.md`**
 
-6) docs/VISUAL-CREDENTIALS-FLOW.md
+- **Why:** Explicit allowlist for Visual reads; CSV line references.
+- **Dependencies:** Data contracts, credentials flow
+- **Done When:** Allowlist documented; FK relationships mapped.
+- **Constitution:** Security, Spec-Driven.
 
-2) docs/ENVIRONMENTS-AND-CONFIG.md
+---
 
-   - WHY: Configuration management for Dev/Staging/Prod environmentsPhase 3 — Platform Access and Reliability
+## Phase 3 — Platform Access and Reliability
 
-   - DEPENDENCIES: Security policies7) docs/API-SPECIFICATION.md
+7. **`docs/API-SPECIFICATION.md`**
 
-   - DONE WHEN: Environment switching works; feature flags defined; Toolkit endpoints configured8) docs/OFFLINE-SYNC-POLICY.md
+- **Why:** Android-server contract; endpoints with Visual field constraints.
+- **Dependencies:** Data contracts, Visual whitelist
+- **Done When:** Endpoints defined; error shapes standardized; cancellation supported.
+- **Constitution:** Async/Await, Null Safety, Test-First.
 
-   - VISUAL SCHEMA: Cache size planning (PART: 117 fields, LOCATION: 14 fields, WAREHOUSE: 16 fields, SHOP_RESOURCE: 42 fields)
+8. **`docs/OFFLINE-SYNC-POLICY.md`**
 
-Phase 4 — UX, Scanning, Roles
+- **Why:** Graceful connectivity handling; offline-first support.
+- **Dependencies:** API spec, Visual whitelist
+- **Done When:** Modes defined; queue implemented; conflict resolution rules clear.
+- **Constitution:** Manufacturing Domain, Null Safety.
 
-3) docs/BOOT-SEQUENCE.md9) docs/UI-UX-GUIDELINES.md
+---
 
-   - WHY: Predictable startup with service initialization order10) docs/BARCODE-AND-LABELING-STANDARDS.md
+## Phase 4 — UX, Scanning, Roles
 
-   - DEPENDENCIES: Security policies, environment config11) docs/ROLES-AND-PERMISSIONS.md
+9. **`docs/ROLES-AND-PERMISSIONS.md`**
 
-   - DONE WHEN: Splash screen initializes all services; caches warmed; diagnostics pass
+- **Why:** Authorization model; role-to-action mappings.
+- **Dependencies:** Security, API spec
+- **Done When:** Role mappings clear; approval workflows; Visual read-only enforced.
+- **Constitution:** Manufacturing Domain, Security.
 
-   - VISUAL SCHEMA: Prefetch specifications for PART (Lines: 5779-5888), LOCATION (Lines: 5246-5263), WAREHOUSE (Lines: 14262-14288), SHOP_RESOURCE (Lines: 9299-9343)Phase 5 — Quality, Traceability, Support
+10. **`docs/UI-UX-GUIDELINES.md`**
 
-12) docs/TEST-STRATEGY-AND-TRACEABILITY.md
+- **Why:** Consistent operator experience; accessibility.
+- **Dependencies:** Roles and permissions
+- **Done When:** Touch targets, scan-first patterns, CompiledBinding in XAML, semantic tokens for theming.
+- **Constitution:** Theme V2, CompiledBinding, Accessibility.
 
-Phase 2 — Data and Visual Boundaries13) docs/TROUBLESHOOTING-CATALOG.md
+11. **`docs/BARCODE-AND-LABELING-STANDARDS.md`**
 
-4) docs/DATA-CONTRACTS.md14) docs/COPILOT-ASSETS-CHECKLIST.md
+- **Why:** Reliable scanning/printing; GS1 parsing; label templates.
+- **Dependencies:** Data contracts, UI/UX guidelines
+- **Done When:** Label templates use semantic tokens; validation against Visual cache.
+- **Constitution:** Manufacturing Domain, Theme V2.
 
-   - WHY: Stable entity shapes for API, storage, and UI bindings15) docs/SPECIFY-CHECKLIST.md
+---
 
-   - DEPENDENCIES: Security policy, Visual schema knowledge
+## Phase 5 — Quality, Traceability, Support
 
-   - DONE WHEN: DTOs defined with exact field lengths from Visual; validation rules documentedPhase 6 — Feature Docs (run /specify)
+12. **`docs/TEST-STRATEGY-AND-TRACEABILITY.md`**
 
-   - VISUAL SCHEMA: PART.ID nvarchar(30) Line: 5780, LOCATION.ID nvarchar(15) Line: 5247, exact field types and lengths16) Generate feature specs under docs/specs/features/* using the prompt library.
+- **Why:** Quality gates; AC-to-test mapping; Visual citation validation.
+- **Dependencies:** All above
+- **Done When:** xUnit tests for all features; >80% coverage; Spec-Kit traceability.
+- **Constitution:** Test-First, Spec-Driven.
 
-5) docs/VISUAL-CREDENTIALS-FLOW.md
-   - WHY: Secure credential handling before accessing Visual
-   - DEPENDENCIES: Security policy, data contracts
-   - DONE WHEN: Local validation implemented; Toolkit session established; no plaintext storage
-   - VISUAL SCHEMA: APPLICATION_USER.NAME nvarchar(20) Line: 565, USER_PWD nvarchar(90) Line: 576
+13. **`docs/TROUBLESHOOTING-CATALOG.md`**
 
-6) docs/VISUAL-WHITELIST.md
-   - WHY: Explicit allowlist of what can be read from Visual
-   - DEPENDENCIES: Data contracts, credentials flow
-   - DONE WHEN: Allowlist documented with CSV line references; Toolkit commands cited; FK relationships mapped
-   - VISUAL SCHEMA: All key tables with CSV line numbers, FK relationships from MTMFG Relationships.csv (1,266 relationships)
+- **Why:** Support efficiency; Visual-specific errors.
+- **Dependencies:** All operational docs
+- **Done When:** Common issues documented; resolution steps clear.
+- **Constitution:** Documentation Standards.
 
-Phase 3 — Platform Access and Reliability
-7) docs/API-SPECIFICATION.md
-   - WHY: Android-server communication contract
-   - DEPENDENCIES: Data contracts, Visual whitelist
-   - DONE WHEN: Endpoints defined with Visual field constraints; projections documented; error shapes standardized
-   - VISUAL SCHEMA: Visual projection endpoints with exact field lengths and sources
+14. **`docs/COPILOT-ASSETS-CHECKLIST.md`**
 
-8) docs/OFFLINE-SYNC-POLICY.md
-   - WHY: Handle connectivity issues gracefully
-   - DEPENDENCIES: API specification, Visual whitelist
-   - DONE WHEN: Online/Degraded/Offline modes defined; queue implemented; conflict resolution rules clear
-   - VISUAL SCHEMA: Cache validation against Visual tables, FK integrity checks during offline mode
+- **Why:** AI assistance consistency; Copilot instructions reflect Visual constraints.
+- **Dependencies:** All documentation complete
+- **Done When:** `copilot-instructions.md` matches constitution; templates reference specs.
+- **Constitution:** Spec-Driven, Documentation.
 
-Phase 4 — UX, Scanning, Roles
-9) docs/ROLES-AND-PERMISSIONS.md
-   - WHY: Authorization model before building features
-   - DEPENDENCIES: Security policy, API specification
-   - DONE WHEN: Role-to-action mappings clear; approval workflows defined; Visual read-only enforced at all levels
-   - VISUAL SCHEMA: APPLICATION_USER.IS_ADMIN Line: 574, role enforcement with Visual read-only constraint
+15. **`docs/SPECIFY-CHECKLIST.md`**
 
-10) docs/UI-UX-GUIDELINES.md
-   - WHY: Consistent operator experience
-   - DEPENDENCIES: Roles and permissions
-   - DONE WHEN: Touch targets, scan-first patterns, state banners designed; accessibility rules defined
-   - VISUAL SCHEMA: Field length constraints for inputs (PART.ID 30-char, LOCATION.ID 15-char, TRACE.ID 30-char)
+- **Why:** Documentation generation consistency.
+- **Dependencies:** All core docs
+- **Done When:** `/specify` prompts validate Visual constraints; CSV citations automated.
+- **Constitution:** Spec-Driven.
 
-11) docs/BARCODE-AND-LABELING-STANDARDS.md
-   - WHY: Reliable scanning and printing
-   - DEPENDENCIES: Data contracts, UI/UX guidelines
-   - DONE WHEN: GS1 parsing rules defined; label templates created; validation against Visual cache specified
-   - VISUAL SCHEMA: PART.ID (30-char) Line: 5780, PART.STOCK_UM (15-char) Line: 5791, lot validation
+---
 
-Phase 5 — Quality, Traceability, Support
-12) docs/TEST-STRATEGY-AND-TRACEABILITY.md
-   - WHY: Quality gates and AC tracking
-   - DEPENDENCIES: All above (tests validate everything)
-   - DONE WHEN: Test layers defined; AC-to-test mapping automated; Visual citation validation in CI
-   - VISUAL SCHEMA: Field validation rules, FK relationship tests, read-only enforcement tests
+## Phase 6 — Feature Docs (run `/specify`)
 
-13) docs/TROUBLESHOOTING-CATALOG.md
-   - WHY: Support efficiency
-   - DEPENDENCIES: All operational documents
-   - DONE WHEN: Common issues documented; resolution steps clear; Visual-specific errors covered
-   - VISUAL SCHEMA: Visual table/field references for error diagnosis, FK relationship troubleshooting
+16. **Generate feature specs under `docs/specs/features/*` using Spec-Kit.**
 
-14) docs/COPILOT-ASSETS-CHECKLIST.md
-   - WHY: AI assistance consistency
-   - DEPENDENCIES: All documentation complete
-   - DONE WHEN: copilot-instructions.md reflects Visual constraints; templates reference specs
+- Each spec must reference Visual schema with CSV line numbers.
+- All Visual data access must cite Toolkit commands/pages.
+- All ViewModels use MVVM Community Toolkit and CompiledBinding.
+- All async methods support cancellation.
+- All features have xUnit tests before implementation.
 
-15) docs/SPECIFY-CHECKLIST.md
-   - WHY: Documentation generation consistency
-   - DEPENDENCIES: All core documents
-   - DONE WHEN: /specify prompts validate Visual constraints; CSV citations automated
+---
 
-Phase 6 — Feature Docs (run /specify)
-16) Generate feature specs under docs/specs/features/* using the prompt library.
-    - Each feature spec must reference Visual schema with CSV line numbers
-    - All Visual data access must cite Toolkit commands and pages
+**All phases and documents must comply with the MTM Avalonia Template Constitution v1.1.0.**

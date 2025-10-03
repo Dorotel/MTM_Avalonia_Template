@@ -1,102 +1,77 @@
-# Features Checklist — Template Avalonia Application (Windows + Android)
+# Features Checklist — MTM Avalonia Template
 
-Rule
-- If it says “MANDATORY” next to an item, it is required.
-- If it does NOT say “MANDATORY,” it is optional.
+> **How to use:**
+>
+> - Check off what you plan to include now.
+> - Every enabled item must follow our doc format:
+>   - “For humans” and “For AI agents”
+>   - Acceptance criteria (AC IDs)
+>   - Edge cases
+>   - Data needs (Visual via API Toolkit, with citations)
+>   - Platform notes
+>   - Traceability
+>   - Quick clarification questions
 
-How to use this checklist
-- Check off what you plan to include now. You can add optional items later.
-- Every enabled item should follow our doc format with “For humans” and “For AI agents,” plus acceptance criteria (AC IDs) where it makes sense, edge cases, data needs (Visual via API Toolkit with citations), platform notes, traceability, and quick clarification questions.
+---
 
---------------------------------------------------------------------------------
+## Mandatory Features (`MANDATORY`)
 
-## Mandatory (tagged “MANDATORY”)
+| Feature                           | Status | Doc                                                                                      | Summary                                                             |
+| --------------------------------- | ------ | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Splash‑first Boot Sequence        | ✅     | [BOOT-SEQUENCE.md](/docs/BOOT-SEQUENCE.md)                                               | Plain loading screen starts first, wakes up all app parts in order. |
+| Environments & Configuration      | ✅     | [ENVIRONMENTS-AND-CONFIG.md](/docs/ENVIRONMENTS-AND-CONFIG.md)                           | One place to set “Dev, Test, Prod” and server addresses.            |
+| Data Contracts                    | ✅     | [DATA-CONTRACTS.md](/docs/DATA-CONTRACTS.md)                                             | Lists of fields (e.g., Part Number, Location Code) and sizes.       |
+| Test Strategy & Traceability      | ✅     | [TEST-STRATEGY-AND-TRACEABILITY.md](/docs/TEST-STRATEGY-AND-TRACEABILITY.md)             | Every rule has a test, tracked to PRs.                              |
+| UI & UX Guidelines                | ⬜     | [UI-UX-GUIDELINES.md](/docs/UI-UX-GUIDELINES.md)                                         | Designs for shop floor: easy tap/read, banners for online/offline.  |
+| Roles & Permissions               | ⬜     | [ROLES-AND-PERMISSIONS.md](/docs/ROLES-AND-PERMISSIONS.md)                               | Defines who can do what (e.g., Supervisor approvals).               |
+| Troubleshooting Catalog           | ⬜     | [TROUBLESHOOTING-CATALOG.md](/docs/TROUBLESHOOTING-CATALOG.md)                           | Quick fixes for common problems (Visual, scanner, printer).         |
+| Copilot Assets Checklist          | ⬜     | [COPILOT-ASSETS-CHECKLIST.md](/docs/COPILOT-ASSETS-CHECKLIST.md)                         | AI helpers get correct rules/templates.                             |
+| Specify Command Checklist         | ⬜     | [SPECIFY-CHECKLIST.md](/docs/SPECIFY-CHECKLIST.md)                                       | How to run `/specify` prompts for consistent docs.                  |
+| Master TOC & Implementation Order | ⬜     | [TOC.md](/docs/TOC.md), [TOC-IMPLEMENTATION-ORDER.md](/docs/TOC-IMPLEMENTATION-ORDER.md) | Master index and build order.                                       |
+| Update & Version Check            | ⬜     | _(notifications/policies)_                                                               | Notifies users of new versions and changes.                         |
+| Modular Extensions Framework      | ⬜     | _(future plug-ins)_                                                                      | Add new app parts later without breaking core.                      |
 
-- [x] Splash‑first Boot Sequence (docs/BOOT-SEQUENCE.md) — MANDATORY
-  - Simple explanation: A plain loading screen starts first and wakes up all the app’s parts in the right order. This keeps startup clean and safe.
+> **Note:**
+> Data Contracts are `MANDATORY` when using `/specify` for specs. Otherwise, strongly recommended.
 
-- [x] Environments and Configuration (docs/ENVIRONMENTS-AND-CONFIG.md) — MANDATORY
-  - Simple explanation: One place to set “Dev, Test, or Prod” and all server addresses so you can switch without changing code.
+---
 
-- [x] Data Contracts (docs/DATA-CONTRACTS.md) — MANDATORY when used by /specify
-  - Simple explanation: Clear lists of fields (like Part Number, Location Code) and their sizes. Everyone uses the same shapes so things fit together.
+## Optional Features
 
-- [x] Test Strategy and Traceability (docs/TEST-STRATEGY-AND-TRACEABILITY.md) — MANDATORY
-  - Simple explanation: Every rule has a test, and we track rule → test → pull request so nothing slips through.
+| Feature                      | Status | Doc                                                                          | Summary                                                              |
+| ---------------------------- | ------ | ---------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Security & Compliance        | ⬜     | [SECURITY-COMPLIANCE-POLICY.md](/docs/SECURITY-COMPLIANCE-POLICY.md)         | Data safety rules (HTTPS, no secrets in files, Visual is read-only). |
+| Visual Credentials Flow      | ⬜     | [VISUAL-CREDENTIALS-FLOW.md](/docs/VISUAL-CREDENTIALS-FLOW.md)               | Local Visual login, then connect in read-only mode.                  |
+| Visual Read‑Only Allowlist   | ⬜     | [VISUAL-WHITELIST.md](/docs/VISUAL-WHITELIST.md)                             | Approved read-only Visual data list. No writes.                      |
+| Inventory API Specification  | ⬜     | [API-SPECIFICATION.md](/docs/API-SPECIFICATION.md)                           | Phone app talks to server, not direct to Visual/MySQL.               |
+| Offline & Sync Policy        | ⬜     | [OFFLINE-SYNC-POLICY.md](/docs/OFFLINE-SYNC-POLICY.md)                       | Handles internet drops—save now, send later, safe retry.             |
+| Barcode & Labeling Standards | ⬜     | [BARCODE-AND-LABELING-STANDARDS.md](/docs/BARCODE-AND-LABELING-STANDARDS.md) | Which barcodes to scan, label requirements.                          |
+| Receiving Purchase Orders    | ⬜     | [receiving.md](/docs/specs/features/receiving.md)                            | Goods arrival, PO matching, lots, labels.                            |
+| Put‑Away                     | ⬜     | [put-away.md](/docs/specs/features/put-away.md)                              | Move items to bins/racks, QC/allergen rules.                         |
+| Location Management          | ⬜     | [location-management.md](/docs/specs/features/location-management.md)        | Bin/rack accuracy, Visual reference sync.                            |
+| Kitting to Work Orders       | ⬜     | [kitting.md](/docs/specs/features/kitting.md)                                | Picking parts, substitutions, kit labels.                            |
+| Cycle Counts                 | ⬜     | [cycle-counts.md](/docs/specs/features/cycle-counts.md)                      | Frequent counts, recounts, approvals.                                |
+| Traceability                 | ⬜     | [traceability.md](/docs/specs/features/traceability.md)                      | List raw lots for finished goods, audit support.                     |
+| Reporting & KPIs             | ⬜     | [reporting.md](/docs/specs/features/reporting.md)                            | Key metrics, calculation explanations.                               |
+| Printing Pipeline Extensions | ⬜     | _(advanced templates/printer overrides)_                                     | Extra printing tools/templates for special cases.                    |
 
-- [ ] UI and UX Guidelines (docs/UI-UX-GUIDELINES.md) — MANDATORY
-  - Simple explanation: Designs that are easy to tap and read on the shop floor. Clear banners show when you’re online, limited, or offline.
+---
 
-- [ ] Roles and Permissions (docs/ROLES-AND-PERMISSIONS.md) — MANDATORY
-  - Simple explanation: Who can do what. For example, only a Supervisor can approve an over‑receipt or a big change.
+## Validation Reminders
 
-- [ ] Troubleshooting Catalog (docs/TROUBLESHOOTING-CATALOG.md) — MANDATORY
-  - Simple explanation: Quick “fix it” steps for common problems like “can’t reach Visual,” “scanner not working,” or “printer won’t print.”
-
-- [ ] Copilot Assets Checklist (docs/COPILOT-ASSETS-CHECKLIST.md) — MANDATORY
-  - Simple explanation: Makes AI helpers smarter by giving them the right rules and templates for your project.
-
-- [ ] Specify Command Checklist (docs/SPECIFY-CHECKLIST.md) — MANDATORY
-  - Simple explanation: How to run the /specify prompts so your feature docs are created the same way every time.
-
-- [ ] Master TOC (docs/TOC.md) and Implementation Order (docs/TOC-IMPLEMENTATION-ORDER.md) — MANDATORY
-  - Simple explanation: The master index and the step‑by‑step build order so you always know what to do next.
-
-- [ ] Update and Version Check (notifications and policies) — MANDATORY
-  - Simple explanation: Tells users when a new app version is ready and what changed. Can require minimum versions if needed.
-
-- [ ] Modular Extensions Framework (future plug‑ins) — MANDATORY
-  - Simple explanation: Lets you add new parts to the app later (like advanced reports) without breaking the core.
-
-Note about “MANDATORY when used by /specify”
-- Data Contracts are mandatory when you are using /specify to generate or manage spec files, because /specify needs stable field shapes. If you are not using /specify yet, you may stage this, but it’s still strongly recommended.
-
---------------------------------------------------------------------------------
-
-## Optional (no “MANDATORY” tag)
-
-- [ ] Security and Compliance (docs/SECURITY-COMPLIANCE-POLICY.md)
-  - Simple explanation: Rules that keep your data safe (HTTPS, no secret passwords in files, Visual is read‑only). Highly recommended.
-
-- [ ] Visual Credentials Flow (docs/VISUAL-CREDENTIALS-FLOW.md)
-  - Simple explanation: Users type their Visual username and password. We check it locally first, then connect to Visual in read‑only mode.
-
-- [ ] Visual Read‑Only Allowlist (API Toolkit) (docs/VISUAL-WHITELIST.md)
-  - Simple explanation: The approved “read‑only” list for Visual data. Says exactly what we can read and from where. No writes to Visual, ever.
-
-- [ ] Inventory API Specification (docs/API-SPECIFICATION.md)
-  - Simple explanation: The phone app talks to your server, not straight to Visual or MySQL. This file explains every endpoint and the data it returns.
-
-- [ ] Offline and Sync Policy (docs/OFFLINE-SYNC-POLICY.md)
-  - Simple explanation: What the app does when the internet drops—save work now, send later—with safe retry rules.
-
-- [ ] Barcode and Labeling Standards (docs/BARCODE-AND-LABELING-STANDARDS.md)
-  - Simple explanation: Which barcodes we scan (like GS1‑128) and what must be on labels (like Part, Lot, Qty). Keeps scanning and printing consistent.
-
-Feature specs (add when in scope; one file per feature in docs/specs/features/)
-- [ ] Receiving Purchase Orders (receiving.md)
-  - Simple explanation: How goods arrive and get checked in. Covers matching to POs, lots, and labels.
-- [ ] Put‑Away (put-away.md)
-  - Simple explanation: Moving items from the dock to the right bin or rack. Handles rules like QC hold or allergen areas.
-- [ ] Location Management (location-management.md)
-  - Simple explanation: Keeping bins and racks accurate. Matches your app’s locations with Visual’s reference list.
-- [ ] Kitting to Work Orders (kitting.md)
-  - Simple explanation: Picking parts for a job. Handles allowed substitutions and prints kit labels.
-- [ ] Cycle Counts (cycle-counts.md)
-  - Simple explanation: Counting a small set of items often. Handles recounts and approvals for big differences.
-- [ ] Traceability (traceability.md)
-  - Simple explanation: Given a finished good, list which raw lots were used, who did it, and when. Great for audits.
-- [ ] Reporting & KPIs (reporting.md)
-  - Simple explanation: Key numbers like inventory accuracy and count time. Explains how each number is calculated.
-- [ ] Printing Pipeline Extensions (advanced templates, per‑printer overrides)
-  - Simple explanation: Extra printing tools and templates for special labels or special printers.
-
---------------------------------------------------------------------------------
-
-Validation reminders
 - For any enabled document:
-  - Include acceptance criteria with IDs (if it makes sense), edge cases, data needs (Visual via API Toolkit with exact citations; CSV line placeholders if needed), platform notes (Windows uses MySQL directly; Android uses the API), scanning/printing when relevant, traceability hooks, and simple “why it matters” questions.
-  - Always follow the Visual rules: READ‑ONLY; use the API Toolkit only (no direct SQL); check Visual login locally in MAMP before any Visual session starts.
+  - Include acceptance criteria (with IDs), edge cases, data needs (Visual API citations), platform notes, scanning/printing, traceability hooks, and “why it matters.”
+  - Always follow Visual rules: **READ-ONLY**, use API Toolkit only, check Visual login locally before session.
 
-Tip
-- You can change an item from optional to mandatory by adding “— MANDATORY” at the end of the line.
+---
+
+## Tips
+
+- Change an item from optional to mandatory by adding `— MANDATORY` at the end of the line.
+- All docs must align with [project constitution](../.specify/memory/constitution.md):
+  - Use CommunityToolkit.Mvvm patterns
+  - CompiledBinding in XAML (`x:DataType`, `x:CompileBindings="True"`)
+  - Async methods with `CancellationToken`
+  - Test-first (xUnit, >80% coverage)
+  - DI via AppBuilder
+  - Theming via semantic tokens

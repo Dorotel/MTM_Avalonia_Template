@@ -1,42 +1,84 @@
 # Troubleshooting Catalog
-Common problems, symptoms, and fixes.
 
-For humans
-- Purpose: Speed up resolution on the floor and for IT.
-- When used: When something breaks or behaves strangely.
-- Dependencies: Logging, health checks, diagnostics.
-- What depends on it: Support efficiency.
-- Priority: Medium-High.
+> **Purpose:** Speed up resolution for operators and IT.
+> **Usage:** Reference when issues arise or abnormal behavior occurs.
+> **Dependencies:** Logging, health checks, diagnostics, telemetry.
+> **Priority:** Medium-High
 
-For AI agents
-- Intent: Provide a symptom→cause→action table for Visual Toolkit connectivity, MySQL/API issues, scanning, printing, and caches.
-- Dependencies: Telemetry, health endpoints.
-- Consumers: Support teams, operators.
-- Non-functionals: Clear language, short steps, link to detailed logs.
-- Priority: Medium-High.
+---
 
-Sections
-- Visual offline or Toolkit error:
-  - Check credentials (APPLICATION_USER.NAME nvarchar(20), Visual Data Table.csv Line: 565) validated locally first
-  - Confirm Toolkit endpoint reachability; review allowlist (PART: 30-char max, LOCATION: 15-char max)
-  - Use cached master data (last sync timestamp shown in banner)
-  - Verify read-only access: no writes to Visual tables (PART, LOCATION, WAREHOUSE, SHOP_RESOURCE, SITE)
-  - Check foreign key relationships cache: LOCATION→WAREHOUSE (FK Line: 427), PART_LOCATION (FK Lines: 459-460)
-  - Notify IT with specific table/field reference if projection fails
-- MySQL unavailable:
-  - Confirm MAMP running and port (default 3306); check MySQL service status
-  - Switch to API for tests; review firewall rules
-  - Verify local app database (not Visual) is the target
-- Android can’t reach API:
-  - Use 10.0.2.2 for emulator; check TLS certificates; firewall rules.
-- Scanning fails:
-  - Confirm symbology; camera permission; ambient lighting; hardware status.
-- Printing fails:
-  - Printer online; correct language (ZPL); driver settings; test-print template.
+## For AI Agents
 
-Clarification questions
-- Q: Allow operators to send diagnostic bundles to IT?
-  - Why: Faster support.
-  - Suggested: Yes, with consent and redaction.
-  - Reason: Balance privacy and speed.
-  - Options: [A] Yes [B] No
+- **Intent:** Provide a concise symptom → cause → action table for Visual Toolkit connectivity, MySQL/API, scanning, printing, and cache issues.
+- **Dependencies:** Telemetry, health endpoints.
+- **Consumers:** Support teams, operators.
+- **Non-functionals:** Clear language, short actionable steps, links to detailed logs.
+
+---
+
+## Troubleshooting Sections
+
+### Visual Offline / Toolkit Error
+
+| Symptom                         | Cause                      | Action                                                                                         |
+| ------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------- |
+| Visual error, offline banner    | Credentials not validated  | Check `APPLICATION_USER.NAME` (nvarchar(20)), validate locally                                 |
+| Toolkit endpoint unreachable    | Network/firewall/allowlist | Confirm endpoint reachability, review allowlist (`PART`: 30-char max, `LOCATION`: 15-char max) |
+| Data not updating               | Using stale cache          | Use cached master data (check last sync timestamp in banner)                                   |
+| Write attempts to Visual tables | Read-only access required  | Verify no writes to Visual tables (`PART`, `LOCATION`, `WAREHOUSE`, `SHOP_RESOURCE`, `SITE`)   |
+| Foreign key errors              | Cache mismatch             | Check FK cache: `LOCATION→WAREHOUSE` (FK Line: 427), `PART_LOCATION` (FK Lines: 459-460)       |
+| Projection fails                | Table/field mismatch       | Notify IT with specific table/field reference                                                  |
+
+---
+
+### MySQL Unavailable
+
+| Symptom                 | Cause                        | Action                                                      |
+| ----------------------- | ---------------------------- | ----------------------------------------------------------- |
+| Cannot connect to MySQL | MAMP not running, wrong port | Confirm MAMP running, port 3306, check MySQL service status |
+| API tests fail          | Firewall or endpoint issue   | Switch to API for tests, review firewall rules              |
+| Wrong database targeted | Misconfiguration             | Verify local app database (not Visual) is the target        |
+
+---
+
+### Android Cannot Reach API
+
+| Symptom                       | Cause                   | Action                                                              |
+| ----------------------------- | ----------------------- | ------------------------------------------------------------------- |
+| API unreachable from emulator | Wrong IP, TLS, firewall | Use `10.0.2.2` for emulator, check TLS certificates, firewall rules |
+
+---
+
+### Scanning Fails
+
+| Symptom          | Cause                     | Action                                                                  |
+| ---------------- | ------------------------- | ----------------------------------------------------------------------- |
+| Barcode not read | Symbology/camera/lighting | Confirm symbology, camera permission, ambient lighting, hardware status |
+
+---
+
+### Printing Fails
+
+| Symptom         | Cause                                  | Action                                                                              |
+| --------------- | -------------------------------------- | ----------------------------------------------------------------------------------- |
+| Print job fails | Printer offline, wrong language/driver | Ensure printer online, correct language (ZPL), driver settings, test-print template |
+
+---
+
+## Clarification Questions
+
+- **Q:** Allow operators to send diagnostic bundles to IT?
+  - **Why:** Faster support.
+  - **Suggested:** Yes, with consent and redaction.
+  - **Reason:** Balance privacy and speed.
+  - **Options:** [A] Yes [B] No
+
+---
+
+> **Formatting Standards:**
+>
+> - Use semantic headings and tables for clarity.
+> - Avoid hardcoded values; reference schema and field names.
+> - Link to logs and diagnostics where possible.
+> - Ensure cross-platform terminology (Windows, Linux, macOS, Android).
+> - Use concise, actionable steps.
