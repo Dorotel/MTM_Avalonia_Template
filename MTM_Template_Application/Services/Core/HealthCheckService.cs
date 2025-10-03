@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,8 +22,9 @@ public class HealthCheckService
     /// <summary>
     /// Run all health checks
     /// </summary>
-    public async Task<HealthCheckResult> CheckHealthAsync()
+    public async Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var results = new List<IndividualHealthCheckResult>();
 
         foreach (var check in _healthChecks)

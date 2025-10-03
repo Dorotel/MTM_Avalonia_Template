@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -15,7 +16,7 @@ public class StorageDiagnostic : IDiagnosticCheck
     private const long MinimumFreeSpaceBytes = 100 * 1024 * 1024; // 100MB minimum
     private const long RecommendedFreeSpaceBytes = 1024 * 1024 * 1024; // 1GB recommended
 
-    public async Task<DiagnosticResult> RunAsync()
+    public async Task<DiagnosticResult> RunAsync(CancellationToken cancellationToken = default)
     {
         var stopwatch = Stopwatch.StartNew();
         var details = new Dictionary<string, object>();

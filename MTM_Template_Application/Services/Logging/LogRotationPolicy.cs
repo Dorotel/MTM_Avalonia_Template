@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.IO;
 using System.Linq;
 using Serilog.Core;

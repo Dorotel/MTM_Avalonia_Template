@@ -40,7 +40,7 @@ public class LocalizationService : ILocalizationService
         ArgumentNullException.ThrowIfNull(key);
 
         var cultureName = _currentCulture.Name;
-        
+
         if (_translations.TryGetValue(cultureName, out var cultureTranslations) &&
             cultureTranslations.TryGetValue(key, out var translation))
         {
@@ -49,7 +49,7 @@ public class LocalizationService : ILocalizationService
 
         // Try fallback culture
         var fallbackCulture = _cultureProvider.GetFallbackCulture(_currentCulture);
-        if (fallbackCulture != null && 
+        if (fallbackCulture != null &&
             _translations.TryGetValue(fallbackCulture.Name, out var fallbackTranslations) &&
             fallbackTranslations.TryGetValue(key, out var fallbackTranslation))
         {

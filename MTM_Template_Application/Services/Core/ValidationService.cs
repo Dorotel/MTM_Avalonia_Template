@@ -94,7 +94,7 @@ public class ValidationService : IValidationService
             if (validatorObj is IValidator<T> validator)
             {
                 var descriptor = validator.CreateDescriptor();
-                
+
                 foreach (var member in descriptor.GetMembersWithValidators())
                 {
                     foreach (var rule in descriptor.GetRulesForMember(member.Key))

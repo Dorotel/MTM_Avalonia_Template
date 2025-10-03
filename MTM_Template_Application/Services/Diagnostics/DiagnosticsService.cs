@@ -40,7 +40,7 @@ public class DiagnosticsService : IDiagnosticsService
             cancellationToken.ThrowIfCancellationRequested();
             try
             {
-                return await check.RunAsync();
+                return await check.RunAsync(cancellationToken);
             }
             catch (Exception ex)
             {
@@ -73,7 +73,7 @@ public class DiagnosticsService : IDiagnosticsService
         cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(checkName);
 
-        var check = _diagnosticChecks.FirstOrDefault(c => 
+        var check = _diagnosticChecks.FirstOrDefault(c =>
             c.GetType().Name.Equals(checkName, StringComparison.OrdinalIgnoreCase));
 
         if (check == null)
@@ -117,15 +117,4 @@ public class DiagnosticsService : IDiagnosticsService
     {
         return _hardwareDetection.DetectCapabilities();
     }
-}
-
-/// <summary>
-/// Base interface for diagnostic checks
-/// </summary>
-public interface IDiagnosticCheck
-{
-    /// <summary>
-    /// Run the diagnostic check
-    /// </summary>
-    Task<DiagnosticResult> RunAsync();
 }

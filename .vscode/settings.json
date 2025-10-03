@@ -53,7 +53,8 @@
       "matchCommandLine": true
     },
     "/^dotnet\\b/i": true,
-    "/^git\\b/i": true
+    "/^git\\s+(commit|add|status|diff|log|branch|checkout|switch|restore|reset|stash|tag)\\b/i": true,
+    "/^git\\s+(pull|push|fetch)\\b/i": false
   },
   // ============================================================================
   // C# / .NET Configuration

@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 using MTM_Template_Application.Models.Cache;
 
@@ -21,12 +22,12 @@ public interface ICacheService
     /// <summary>
     /// Remove cached item
     /// </summary>
-    Task RemoveAsync(string key);
+    Task RemoveAsync(string key, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Clear all cached items
     /// </summary>
-    Task ClearAsync();
+    Task ClearAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Get cache statistics

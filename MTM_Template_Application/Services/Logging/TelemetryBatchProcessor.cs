@@ -49,8 +49,9 @@ public class TelemetryBatchProcessor : IDisposable
     /// <summary>
     /// Add a log entry to the batch
     /// </summary>
-    public async Task AddAsync(LogEntry entry)
+    public async Task AddAsync(LogEntry entry, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(entry);
 
         if (_disposed)
@@ -78,7 +79,7 @@ public class TelemetryBatchProcessor : IDisposable
     /// <summary>
     /// Flush all pending entries
     /// </summary>
-    public async Task FlushAsync()
+    public async Task FlushAsync(CancellationToken cancellationToken = default)
     {
         if (_disposed)
         {
