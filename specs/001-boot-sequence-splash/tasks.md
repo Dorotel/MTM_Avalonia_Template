@@ -117,15 +117,15 @@
 
 ### Integration Tests (from quickstart.md scenarios)
 
-- [ ] T055 [P] Integration test: Normal boot sequence (happy path) in tests/integration/BootSequenceTests.cs - Validate Stage 0→1→2 execution, all services initialized, performance <10s, memory <100MB
-- [ ] T056 [P] Integration test: Configuration loading and override precedence in tests/integration/ConfigurationTests.cs - Validate env vars > user config > app config > defaults, hot-reload
-- [ ] T057 [P] Integration test: Credential storage and validation in tests/integration/SecretsTests.cs - Validate OS-native storage (Windows DPAPI, macOS Keychain, Android KeyStore), encryption, retrieval
-- [ ] T058 [P] Integration test: Diagnostic checks and issue detection in tests/integration/DiagnosticsTests.cs - Validate storage, permissions, network, hardware detection
-- [ ] T059 [P] Integration test: Visual master data caching (population) in tests/integration/VisualCachingTests.cs - Validate initial cache population, LZ4 compression, TTL enforcement
-- [ ] T060 [P] Integration test: Visual master data caching (cache hits) in tests/integration/VisualCachingTests.cs - Validate cache hits reduce Visual API calls, performance improvement
-- [ ] T061 [P] Integration test: Visual master data caching (staleness detection) in tests/integration/VisualCachingTests.cs - Validate delta sync, refresh stale entries, background refresh
-- [ ] T062 [P] Integration test: Visual master data caching (offline mode) in tests/integration/VisualCachingTests.cs - Validate cached-only mode when Visual unavailable, reconnection detection
-- [ ] T063 [P] Integration test: Logging and telemetry (structured JSON) in tests/integration/LoggingTests.cs - Validate OpenTelemetry format, trace/span IDs, PII redaction, log rotation
+- [x] T055 [P] Integration test: Normal boot sequence (happy path) in tests/integration/BootSequenceTests.cs - Validate Stage 0→1→2 execution, all services initialized, performance <10s, memory <100MB
+- [x] T056 [P] Integration test: Configuration loading and override precedence in tests/integration/ConfigurationTests.cs - Validate env vars > user config > app config > defaults, hot-reload
+- [x] T057 [P] Integration test: Credential storage and validation in tests/integration/SecretsTests.cs - Validate OS-native storage (Windows DPAPI, macOS Keychain, Android KeyStore), encryption, retrieval
+- [x] T058 [P] Integration test: Diagnostic checks and issue detection in tests/integration/DiagnosticsTests.cs - Validate storage, permissions, network, hardware detection
+- [x] T059 [P] Integration test: Visual master data caching (population) in tests/integration/VisualCachingTests.cs - Validate initial cache population, LZ4 compression, TTL enforcement
+- [x] T060 [P] Integration test: Visual master data caching (cache hits) in tests/integration/VisualCachingTests.cs - Validate cache hits reduce Visual API calls, performance improvement
+- [x] T061 [P] Integration test: Visual master data caching (staleness detection) in tests/integration/VisualCachingTests.cs - Validate delta sync, refresh stale entries, background refresh
+- [x] T062 [P] Integration test: Visual master data caching (offline mode) in tests/integration/VisualCachingTests.cs - Validate cached-only mode when Visual unavailable, reconnection detection
+- [x] T063 [P] Integration test: Logging and telemetry (structured JSON) in tests/integration/LoggingTests.cs - Validate OpenTelemetry format, trace/span IDs, PII redaction, log rotation
 - [ ] T064 [P] Integration test: Error handling and recovery (network failures) in tests/integration/ErrorHandlingTests.cs - Validate exponential backoff, circuit breaker, diagnostic bundles
 - [ ] T065 [P] Integration test: Error handling and recovery (configuration errors) in tests/integration/ErrorHandlingTests.cs - Validate fallback config, error reporting, recovery
 - [ ] T066 [P] Integration test: Accessibility and localization (screen reader) in tests/integration/AccessibilityTests.cs - Validate screen reader announcements, keyboard navigation
@@ -137,13 +137,13 @@
 
 ### Contract Tests (API Validation)
 
-- [ ] T072 [P] Contract test: Visual API Toolkit whitelist validation in tests/contract/VisualApiContractTests.cs - Validate only whitelisted commands accepted (see visual-whitelist.md)
-- [ ] T073 [P] Contract test: Visual API Toolkit authentication in tests/contract/VisualApiContractTests.cs - Validate device certificate + user credentials (Android)
-- [ ] T074 [P] Contract test: Visual API Toolkit schema dictionary in tests/contract/VisualApiContractTests.cs - Validate table/column name resolution
-- [ ] T075 [P] Contract test: HTTP API endpoint availability in tests/contract/HttpApiContractTests.cs - Validate Android HTTP API endpoints respond
-- [ ] T076 [P] Contract test: MySQL connection string validation in tests/contract/MySqlContractTests.cs - Validate connection string format, role-based access
-- [ ] T077 [P] Contract test: Diagnostics API checks in tests/contract/DiagnosticsContractTests.cs - Validate diagnostic check contracts (storage, permissions, network, hardware)
-- [ ] T078 [P] Contract test: Android device certificate + two-factor auth in tests/contract/AndroidAuthContractTests.cs - Validate device cert stored in Android KeyStore + user credentials (FR-154)
+- [x] T072 [P] Contract test: Visual API Toolkit whitelist validation in tests/contract/VisualApiContractTests.cs - Validate only whitelisted commands accepted (see visual-whitelist.md)
+- [x] T073 [P] Contract test: Visual API Toolkit authentication in tests/contract/VisualApiContractTests.cs - Validate device certificate + user credentials (Android)
+- [x] T074 [P] Contract test: Visual API Toolkit schema dictionary in tests/contract/VisualApiContractTests.cs - Validate table/column name resolution
+- [x] T075 [P] Contract test: HTTP API endpoint availability in tests/contract/HttpApiContractTests.cs - Validate Android HTTP API endpoints respond
+- [x] T076 [P] Contract test: MySQL connection string validation in tests/contract/MySqlContractTests.cs - Validate connection string format, role-based access
+- [x] T077 [P] Contract test: Diagnostics API checks in tests/contract/DiagnosticsContractTests.cs - Validate diagnostic check contracts (storage, permissions, network, hardware)
+- [x] T078 [P] Contract test: Android device certificate + two-factor auth in tests/contract/AndroidAuthContractTests.cs - Validate device cert stored in Android KeyStore + user credentials (FR-154)
 
 ---
 
