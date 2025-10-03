@@ -17,6 +17,18 @@ $ARGUMENTS
    - **IF EXISTS**: Read contracts/ for API specifications and test requirements
    - **IF EXISTS**: Read research.md for technical decisions and constraints
    - **IF EXISTS**: Read quickstart.md for integration scenarios
+   - **IF EXISTS**: Read clarify/ folder for clarification decisions:
+     * Load all `{FEATURE_DIR}/clarify/outstanding-questions-*.md` files
+     * Extract answered questions and reasoning (look for `**Answer:` or `Answer:` patterns)
+     * Use clarification answers to guide implementation choices:
+       - Configuration precedence rules
+       - Retry policies and backoff strategies
+       - Authentication mechanisms
+       - Performance thresholds
+       - Error handling patterns
+       - User experience behaviors
+     * When making design decisions during implementation, reference specific clarifications
+     * If implementation conflicts with a clarification answer, flag it for review
 
 3. Parse tasks.md structure and extract:
    - **Task phases**: Setup, Tests, Core, Integration, Polish

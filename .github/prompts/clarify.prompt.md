@@ -20,7 +20,23 @@ Execution steps:
    - (Optionally capture `IMPL_PLAN`, `TASKS` for future chained flows.)
    - If JSON parsing fails, abort and instruct user to re-run `/specify` or verify feature branch environment.
 
-2. Load the current spec file. Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
+2. Load the current spec file. **Detect if the spec contains multiple distinct features** by scanning for:
+   - Multiple top-level "Feature Specification:" headings, OR
+   - Multiple major feature sections enumerated in the document (e.g., numbered feature lists like "1. Splash Screen, 2. Configuration Service, 3. Logging Service"), OR
+   - Explicit statement that this is a multi-feature specification (look for phrases like "Features/Implementations Covered by This Document" or similar enumeration)
+   
+   **If multiple features detected**:
+   - Set mode to **Multi-Feature Clarification Mode**
+   - Question limit is **UNLIMITED** (ignore the 5-question interactive limit)
+   - For each distinct feature, create a separate clarification file: `{FEATURE_DIR}/clarify/outstanding-questions-[feature-name]-{YYYY-MM-DD}.md`
+   - Generate comprehensive question sets for each feature independently
+   - All questions will be written to files (no interactive questioning for multi-feature specs)
+   - After creating all clarification files, provide a summary table showing question counts per feature
+   
+   **If single feature detected**:
+   - Proceed with standard single-feature mode (5-question interactive limit applies)
+   
+   Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
 
    Functional Scope & Behavior:
    - Core user goals & success criteria
@@ -76,20 +92,77 @@ Execution steps:
    - Clarification would not materially change implementation or validation strategy
    - Information is better deferred to planning phase (note internally)
 
-3. Generate (internally) a prioritized queue of candidate clarification questions (maximum 10). Do NOT output them all at once. Apply these constraints:
-    - Maximum of 10 total questions across the whole session.
-    - Each question must be answerable with EITHER:
-       * A short multiple‑choice selection (5–10 distinct, mutually exclusive options), OR
-       * A one-word / short‑phrase answer (explicitly constrain: "Answer in <=5 words").
-   - Only include questions whose answers materially impact architecture, data modeling, task decomposition, test design, UX behavior, operational readiness, or compliance validation.
-   - Ensure category coverage balance: attempt to cover the highest impact unresolved categories first; avoid asking two low-impact questions when a single high-impact area (e.g., security posture) is unresolved.
-   - Exclude questions already answered, trivial stylistic preferences, or plan-level execution details (unless blocking correctness).
-   - Favor clarifications that reduce downstream rework risk or prevent misaligned acceptance tests.
-   - If more than 5 categories remain unresolved, select the top 5 by (Impact * Uncertainty) heuristic.
+3. Generate (internally) a prioritized queue of candidate clarification questions. Apply these constraints based on mode:
+   
+   **Multi-Feature Mode** (detected in step 2):
+   - **UNLIMITED questions** per feature (no quota restrictions)
+   - For each distinct feature identified, generate a complete question set covering all ambiguities
+   - Each question must be answerable with EITHER:
+      * A short multiple‑choice selection (5–10 distinct, mutually exclusive options), OR
+      * A one-word / short‑phrase answer (explicitly constrain: "Answer in <=5 words")
+   - Group questions by feature, maintaining category taxonomy within each feature
+   - All questions go directly to files (no interactive questioning)
+   
+   **Single-Feature Mode**:
+   - Maximum of 10 total questions across the whole session
+   - Each question must be answerable with EITHER:
+      * A short multiple‑choice selection (5–10 distinct, mutually exclusive options), OR
+      * A one-word / short‑phrase answer (explicitly constrain: "Answer in <=5 words")
+   - Only include questions whose answers materially impact architecture, data modeling, task decomposition, test design, UX behavior, operational readiness, or compliance validation
+   - Ensure category coverage balance: attempt to cover the highest impact unresolved categories first; avoid asking two low-impact questions when a single high-impact area (e.g., security posture) is unresolved
+   - Exclude questions already answered, trivial stylistic preferences, or plan-level execution details (unless blocking correctness)
+   - Favor clarifications that reduce downstream rework risk or prevent misaligned acceptance tests
+   - If more than 5 categories remain unresolved, select the top 5 by (Impact * Uncertainty) heuristic
    - **If more than 5 questions are generated**: Instead of posting questions to chat, create a Markdown file at `{FEATURE_DIR}/clarify/outstanding-questions-{YYYY-MM-DD}.md` containing all questions in a structured format (numbered list with options/format for each). Inform the user of the file location and suggest they review it, then re-run `/clarify` after addressing high-priority items in the spec. Exit the clarification loop after file creation.
 
 4. Sequential questioning loop (interactive):
-    - **Pre-loop check**: If the prioritized queue contains MORE than 5 questions:
+    - **Multi-Feature Mode Pre-check**: If Multi-Feature Clarification Mode is active:
+       * Create directory `{FEATURE_DIR}/clarify/` if it doesn't exist
+       * For EACH distinct feature identified, create a separate file: `{FEATURE_DIR}/clarify/outstanding-questions-[feature-name]-{YYYY-MM-DD}.md`
+       * Format each file as:
+         ```markdown
+         # Outstanding Clarification Questions: [Feature Name] - {YYYY-MM-DD}
+
+         Generated from multi-feature specification analysis. This file contains clarification questions specific to the **[Feature Name]** feature.
+
+         **Note**: This is part of a multi-feature specification. See other clarification files in this directory for questions about other features.
+
+         ## Questions ({N} total)
+
+         ### Q1: [Category] - [Question text]
+         **Impact**: [High/Medium/Low]
+         **Category**: [Functional Scope/Data Model/etc.]
+         **Feature Context**: [Specific feature/subsystem this applies to]
+
+         [For multiple choice:]
+         | Option | Description |
+         |--------|-------------|
+         | A | ... |
+         | B | ... |
+
+         [For short answer:]
+         Format: Short answer (<=5 words)
+
+         ---
+         [Repeat for each question]
+         ```
+       * After creating all feature-specific clarification files, inform user with a summary table:
+         ```
+         Multi-feature specification detected. Generated clarification files:
+
+         | Feature | Questions | File Path |
+         |---------|-----------|-----------|
+         | [Feature 1] | {N} | {filepath} |
+         | [Feature 2] | {N} | {filepath} |
+         | ... | ... | ... |
+         
+         Total: {X} features, {Y} total questions
+
+         Please review each file and address high-priority questions in the spec, then re-run `/clarify` to continue.
+         ```
+       * Exit clarification loop (no interactive questioning for multi-feature specs)
+    
+    - **Single-Feature Mode Pre-loop check**: If the prioritized queue contains MORE than 5 questions:
        * Create directory `{FEATURE_DIR}/clarify/` if it doesn't exist.
        * Create file `{FEATURE_DIR}/clarify/outstanding-questions-{YYYY-MM-DD}.md` with all questions formatted as:
          ```markdown
@@ -179,11 +252,17 @@ Execution steps:
 Behavior rules:
 - If no meaningful ambiguities found (or all potential questions would be low-impact), respond: "No critical ambiguities detected worth formal clarification." and suggest proceeding.
 - If spec file missing, instruct user to run `/specify` first (do not create a new spec here).
-- Never exceed 5 total asked questions (clarification retries for a single question do not count as new questions).
-- If more than 5 questions generated, create the outstanding questions file at `{FEATURE_DIR}/clarify/outstanding-questions-{YYYY-MM-DD}.md` and exit instead of asking interactively.
+- **Multi-Feature Mode**: Question limit is UNLIMITED. Generate comprehensive question sets for each feature and create separate clarification files per feature.
+- **Single-Feature Mode**: Never exceed 5 total asked questions (clarification retries for a single question do not count as new questions).
+- If more than 5 questions generated in single-feature mode, create the outstanding questions file at `{FEATURE_DIR}/clarify/outstanding-questions-{YYYY-MM-DD}.md` and exit instead of asking interactively.
 - Avoid speculative tech stack questions unless the absence blocks functional clarity.
 - Respect user early termination signals ("stop", "done", "proceed").
 - If no questions asked due to full coverage, output a compact coverage summary (all categories Clear) then suggest advancing.
 - If quota reached with unresolved high-impact categories remaining, explicitly flag them under Deferred with rationale.
+- Multi-feature detection criteria:
+  * Look for enumerated lists of features/implementations in overview sections
+  * Check for phrases like "Features/Implementations Covered by This Document"
+  * Identify documents with 10+ distinct functional requirement groupings that represent separate subsystems
+  * When in doubt, treat large specifications (100+ requirements spanning multiple subsystems) as multi-feature
 
 Context for prioritization: $ARGUMENTS
