@@ -115,9 +115,3 @@ public class LocalizationService : ILocalizationService
         };
     }
 }
-
-public class LanguageChangedEventArgs : EventArgs
-{
-    public string OldCulture { get; set; } = string.Empty;
-    public string NewCulture { get; set; } = string.Empty;
-}
