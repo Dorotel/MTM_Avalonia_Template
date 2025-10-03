@@ -2,6 +2,7 @@ using System;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using MTM_Template_Application.Models.Secrets;
 using Microsoft.Extensions.Logging;
@@ -22,8 +23,9 @@ public class AndroidSecretsService : ISecretsService
         _logger = logger;
     }
 
-    public async Task StoreSecretAsync(string key, string value)
+    public async Task StoreSecretAsync(string key, string value, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(value);
 
@@ -61,8 +63,9 @@ public class AndroidSecretsService : ISecretsService
         }
     }
 
-    public Task<string?> RetrieveSecretAsync(string key)
+    public Task<string?> RetrieveSecretAsync(string key, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(key);
 
         try
@@ -93,8 +96,9 @@ public class AndroidSecretsService : ISecretsService
         }
     }
 
-    public Task DeleteSecretAsync(string key)
+    public Task DeleteSecretAsync(string key, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(key);
 
         SecretCache.Instance.Delete(key);
@@ -102,12 +106,13 @@ public class AndroidSecretsService : ISecretsService
         return Task.CompletedTask;
     }
 
-    public async Task RotateSecretAsync(string key, string newValue)
+    public async Task RotateSecretAsync(string key, string newValue, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(newValue);
 
-        await StoreSecretAsync(key, newValue);
+        await StoreSecretAsync(key, newValue, cancellationToken);
         _logger.LogInformation("Secret {Key} rotated in Android KeyStore", key);
     }
 
