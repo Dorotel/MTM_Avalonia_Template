@@ -17,21 +17,21 @@
 
 ## Phase 3.1: Setup (Project Initialization)
 
-- [ ] T001 Create MTM_Template_Application/Services/ directory structure (Boot/, Configuration/, Secrets/, Logging/, Diagnostics/, DataLayer/, Cache/, Core/, Localization/, Theme/, Navigation/)
-- [ ] T002 Create MTM_Template_Application/Models/ directory structure (Boot/, Configuration/, Secrets/, Logging/, Diagnostics/, DataLayer/, Cache/, Core/, Localization/, Theme/, Navigation/, ErrorHandling/)
-- [ ] T003 Create tests/ directory structure (contract/, integration/, unit/)
-- [ ] T004 Add Avalonia 11.3+ package references to MTM_Template_Application.csproj
-- [ ] T005 Add CommunityToolkit.Mvvm 8.3+ package reference to MTM_Template_Application.csproj
-- [ ] T006 Add Serilog.Sinks.Console, Serilog.Sinks.File, Serilog.Sinks.OpenTelemetry package references to MTM_Template_Application.csproj
-- [ ] T007 Add Polly 8.0+ package reference to MTM_Template_Application.csproj
-- [ ] T008 Add AutoMapper 13.0+ package reference to MTM_Template_Application.csproj
-- [ ] T009 Add FluentValidation 11.0+ package reference to MTM_Template_Application.csproj
-- [ ] T010 Add MySql.Data 8.0+ package reference to MTM_Template_Application.csproj
-- [ ] T011 Add K4os.Compression.LZ4 package reference for cache compression to MTM_Template_Application.csproj
-- [ ] T012 Create test project with xUnit, FluentAssertions, NSubstitute references
-- [ ] T013 [P] Configure .editorconfig for C# formatting (nullable enabled, var usage, spacing)
-- [ ] T014 [P] Create tests/TestHelpers/MockFactory.cs for NSubstitute mock creation patterns
-- [ ] T015 [P] Create tests/TestHelpers/TestData.cs for shared test data fixtures
+- [x] T001 Create MTM_Template_Application/Services/ directory structure (Boot/, Configuration/, Secrets/, Logging/, Diagnostics/, DataLayer/, Cache/, Core/, Localization/, Theme/, Navigation/)
+- [x] T002 Create MTM_Template_Application/Models/ directory structure (Boot/, Configuration/, Secrets/, Logging/, Diagnostics/, DataLayer/, Cache/, Core/, Localization/, Theme/, Navigation/, ErrorHandling/)
+- [x] T003 Create tests/ directory structure (contract/, integration/, unit/)
+- [x] T004 Add Avalonia 11.3+ package references to MTM_Template_Application.csproj
+- [x] T005 Add CommunityToolkit.Mvvm 8.3+ package reference to MTM_Template_Application.csproj
+- [x] T006 Add Serilog.Sinks.Console, Serilog.Sinks.File, Serilog.Sinks.OpenTelemetry package references to MTM_Template_Application.csproj
+- [x] T007 Add Polly 8.0+ package reference to MTM_Template_Application.csproj
+- [x] T008 Add AutoMapper 13.0+ package reference to MTM_Template_Application.csproj
+- [x] T009 Add FluentValidation 11.0+ package reference to MTM_Template_Application.csproj
+- [x] T010 Add MySql.Data 8.0+ package reference to MTM_Template_Application.csproj
+- [x] T011 Add K4os.Compression.LZ4 package reference for cache compression to MTM_Template_Application.csproj
+- [x] T012 Create test project with xUnit, FluentAssertions, NSubstitute references
+- [x] T013 [P] Configure .editorconfig for C# formatting (nullable enabled, var usage, spacing)
+- [x] T014 [P] Create tests/TestHelpers/MockFactory.cs for NSubstitute mock creation patterns
+- [x] T015 [P] Create tests/TestHelpers/TestData.cs for shared test data fixtures
 
 ---
 
