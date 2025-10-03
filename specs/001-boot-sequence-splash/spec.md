@@ -1,8 +1,8 @@
 # Feature Specification: Boot Sequence — Splash-First, Services Initialization Order
 
-**Feature Branch**: `001-boot-sequence-splash`  
-**Created**: 2025-10-02  
-**Status**: Draft  
+**Feature Branch**: `001-boot-sequence-splash`
+**Created**: 2025-10-02
+**Status**: Draft
 **Input**: User description: "Boot Sequence — Splash-First, Services Initialization Order"
 
 ## Execution Flow (main)
@@ -143,7 +143,7 @@ As an operator, when I launch the application, I need a clear, informative start
 - **FR-044**: System MUST check path availability and storage capacity
 - **FR-045**: System MUST detect camera availability on Android devices
 - **FR-046**: System MUST verify network reachability before attempting remote connections
-- **FR-047**: System MUST run performance benchmarks on startup to detect slow hardware (CPU benchmark <100ms baseline, disk I/O >50MB/s sequential read, memory allocation <10ms for 10MB block)
+- **FR-047**: System MUST run performance benchmarks on startup to detect slow hardware. **Acceptance Criteria** (minimum required baselines): CPU benchmark execution <100ms (single-threaded prime calculation), disk I/O >50MB/s sequential read (10MB test file), memory allocation <10ms for 10MB block. System MUST log warning if hardware fails to meet baseline and MAY adjust cache/parallelization settings accordingly.
 - **FR-048**: System MUST measure network quality (latency/bandwidth) to remote endpoints (Good: latency <100ms and bandwidth >1Mbps; Poor: latency >500ms or bandwidth <256Kbps; Warning: values between Good and Poor)
 - **FR-049**: System MUST detect hardware capabilities (CPU cores, RAM, screen resolution)
 - **FR-050**: System MUST verify runtime version and required dependencies
@@ -152,7 +152,7 @@ As an operator, when I launch the application, I need a clear, informative start
 
 #### Data Layer & Connectivity
 
-- **FR-053**: System MUST initialize MySQL client for desktop application database
+- **FR-053**: System MUST initialize MySqlClient for desktop application database
 - **FR-054**: System MUST initialize Visual API Toolkit client with read-only access for desktop
 - **FR-055**: System MUST initialize HTTP API client for Android devices (app data and Visual projections)
 - **FR-056**: System MUST implement connection pooling with retry policies
@@ -248,10 +248,10 @@ As an operator, when I launch the application, I need a clear, informative start
 - **FR-128**: System MUST use dependency injection for all services
 - **FR-129**: System MUST ensure all services are unit-testable with mock dependencies
 - **FR-130**: System MUST enforce performance budget for boot time (target: <3s for Stage 1)
-- **FR-131**: System MUST enforce memory budget for startup operations (target: <100MB peak memory usage during boot, including all services and initial cache population)
-- **FR-132**: [POST-MVP] System MUST provide admin monitoring dashboard for service status
+- **FR-131**: System MUST enforce memory budget for startup operations (target: <100MB peak memory usage during boot, allocated as: initial cache population ~40MB compressed, core services ~30MB, framework overhead ~30MB)
+- **FR-132**: [POST-MVP Phase 4+] System MUST provide admin monitoring dashboard for service status
 - **FR-133**: System MUST support runtime enable/disable of services via feature toggles
-- **FR-134**: [DEFERRED] System SHOULD generate API documentation from service interfaces for developer reference
+- **FR-134**: [DEFERRED until team size >5 OR external contributors join] System SHOULD generate API documentation from service interfaces for developer reference
 - **FR-135**: System MUST export boot metrics for external monitoring tools
 
 #### Failure Handling & Recovery
@@ -330,7 +330,7 @@ As an operator, when I launch the application, I need a clear, informative start
 ### Requirement Completeness
 
 - [x] No [NEEDS CLARIFICATION] markers remain
-- [x] Requirements are testable and unambiguous  
+- [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Scope is clearly bounded
 - [x] Dependencies and assumptions identified
