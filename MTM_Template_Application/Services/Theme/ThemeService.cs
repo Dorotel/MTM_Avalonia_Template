@@ -104,9 +104,3 @@ public class ThemeService : IThemeService
         }
     }
 }
-
-public class ThemeChangedEventArgs : EventArgs
-{
-    public ThemeConfiguration OldTheme { get; set; } = new();
-    public ThemeConfiguration NewTheme { get; set; } = new();
-}
