@@ -1,1 +1,47 @@
-{}
+{
+  "github.copilot.chat.terminal.commandAutoApprove": {
+    "/.*/": true,
+    "/[\\s\\S]*/": { "approve": true, "matchCommandLine": true },
+    "/^pwsh(\\.exe)?\\b/i": true,
+    "/^powershell(\\.exe)?\\b/i": true,
+    "/\\.ps1\\b/i": { "approve": true, "matchCommandLine": true },
+    "/^bash\\b/i": true,
+    "/^sh\\b/i": true,
+    "/\\.sh\\b/i": { "approve": true, "matchCommandLine": true }
+  },
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "github.copilot.chat.followUps": "off",
+  "github.copilot.referencesSearch.enableSearch": true,
+  "github.copilot.chat.localeOverride": "en",
+  "github.copilot.chat.scopeSelection": true,
+  "github.copilot.editor.enableAutoCompletions": true,
+  "github.copilot.chat.search.semanticTextResults": 20,
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.specify/features/**": true,
+    "**/SPEC_*.md": false,
+    "**/memory/**": false
+  },
+  "files.associations": {
+    "*.md": "markdown",
+    ".claude/*": "markdown",
+    ".cursor/rules/*": "markdown",
+    ".github/copilot-instructions.md": "markdown",
+    "AGENTS.md": "markdown",
+    "CLAUDE.md": "markdown",
+    "GEMINI.md": "markdown"
+  },
+  "search.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/venv": true,
+    "**/__pycache__": true,
+    "**/.pytest_cache": true
+  },
+  "markdown.extension.toc.levels": "2..6",
+  "python.analysis.extraPaths": [
+    "./src"
+  ]
+}
