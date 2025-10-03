@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using MTM_Template_Application.Models.Diagnostics;
 using MTM_Template_Application.Services.Diagnostics.Checks;
@@ -29,13 +30,14 @@ public class DiagnosticsService : IDiagnosticsService
     /// <summary>
     /// Run all diagnostic checks
     /// </summary>
-    public async Task<List<DiagnosticResult>> RunAllChecksAsync()
+    public async Task<List<DiagnosticResult>> RunAllChecksAsync(CancellationToken cancellationToken = default)
     {
         var results = new List<DiagnosticResult>();
 
         // Run all checks in parallel
         var checkTasks = _diagnosticChecks.Select(async check =>
         {
+            cancellationToken.ThrowIfCancellationRequested();
             try
             {
                 return await check.RunAsync();
@@ -66,8 +68,9 @@ public class DiagnosticsService : IDiagnosticsService
     /// <summary>
     /// Run a specific diagnostic check
     /// </summary>
-    public async Task<DiagnosticResult> RunCheckAsync(string checkName)
+    public async Task<DiagnosticResult> RunCheckAsync(string checkName, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(checkName);
 
         var check = _diagnosticChecks.FirstOrDefault(c => 
