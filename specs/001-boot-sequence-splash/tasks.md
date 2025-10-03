@@ -126,14 +126,14 @@
 - [x] T061 [P] Integration test: Visual master data caching (staleness detection) in tests/integration/VisualCachingTests.cs - Validate delta sync, refresh stale entries, background refresh
 - [x] T062 [P] Integration test: Visual master data caching (offline mode) in tests/integration/VisualCachingTests.cs - Validate cached-only mode when Visual unavailable, reconnection detection
 - [x] T063 [P] Integration test: Logging and telemetry (structured JSON) in tests/integration/LoggingTests.cs - Validate OpenTelemetry format, trace/span IDs, PII redaction, log rotation
-- [ ] T064 [P] Integration test: Error handling and recovery (network failures) in tests/integration/ErrorHandlingTests.cs - Validate exponential backoff, circuit breaker, diagnostic bundles
-- [ ] T065 [P] Integration test: Error handling and recovery (configuration errors) in tests/integration/ErrorHandlingTests.cs - Validate fallback config, error reporting, recovery
-- [ ] T066 [P] Integration test: Accessibility and localization (screen reader) in tests/integration/AccessibilityTests.cs - Validate screen reader announcements, keyboard navigation
-- [ ] T067 [P] Integration test: Accessibility and localization (language switching) in tests/integration/LocalizationTests.cs - Validate culture change, missing translations, fallback
-- [ ] T068 [P] Integration test: Accessibility and localization (high contrast) in tests/integration/ThemeTests.cs - Validate high contrast mode, theme switching (Light/Dark/Auto)
-- [ ] T069 [P] Integration test: Performance validation (boot time) in tests/integration/PerformanceTests.cs - Validate Stage 1 <3s, total boot <10s
-- [ ] T070 [P] Integration test: Performance validation (memory usage) in tests/integration/PerformanceTests.cs - Validate memory <100MB during boot
-- [ ] T071 [P] Integration test: Performance validation (parallel initialization) in tests/integration/PerformanceTests.cs - Validate services start in parallel where possible
+- [x] T064 [P] Integration test: Error handling and recovery (network failures) in tests/integration/ErrorHandlingTests.cs - Validate exponential backoff, circuit breaker, diagnostic bundles
+- [x] T065 [P] Integration test: Error handling and recovery (configuration errors) in tests/integration/ErrorHandlingTests.cs - Validate fallback config, error reporting, recovery
+- [x] T066 [P] Integration test: Accessibility and localization (screen reader) in tests/integration/AccessibilityTests.cs - Validate screen reader announcements, keyboard navigation
+- [x] T067 [P] Integration test: Accessibility and localization (language switching) in tests/integration/LocalizationTests.cs - Validate culture change, missing translations, fallback
+- [x] T068 [P] Integration test: Accessibility and localization (high contrast) in tests/integration/ThemeTests.cs - Validate high contrast mode, theme switching (Light/Dark/Auto)
+- [x] T069 [P] Integration test: Performance validation (boot time) in tests/integration/PerformanceTests.cs - Validate Stage 1 <3s, total boot <10s
+- [x] T070 [P] Integration test: Performance validation (memory usage) in tests/integration/PerformanceTests.cs - Validate memory <100MB during boot
+- [x] T071 [P] Integration test: Performance validation (parallel initialization) in tests/integration/PerformanceTests.cs - Validate services start in parallel where possible
 
 ### Contract Tests (API Validation)
 
