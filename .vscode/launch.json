@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch MTM Avalonia Template",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build Solution",
+      "program": "${workspaceFolder}/src/MTM_Avalonia_Template/bin/Debug/net9.0/MTM_Avalonia_Template.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/MTM_Avalonia_Template",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    {
+      "name": "Attach to Process",
+      "type": "coreclr",
+      "request": "attach"
+    }
+  ]
+}
