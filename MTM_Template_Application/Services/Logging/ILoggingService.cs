@@ -1,3 +1,4 @@
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MTM_Template_Application.Services.Logging;
@@ -30,5 +31,5 @@ public interface ILoggingService
     /// <summary>
     /// Flush pending log entries
     /// </summary>
-    Task FlushAsync();
+    Task FlushAsync(CancellationToken cancellationToken = default);
 }

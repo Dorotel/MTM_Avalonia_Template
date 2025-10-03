@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using MTM_Template_Application.Models.Boot;
 
@@ -12,17 +13,17 @@ public interface IBootOrchestrator
     /// <summary>
     /// Execute Stage 0: Splash screen and minimal initialization
     /// </summary>
-    Task ExecuteStage0Async();
+    Task ExecuteStage0Async(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Execute Stage 1: Core services initialization
     /// </summary>
-    Task ExecuteStage1Async();
+    Task ExecuteStage1Async(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Execute Stage 2: Application ready
     /// </summary>
-    Task ExecuteStage2Async();
+    Task ExecuteStage2Async(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Get boot metrics for the current or last session
