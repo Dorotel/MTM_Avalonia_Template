@@ -18,10 +18,10 @@ public class DiagnosticsContractTests
     {
         // Arrange
         var diagnosticsService = Substitute.For<IDiagnosticsService>();
-        
+
         // Act
         var result = await diagnosticsService.RunCheckAsync("Storage");
-        
+
         // Assert
         result.Should().NotBeNull();
         result.CheckName.Should().Be("Storage");
@@ -33,10 +33,10 @@ public class DiagnosticsContractTests
     {
         // Arrange
         var diagnosticsService = Substitute.For<IDiagnosticsService>();
-        
+
         // Act
         var result = await diagnosticsService.RunCheckAsync("Permissions");
-        
+
         // Assert
         result.Should().NotBeNull();
         result.CheckName.Should().Be("Permissions");
@@ -47,10 +47,10 @@ public class DiagnosticsContractTests
     {
         // Arrange
         var diagnosticsService = Substitute.For<IDiagnosticsService>();
-        
+
         // Act
         var result = await diagnosticsService.RunCheckAsync("Network");
-        
+
         // Assert
         result.Should().NotBeNull();
         result.DurationMs.Should().BeLessThan(5000, "network check should have 5s timeout");
@@ -61,10 +61,10 @@ public class DiagnosticsContractTests
     {
         // Arrange
         var diagnosticsService = Substitute.For<IDiagnosticsService>();
-        
+
         // Act
         var capabilities = diagnosticsService.GetHardwareCapabilities();
-        
+
         // Assert
         capabilities.Should().NotBeNull();
     }

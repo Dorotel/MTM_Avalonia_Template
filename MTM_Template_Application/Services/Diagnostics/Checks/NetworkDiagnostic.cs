@@ -1,9 +1,9 @@
 using System;
-using System.Threading;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Net.NetworkInformation;
 using System.Net.Http;
+using System.Net.NetworkInformation;
+using System.Threading;
 using System.Threading.Tasks;
 using MTM_Template_Application.Models.Diagnostics;
 

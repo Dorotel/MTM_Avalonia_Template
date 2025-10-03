@@ -1,7 +1,7 @@
 using System;
-using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MTM_Template_Application.Services.Core;
@@ -66,7 +66,7 @@ public class HealthCheckService
     {
         ArgumentNullException.ThrowIfNull(serviceName);
 
-        var check = _healthChecks.FirstOrDefault(c => 
+        var check = _healthChecks.FirstOrDefault(c =>
             c.GetType().Name.Equals(serviceName, StringComparison.OrdinalIgnoreCase));
 
         if (check == null)
