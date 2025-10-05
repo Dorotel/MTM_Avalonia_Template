@@ -7,11 +7,30 @@ Joyride enables scripting VS Code with ClojureScript. This directory contains wo
 ```
 .joyride/
 ├── README.md           # This file
+├── data/               # Data files (EDN, JSON)
+│   ├── service-metadata.edn         # Collected service metadata
+│   └── todo-replacements.edn        # TODO replacement mappings
 ├── scripts/            # User scripts (executed with Cmd/Ctrl+Alt+J S)
-│   └── example.cljs    # Example script
+│   ├── example.cljs    # Example script
+│   └── Services/       # Service documentation automation
+│       ├── collect-service-metadata.cljs
+│       ├── apply-todo-replacements.cljs
+│       ├── generate-service-docs.cljs
+│       └── TODO-WORKFLOW-README.md
 ├── src/                # Namespace sources (require in scripts)
+│   └── mtm/helpers.cljs
 └── user.cljs           # User activation script (auto-loaded)
 ```
+
+## MTM Custom Commands
+
+This workspace includes pre-configured commands for service documentation automation:
+
+- **mtm.collectServiceMetadata** - Extract metadata from C# service files
+- **mtm.applyTodoReplacements** - Apply TODO replacements to documentation
+- **mtm.generateServiceDocs** - Generate new service documentation
+
+**Quick Start**: See `.joyride/scripts/Services/TODO-WORKFLOW-README.md` for complete workflow.
 
 ## Getting Started
 
