@@ -34,8 +34,7 @@
                     VerticalAlignment="Center">
                     <Viewbox Width="20" Height="20">
                         <Canvas Width="24" Height="24">
-                            <Ellipse Width="24" Height="24"
-                                Fill="{DynamicResource SystemAccentForegroundColor}" Opacity="0.9" />
+                            <Ellipse Width="24" Height="24" Fill="{DynamicResource SystemAccentForegroundColor}" Opacity="0.9" />
                             <TextBlock Text="M"
                                 FontSize="14"
                                 FontWeight="Bold"
@@ -75,12 +74,10 @@
                         HorizontalContentAlignment="Center">
                         <Button.Styles>
                             <Style Selector="Button:pointerover">
-                                <Setter Property="Background"
-                                    Value="{DynamicResource SystemListLowColor}" />
+                                <Setter Property="Background" Value="#40FFFFFF" />
                             </Style>
                             <Style Selector="Button:pressed">
-                                <Setter Property="Background"
-                                    Value="{DynamicResource SystemListMediumColor}" />
+                                <Setter Property="Background" Value="#60FFFFFF" />
                             </Style>
                         </Button.Styles>
                     </Button>
@@ -100,12 +97,10 @@
                         HorizontalContentAlignment="Center">
                         <Button.Styles>
                             <Style Selector="Button:pointerover">
-                                <Setter Property="Background"
-                                    Value="{DynamicResource SystemListLowColor}" />
+                                <Setter Property="Background" Value="#40FFFFFF" />
                             </Style>
                             <Style Selector="Button:pressed">
-                                <Setter Property="Background"
-                                    Value="{DynamicResource SystemListMediumColor}" />
+                                <Setter Property="Background" Value="#60FFFFFF" />
                             </Style>
                         </Button.Styles>
                     </Button>
@@ -125,12 +120,10 @@
                         HorizontalContentAlignment="Center">
                         <Button.Styles>
                             <Style Selector="Button:pointerover">
-                                <Setter Property="Background"
-                                    Value="{DynamicResource SystemErrorTextColor}" />
+                                <Setter Property="Background" Value="#E81123" />
                             </Style>
                             <Style Selector="Button:pressed">
-                                <Setter Property="Background"
-                                    Value="{DynamicResource SystemErrorTextColor}" />
+                                <Setter Property="Background" Value="#C50F1F" />
                             </Style>
                         </Button.Styles>
                     </Button>
