@@ -14,7 +14,7 @@ public class UnsavedChangesGuard
     /// <summary>
     /// Register callback to check for unsaved changes
     /// </summary>
-    public void RegisterUnsavedChangesCheck(Func<Task<bool>> callback)
+    public virtual void RegisterUnsavedChangesCheck(Func<Task<bool>> callback)
     {
         _hasUnsavedChangesCallback = callback;
     }
@@ -22,7 +22,7 @@ public class UnsavedChangesGuard
     /// <summary>
     /// Register callback to confirm navigation (e.g., show dialog)
     /// </summary>
-    public void RegisterConfirmationDialog(Func<Task<bool>> callback)
+    public virtual void RegisterConfirmationDialog(Func<Task<bool>> callback)
     {
         _confirmNavigationCallback = callback;
     }
@@ -30,7 +30,7 @@ public class UnsavedChangesGuard
     /// <summary>
     /// Check if navigation can proceed
     /// </summary>
-    public async Task<bool> CanNavigateAsync()
+    public virtual async Task<bool> CanNavigateAsync()
     {
         // No check registered - allow navigation
         if (_hasUnsavedChangesCallback == null)
@@ -40,7 +40,7 @@ public class UnsavedChangesGuard
 
         // Check for unsaved changes
         var hasUnsavedChanges = await _hasUnsavedChangesCallback();
-        
+
         if (!hasUnsavedChanges)
         {
             return true; // No unsaved changes - allow navigation
@@ -59,7 +59,7 @@ public class UnsavedChangesGuard
     /// <summary>
     /// Clear all registered callbacks
     /// </summary>
-    public void Clear()
+    public virtual void Clear()
     {
         _hasUnsavedChangesCallback = null;
         _confirmNavigationCallback = null;

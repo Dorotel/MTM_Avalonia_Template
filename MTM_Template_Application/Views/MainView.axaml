@@ -11,68 +11,296 @@
         <vm:MainViewModel />
     </Design.DataContext>
 
-    <!-- Main application view for Android -->
+    <!-- Main application view for Android - Developer Hub -->
     <Grid RowDefinitions="Auto,*,Auto">
 
         <!-- Header -->
-        <Border Grid.Row="0" Background="#2196F3" Padding="16">
-            <TextBlock Text="MTM Template Application"
-                FontSize="20"
-                FontWeight="SemiBold"
-                Foreground="White"
-                HorizontalAlignment="Center" />
+        <Border Grid.Row="0" Background="#2196F3" Padding="20,16">
+            <StackPanel Spacing="8">
+                <TextBlock Text="MTM Developer Hub"
+                    FontSize="22"
+                    FontWeight="Bold"
+                    Foreground="White"
+                    HorizontalAlignment="Center" />
+                <TextBlock Text="Android Mobile Testing Interface"
+                    FontSize="12"
+                    Foreground="#E3F2FD"
+                    HorizontalAlignment="Center" />
+            </StackPanel>
         </Border>
 
         <!-- Main Content Area -->
         <ScrollViewer Grid.Row="1">
             <StackPanel Margin="16" Spacing="16">
 
-                <!-- Welcome Message -->
-                <TextBlock Text="{CompiledBinding Greeting}"
-                    FontSize="24"
-                    FontWeight="Bold"
-                    HorizontalAlignment="Center"
-                    TextWrapping="Wrap" />
+                <!-- Test Statistics Card -->
+                <Border Background="#E8F5E9"
+                    BorderBrush="#4CAF50"
+                    BorderThickness="2"
+                    CornerRadius="8"
+                    Padding="16">
+                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto">
+                        <StackPanel Grid.Column="0" Grid.Row="0" Spacing="4">
+                            <TextBlock Text="Tests Run"
+                                FontSize="11"
+                                Foreground="#424242"
+                                HorizontalAlignment="Center" />
+                            <TextBlock Text="{CompiledBinding TestsRun}"
+                                FontSize="24"
+                                FontWeight="Bold"
+                                Foreground="#212121"
+                                HorizontalAlignment="Center" />
+                        </StackPanel>
 
-                <!-- Application Info -->
-                <Border Background="#F5F5F5"
+                        <StackPanel Grid.Column="1" Grid.Row="0" Spacing="4">
+                            <TextBlock Text="Passed"
+                                FontSize="11"
+                                Foreground="#2E7D32"
+                                HorizontalAlignment="Center" />
+                            <TextBlock Text="{CompiledBinding TestsPassed}"
+                                FontSize="24"
+                                FontWeight="Bold"
+                                Foreground="#1B5E20"
+                                HorizontalAlignment="Center" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" Grid.Row="0" Spacing="4">
+                            <TextBlock Text="Failed"
+                                FontSize="11"
+                                Foreground="#C62828"
+                                HorizontalAlignment="Center" />
+                            <TextBlock Text="{CompiledBinding TestsFailed}"
+                                FontSize="24"
+                                FontWeight="Bold"
+                                Foreground="#B71C1C"
+                                HorizontalAlignment="Center" />
+                        </StackPanel>
+
+                        <Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
+                            Background="#C8E6C9"
+                            CornerRadius="4"
+                            Padding="8"
+                            Margin="0,12,0,0">
+                            <TextBlock
+                                Text="{CompiledBinding SelectedTestCategory, StringFormat='Active: {0}'}"
+                                FontSize="12"
+                                FontWeight="SemiBold"
+                                Foreground="#1B5E20"
+                                HorizontalAlignment="Center" />
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Quick Action Buttons -->
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8"
+                    RowSpacing="8">
+                    <Button Grid.Column="0" Grid.Row="0"
+                        Content="Run All Tests"
+                        Command="{CompiledBinding RunAllTestsCommand}"
+                        HorizontalAlignment="Stretch"
+                        Padding="16,12"
+                        Background="#4CAF50"
+                        Foreground="White"
+                        FontSize="14"
+                        FontWeight="SemiBold" />
+
+                    <Button Grid.Column="1" Grid.Row="0"
+                        Content="Clear Output"
+                        Command="{CompiledBinding ClearOutputCommand}"
+                        HorizontalAlignment="Stretch"
+                        Padding="16,12"
+                        Background="#37474F"
+                        Foreground="White"
+                        FontSize="14"
+                        FontWeight="SemiBold" />
+
+                    <Button Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
+                        Content="Export Results"
+                        Command="{CompiledBinding ExportResultsCommand}"
+                        HorizontalAlignment="Stretch"
+                        Padding="16,12"
+                        Background="#1976D2"
+                        Foreground="White"
+                        FontSize="14"
+                        FontWeight="SemiBold" />
+                </Grid>
+
+                <!-- Test Categories -->
+                <Border Background="White"
                     BorderBrush="#E0E0E0"
                     BorderThickness="1"
                     CornerRadius="8"
                     Padding="16">
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="Application Status"
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="Test Categories"
                             FontSize="18"
-                            FontWeight="SemiBold"
+                            FontWeight="Bold"
                             Foreground="#212121" />
-                        <TextBlock Text="✓ Boot sequence completed successfully"
-                            FontSize="14"
-                            Foreground="#4CAF50" />
-                        <TextBlock Text="✓ All services initialized"
-                            FontSize="14"
-                            Foreground="#4CAF50" />
-                        <TextBlock Text="✓ Ready for operation"
-                            FontSize="14"
-                            Foreground="#4CAF50" />
+
+                        <!-- Boot Tests -->
+                        <Expander Header="Boot Sequence Tests" IsExpanded="False">
+                            <StackPanel Spacing="8" Margin="0,12,0,0">
+                                <Button Content="Test Boot Sequence"
+                                    Command="{CompiledBinding TestBootSequenceCommand}"
+                                    HorizontalAlignment="Stretch"
+                                    Padding="16,10"
+                                    Background="#E3F2FD"
+                                    Foreground="#1976D2" />
+                                <Button Content="Test Boot Metrics"
+                                    Command="{CompiledBinding TestBootMetricsCommand}"
+                                    HorizontalAlignment="Stretch"
+                                    Padding="16,10"
+                                    Background="#E3F2FD"
+                                    Foreground="#1976D2" />
+                            </StackPanel>
+                        </Expander>
+
+                        <!-- Diagnostics Tests -->
+                        <Expander Header="Diagnostics Tests" IsExpanded="False">
+                            <StackPanel Spacing="8" Margin="0,12,0,0">
+                                <Button Content="Run Health Checks"
+                                    Command="{CompiledBinding TestDiagnosticsCommand}"
+                                    HorizontalAlignment="Stretch"
+                                    Padding="16,10"
+                                    Background="#FFF3E0"
+                                    Foreground="#E65100" />
+                                <Button Content="Hardware Capabilities"
+                                    Command="{CompiledBinding TestHardwareCapabilitiesCommand}"
+                                    HorizontalAlignment="Stretch"
+                                    Padding="16,10"
+                                    Background="#FFF3E0"
+                                    Foreground="#E65100" />
+                            </StackPanel>
+                        </Expander>
+
+                        <!-- Navigation Tests -->
+                        <Expander Header="Navigation Tests" IsExpanded="False">
+                            <StackPanel Spacing="8" Margin="0,12,0,0">
+                                <Button Content="Test Navigation"
+                                    Command="{CompiledBinding TestNavigationCommand}"
+                                    HorizontalAlignment="Stretch"
+                                    Padding="16,10"
+                                    Background="#F3E5F5"
+                                    Foreground="#6A1B9A" />
+                            </StackPanel>
+                        </Expander>
+
+                        <!-- Cache Tests -->
+                        <Expander Header="Cache Tests" IsExpanded="False">
+                            <StackPanel Spacing="8" Margin="0,12,0,0">
+                                <Button Content="Test Cache Operations"
+                                    Command="{CompiledBinding TestCacheCommand}"
+                                    HorizontalAlignment="Stretch"
+                                    Padding="16,10"
+                                    Background="#E8F5E9"
+                                    Foreground="#2E7D32" />
+                            </StackPanel>
+                        </Expander>
+
+                        <!-- Configuration Tests -->
+                        <Expander Header="Configuration Tests" IsExpanded="False">
+                            <StackPanel Spacing="8" Margin="0,12,0,0">
+                                <Button Content="Test Configuration"
+                                    Command="{CompiledBinding TestConfigurationCommand}"
+                                    HorizontalAlignment="Stretch"
+                                    Padding="16,10"
+                                    Background="#FCE4EC"
+                                    Foreground="#C2185B" />
+                            </StackPanel>
+                        </Expander>
+
+                        <!-- Theme Tests -->
+                        <Expander Header="Theme Tests" IsExpanded="False">
+                            <StackPanel Spacing="8" Margin="0,12,0,0">
+                                <Button Content="Test Theme Switching"
+                                    Command="{CompiledBinding TestThemeCommand}"
+                                    HorizontalAlignment="Stretch"
+                                    Padding="16,10"
+                                    Background="#E0F7FA"
+                                    Foreground="#00838F" />
+                            </StackPanel>
+                        </Expander>
+
+                        <!-- Localization Tests -->
+                        <Expander Header="Localization Tests" IsExpanded="False">
+                            <StackPanel Spacing="8" Margin="0,12,0,0">
+                                <Button Content="Test Localization"
+                                    Command="{CompiledBinding TestLocalizationCommand}"
+                                    HorizontalAlignment="Stretch"
+                                    Padding="16,10"
+                                    Background="#FFF9C4"
+                                    Foreground="#F57F17" />
+                            </StackPanel>
+                        </Expander>
+
                     </StackPanel>
                 </Border>
 
-                <!-- Platform Info -->
-                <Border Background="#E3F2FD"
-                    BorderBrush="#2196F3"
+                <!-- Test Output Console -->
+                <Border Background="#263238"
+                    BorderBrush="#37474F"
                     BorderThickness="1"
-                    CornerRadius="8"
-                    Padding="16">
-                    <StackPanel Spacing="8">
-                        <TextBlock Text="Platform: Android"
-                            FontSize="14"
-                            Foreground="#1976D2" />
-                        <TextBlock Text="Framework: Avalonia UI 11.3+"
-                            FontSize="14"
-                            Foreground="#1976D2" />
-                        <TextBlock Text=".NET 9.0"
-                            FontSize="14"
-                            Foreground="#1976D2" />
+                    CornerRadius="8">
+                    <StackPanel Spacing="0">
+                        <!-- Console Header -->
+                        <Border Background="#1E1E1E"
+                            Padding="12,10"
+                            CornerRadius="8,8,0,0">
+                            <TextBlock Text="Test Output Console"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Foreground="#90A4AE"
+                                HorizontalAlignment="Center" />
+                        </Border>
+
+                        <!-- Console Content -->
+                        <ScrollViewer MaxHeight="300"
+                            VerticalScrollBarVisibility="Auto"
+                            HorizontalScrollBarVisibility="Auto">
+                            <StackPanel Margin="12" Spacing="2">
+                                <!-- Welcome -->
+                                <TextBlock Text="MTM Developer Hub v1.0 - Android"
+                                    FontSize="11"
+                                    FontFamily="Consolas,Courier New,monospace"
+                                    Foreground="#4CAF50"
+                                    Margin="0,0,0,8" />
+
+                                <!-- Boot Logs -->
+                                <StackPanel Spacing="2" IsVisible="{CompiledBinding HasBootLogs}">
+                                    <TextBlock Text="=== Boot Logs ==="
+                                        FontSize="10"
+                                        FontFamily="Consolas,Courier New,monospace"
+                                        Foreground="#FFD700"
+                                        Margin="0,0,0,4" />
+                                    <ItemsControl ItemsSource="{CompiledBinding BootLogs}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}"
+                                                    FontSize="9"
+                                                    FontFamily="Consolas,Courier New,monospace"
+                                                    Foreground="#B0BEC5"
+                                                    TextWrapping="NoWrap"
+                                                    Margin="0,1" />
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+
+                                <!-- Test Output -->
+                                <ItemsControl ItemsSource="{CompiledBinding TestOutput}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}"
+                                                FontSize="10"
+                                                FontFamily="Consolas,Courier New,monospace"
+                                                Foreground="#B0BEC5"
+                                                TextWrapping="Wrap"
+                                                Margin="0,1" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </ScrollViewer>
                     </StackPanel>
                 </Border>
 
@@ -81,58 +309,11 @@
 
         <!-- Footer -->
         <Border Grid.Row="2" Background="#F5F5F5" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0"
-            Padding="16">
-            <StackPanel Spacing="8">
-
-                <!-- Boot Logs Section -->
-                <Expander Header="Boot Sequence Logs" IsExpanded="False"
-                    IsVisible="{CompiledBinding HasBootLogs}">
-                    <Border Background="#FAFAFA" BorderBrush="#E0E0E0" BorderThickness="1"
-                        CornerRadius="4" Padding="12" Margin="0,8,0,0">
-                        <StackPanel Spacing="8">
-
-                            <!-- Boot Metrics Summary -->
-                            <StackPanel Orientation="Horizontal" Spacing="16">
-                                <TextBlock
-                                    Text="{CompiledBinding BootDurationMs, StringFormat='Duration: {0}ms'}"
-                                    FontSize="12"
-                                    FontWeight="Medium"
-                                    Foreground="#1976D2" />
-                                <TextBlock
-                                    Text="{CompiledBinding BootMemoryMB, StringFormat='Memory: {0:F1}MB'}"
-                                    FontSize="12"
-                                    FontWeight="Medium"
-                                    Foreground="#1976D2" />
-                            </StackPanel>
-
-                            <!-- Logs List -->
-                            <ScrollViewer MaxHeight="200" HorizontalScrollBarVisibility="Auto"
-                                VerticalScrollBarVisibility="Auto">
-                                <ItemsControl ItemsSource="{CompiledBinding BootLogs}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding}"
-                                                FontSize="11"
-                                                FontFamily="Consolas,Courier New,monospace"
-                                                Foreground="#424242"
-                                                TextWrapping="NoWrap"
-                                                Margin="0,2" />
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </ScrollViewer>
-
-                        </StackPanel>
-                    </Border>
-                </Expander>
-
-                <!-- Copyright -->
-                <TextBlock Text="© 2025 MTM Template Application"
-                    FontSize="12"
-                    Foreground="#757575"
-                    HorizontalAlignment="Center"
-                    Margin="0,8,0,0" />
-            </StackPanel>
+            Padding="16,12">
+            <TextBlock Text="© 2025 MTM Template Application - Android"
+                FontSize="11"
+                Foreground="#757575"
+                HorizontalAlignment="Center" />
         </Border>
 
     </Grid>

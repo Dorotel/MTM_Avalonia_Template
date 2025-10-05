@@ -14,7 +14,7 @@ The Boot Sequence feature implements a three-stage initialization system (Stage 
 **Primary Dependencies**: Avalonia 11.3+, CommunityToolkit.Mvvm 8.3+, MySQL.Data, HttpClient, Serilog + OpenTelemetry, Polly, AutoMapper, FluentValidation
 **Storage**: MySQL 5.7 (MAMP), Visual ERP (read-only via API Toolkit), Local cache (LZ4 compressed), OS-native credential storage
 **Testing**: xUnit, FluentAssertions, NSubstitute, Contract + Integration + Unit tests
-**Target Platform**: Desktop (Windows/macOS/Linux via Avalonia), Android (warehouse tablets)
+**Target Platform**: Desktop (Windows via Avalonia), Android (warehouse tablets). Note: macOS and Linux desktop support deferred.
 **Project Type**: Mobile + Desktop (Avalonia cross-platform)
 **Performance Goals**: Stage 1 <3s, Total boot <10s, Memory <100MB, Network check 5s timeout
 **Memory Allocation Budget** (100MB peak during boot):
@@ -250,7 +250,7 @@ Based on Phase 1 artifacts, tasks will include:
 **Core Services (Stage 1):**
 
 - Create configuration service with layered precedence
-- Create OS-native secrets service (Windows/macOS/Android implementations)
+- Create OS-native secrets service (Windows/Android implementations; macOS deferred)
 - Create structured logging service with OpenTelemetry
 - [P] Create diagnostics service
 - [P] Create validation service

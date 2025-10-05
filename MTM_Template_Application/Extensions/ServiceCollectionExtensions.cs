@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MTM_Template_Application.Services.Boot;
 using MTM_Template_Application.Services.Boot.Stages;
 using MTM_Template_Application.Services.Cache;
@@ -199,7 +200,8 @@ public static class ServiceCollectionExtensions
                     "GetVendors"
                 };
 
-                return new VisualApiClient(httpClient, baseUrl, whitelistedCommands);
+                var logger = sp.GetRequiredService<ILogger<VisualApiClient>>();
+                return new VisualApiClient(logger, httpClient, baseUrl, whitelistedCommands);
             });
             Serilog.Log.Verbose("[DI] IVisualApiClient registered");
         }
@@ -210,11 +212,6 @@ public static class ServiceCollectionExtensions
             services.AddSingleton<IVisualApiClient>(_ => null!);
             Serilog.Log.Verbose("[DI] IVisualApiClient registered as null");
         }
-
-        // HTTP API client
-        Serilog.Log.Verbose("[DI] Registering IHttpApiClient");
-        services.AddSingleton<IHttpApiClient, HttpApiClient>();
-        Serilog.Log.Verbose("[DI] IHttpApiClient registered");
 
         // Connection pool monitor (needs IConnectionMetricsProvider implementations)
         Serilog.Log.Verbose("[DI] Registering ConnectionPoolMonitor");
@@ -262,6 +259,11 @@ public static class ServiceCollectionExtensions
         Serilog.Log.Verbose("[DI] Registering ICacheService");
         services.AddSingleton<ICacheService, CacheService>();
         Serilog.Log.Verbose("[DI] ICacheService registered");
+
+        // Cache staleness detector
+        Serilog.Log.Verbose("[DI] Registering ICacheStalenessDetector");
+        services.AddSingleton<ICacheStalenessDetector, CacheStalenessDetector>();
+        Serilog.Log.Verbose("[DI] ICacheStalenessDetector registered");
 
         Serilog.Log.Information("[DI] AddCachingServices() - Completed successfully");
         return services;
@@ -348,8 +350,8 @@ public static class ServiceCollectionExtensions
         Serilog.Log.Debug("[DI] AddThemeServices() - Entry");
 
         // OS dark mode monitor
-        Serilog.Log.Verbose("[DI] Registering OSDarkModeMonitor");
-        services.AddSingleton<OSDarkModeMonitor>();
+        Serilog.Log.Verbose("[DI] Registering IOSDarkModeMonitor");
+        services.AddSingleton<IOSDarkModeMonitor, OSDarkModeMonitor>();
 
         // Theme service
         Serilog.Log.Verbose("[DI] Registering IThemeService");

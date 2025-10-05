@@ -12,12 +12,12 @@ public class VisualMasterDataSync
 {
     private readonly IVisualApiClient _visualApiClient;
     private readonly ICacheService _cacheService;
-    private readonly CacheStalenessDetector _stalenessDetector;
+    private readonly ICacheStalenessDetector _stalenessDetector;
 
     public VisualMasterDataSync(
         IVisualApiClient visualApiClient,
         ICacheService cacheService,
-        CacheStalenessDetector stalenessDetector)
+        ICacheStalenessDetector stalenessDetector)
     {
         ArgumentNullException.ThrowIfNull(visualApiClient);
         ArgumentNullException.ThrowIfNull(cacheService);

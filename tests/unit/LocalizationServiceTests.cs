@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using MTM_Template_Application.Models.Localization;
 using MTM_Template_Application.Services.Localization;
 using NSubstitute;
@@ -23,7 +24,7 @@ public class LocalizationServiceTests
         var cultureProvider = Substitute.For<CultureProvider>();
 
         // Act
-        Action act = () => new LocalizationService(null!, cultureProvider);
+        Action act = () => new LocalizationService(Substitute.For<ILogger<LocalizationService>>(), null!, cultureProvider);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
@@ -37,7 +38,7 @@ public class LocalizationServiceTests
         var missingTranslationHandler = Substitute.For<MissingTranslationHandler>();
 
         // Act
-        Action act = () => new LocalizationService(missingTranslationHandler, null!);
+        Action act = () => new LocalizationService(Substitute.For<ILogger<LocalizationService>>(), missingTranslationHandler, null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
@@ -53,7 +54,7 @@ public class LocalizationServiceTests
         cultureProvider.GetCurrentCulture().Returns(new CultureInfo("en-US"));
 
         // Act
-        var service = new LocalizationService(missingTranslationHandler, cultureProvider);
+        var service = new LocalizationService(Substitute.For<ILogger<LocalizationService>>(), missingTranslationHandler, cultureProvider);
 
         // Assert
         service.Should().NotBeNull();
@@ -159,7 +160,8 @@ public class LocalizationServiceTests
         Action act = () => service.SetCulture("invalid-CULTURE");
 
         // Assert
-        act.Should().Throw<CultureNotFoundException>();
+        act.Should().Throw<ArgumentException>()
+            .WithInnerException<CultureNotFoundException>();
     }
 
     [Fact]
@@ -223,7 +225,7 @@ public class LocalizationServiceTests
         cultureProvider.GetCurrentCulture().Returns(new CultureInfo("en-US"));
         cultureProvider.GetFallbackCulture(Arg.Any<CultureInfo>()).Returns((CultureInfo?)null);
 
-        var service = new LocalizationService(missingTranslationHandler, cultureProvider);
+        var service = new LocalizationService(Substitute.For<ILogger<LocalizationService>>(), missingTranslationHandler, cultureProvider);
 
         // Act
         service.GetString("Missing.Key");
@@ -246,7 +248,7 @@ public class LocalizationServiceTests
         cultureProvider.GetCurrentCulture().Returns(new CultureInfo("en-US"));
         cultureProvider.GetFallbackCulture(Arg.Any<CultureInfo>()).Returns((CultureInfo?)null);
 
-        return new LocalizationService(missingTranslationHandler, cultureProvider);
+        return new LocalizationService(Substitute.For<ILogger<LocalizationService>>(), missingTranslationHandler, cultureProvider);
     }
 
     #endregion

@@ -1,7 +1,7 @@
 # Quickstart Guide: Boot Sequence Validation
 
-**Feature**: Boot Sequence — Splash-First, Services Initialization Order  
-**Purpose**: Executable validation scenarios to verify boot sequence implementation  
+**Feature**: Boot Sequence — Splash-First, Services Initialization Order
+**Purpose**: Executable validation scenarios to verify boot sequence implementation
 **Date**: 2025-10-02
 
 ## Overview
@@ -29,7 +29,7 @@ This quickstart provides step-by-step validation scenarios that can be executed 
    ```powershell
    # Desktop
    .\MTM_Template_Application.Desktop.exe
-   
+
    # Or from VS
    F5 / Start Debugging
    ```
@@ -86,7 +86,7 @@ This quickstart provides step-by-step validation scenarios that can be executed 
    # Create test config files
    New-Item -Path ".\config.base.json" -ItemType File -Force
    New-Item -Path ".\config.dev.json" -ItemType File -Force
-   
+
    # Set environment variable
    $env:MTM_ENVIRONMENT = "Development"
    ```
@@ -507,7 +507,7 @@ This quickstart provides step-by-step validation scenarios that can be executed 
 - [ ] Memory: Peak usage <100MB during startup
 - [ ] Security: Credentials encrypted, never logged
 - [ ] Accessibility: Screen reader support, high contrast mode
-- [ ] Cross-platform: Works on Windows, macOS, Linux, Android
+- [ ] Cross-platform: Works on Windows desktop and Android (macOS/Linux deferred)
 
 ---
 

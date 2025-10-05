@@ -11,7 +11,6 @@ namespace MTM_Template_Application.Services.Cache;
 public class CachedOnlyModeManager : IDisposable
 {
     private readonly IVisualApiClient _visualApiClient;
-    private readonly Thread _reconnectionThread;
     private readonly CancellationTokenSource _cts;
     private readonly TimeSpan _reconnectionCheckInterval;
     private bool _isCachedOnlyMode;
@@ -30,25 +29,20 @@ public class CachedOnlyModeManager : IDisposable
         _isCachedOnlyMode = false;
         _cts = new CancellationTokenSource();
 
-        _reconnectionThread = new Thread(ReconnectionLoop)
-        {
-            Name = "CachedOnlyModeManager.ReconnectionLoop",
-            IsBackground = true
-        };
-        _reconnectionThread.Start();
+        // Start reconnection loop as a background task (not blocking)
+        _ = Task.Run(async () => await ReconnectionLoopAsync().ConfigureAwait(false), _cts.Token);
     }
 
-    private void ReconnectionLoop()
+    private async Task ReconnectionLoopAsync()
     {
-
         while (!_cts.Token.IsCancellationRequested)
         {
             try
             {
-                Task.Delay(_reconnectionCheckInterval, _cts.Token).Wait();
+                await Task.Delay(_reconnectionCheckInterval, _cts.Token).ConfigureAwait(false);
                 if (!_disposed)
                 {
-                    CheckServerAvailabilityAsync().GetAwaiter().GetResult();
+                    await CheckServerAvailabilityAsync().ConfigureAwait(false);
                 }
             }
             catch (OperationCanceledException)
@@ -156,10 +150,7 @@ public class CachedOnlyModeManager : IDisposable
         _disposed = true;
         _cts.Cancel();
 
-        if (_reconnectionThread != null && _reconnectionThread.IsAlive)
-        {
-            _reconnectionThread.Join(TimeSpan.FromSeconds(2));
-        }
+        // CancellationToken will stop the background task
 
         _cts.Dispose();
     }

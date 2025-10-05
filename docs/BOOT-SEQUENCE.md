@@ -260,9 +260,9 @@ catch (Exception ex)
 
 **Secrets Service** (platform detection):
 - Windows: `WindowsSecretsService` → DPAPI + Credential Manager
-- macOS: `MacOSSecretsService` → Keychain
 - Android: `AndroidSecretsService` → KeyStore
 - Factory pattern: `SecretsServiceFactory.Create()`
+- **Note**: macOS support deferred (project targets Windows desktop + Android)
 
 **Entry Points**:
 - Desktop: `MTM_Template_Application.Desktop/Program.cs`

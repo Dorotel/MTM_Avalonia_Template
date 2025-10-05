@@ -6,7 +6,7 @@ _Audience: Step-by-step order, always building foundations first. Each step expl
 
 ## Major Constitutional Rules
 
-- **Cross-Platform First:** All features must work on Windows, Linux, macOS. Platform-specific code is abstracted via DI and interfaces.
+- **Cross-Platform First:** All features must work on Windows desktop and Android. Platform-specific code is abstracted via DI and interfaces. Note: macOS and Linux desktop support deferred to future releases.
 - **MVVM Community Toolkit:** All ViewModels use `[ObservableObject]`, `[ObservableProperty]`, `[RelayCommand]`, and constructor DI.
 - **CompiledBinding Only:** All XAML must use `{CompiledBinding}` with `x:DataType` and `x:CompileBindings="True"`.
 - **Test-First Development:** All features require xUnit tests before implementation; >80% coverage on critical paths.

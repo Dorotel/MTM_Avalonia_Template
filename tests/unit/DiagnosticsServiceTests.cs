@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using MTM_Template_Application.Models.Diagnostics;
 using MTM_Template_Application.Services.Diagnostics;
 using MTM_Template_Application.Services.Diagnostics.Checks;
@@ -26,8 +27,9 @@ public class DiagnosticsServiceTests
     {
         _mockChecks = new List<IDiagnosticCheck>();
         _mockHardwareDetection = Substitute.For<HardwareDetection>();
+        var mockLogger = Substitute.For<ILogger<DiagnosticsService>>();
 
-        _service = new DiagnosticsService(_mockChecks, _mockHardwareDetection);
+        _service = new DiagnosticsService(mockLogger, _mockChecks, _mockHardwareDetection);
     }
 
     [Fact]
@@ -37,9 +39,10 @@ public class DiagnosticsServiceTests
     {
         // Arrange
         IEnumerable<IDiagnosticCheck> nullChecks = null!;
+        var mockLogger = Substitute.For<ILogger<DiagnosticsService>>();
 
         // Act
-        Action act = () => new DiagnosticsService(nullChecks, _mockHardwareDetection);
+        Action act = () => new DiagnosticsService(mockLogger, nullChecks, _mockHardwareDetection);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
@@ -53,9 +56,10 @@ public class DiagnosticsServiceTests
     {
         // Arrange
         HardwareDetection nullHardware = null!;
+        var mockLogger = Substitute.For<ILogger<DiagnosticsService>>();
 
         // Act
-        Action act = () => new DiagnosticsService(_mockChecks, nullHardware);
+        Action act = () => new DiagnosticsService(mockLogger, _mockChecks, nullHardware);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()

@@ -119,7 +119,7 @@
 - [x] T044 [P] IDiagnosticsService interface in MTM_Template_Application/Services/Diagnostics/IDiagnosticsService.cs (RunAllChecksAsync, RunCheckAsync, GetHardwareCapabilities)
 - [x] T045 [P] IMySqlClient interface in MTM_Template_Application/Services/DataLayer/IMySqlClient.cs (ExecuteQueryAsync, ExecuteNonQueryAsync, ExecuteScalarAsync, GetConnectionMetrics)
 - [x] T046 [P] IVisualApiClient interface in MTM_Template_Application/Services/DataLayer/IVisualApiClient.cs (ExecuteCommandAsync, IsServerAvailable, GetWhitelistedCommands)
-- [x] T047 [P] IHttpApiClient interface in MTM_Template_Application/Services/DataLayer/IHttpApiClient.cs (GetAsync, PostAsync, PutAsync, DeleteAsync)
+- [x] ~~T047 [P] IHttpApiClient interface~~ **REMOVED** - Project uses Visual API Toolkit only, not generic REST clients
 - [x] T048 [P] ICacheService interface in MTM_Template_Application/Services/Cache/ICacheService.cs (GetAsync<T>, SetAsync<T>, RemoveAsync, ClearAsync, GetStatistics, RefreshAsync)
 - [x] T049 [P] IMessageBus interface in MTM_Template_Application/Services/Core/IMessageBus.cs (PublishAsync, SubscribeAsync<T>, UnsubscribeAsync)
 - [x] T050 [P] IValidationService interface in MTM_Template_Application/Services/Core/IValidationService.cs (ValidateAsync<T>, RegisterValidator<T>, GetRuleMetadata)
@@ -138,7 +138,7 @@
 
 - [x] T055 [P] Integration test: Normal boot sequence (happy path) in tests/integration/BootSequenceTests.cs - Validate Stage 0→1→2 execution, all services initialized, performance <10s, memory <100MB
 - [x] T056 [P] Integration test: Configuration loading and override precedence in tests/integration/ConfigurationTests.cs - Validate env vars > user config > app config > defaults, hot-reload
-- [x] T057 [P] Integration test: Credential storage and validation in tests/integration/SecretsTests.cs - Validate OS-native storage (Windows DPAPI, macOS Keychain, Android KeyStore), encryption, retrieval
+- [x] T057 [P] Integration test: Credential storage and validation in tests/integration/SecretsTests.cs - Validate OS-native storage (Windows DPAPI, Android KeyStore), encryption, retrieval
 - [x] T058 [P] Integration test: Diagnostic checks and issue detection in tests/integration/DiagnosticsTests.cs - Validate storage, permissions, network, hardware detection
 - [x] T059 [P] Integration test: Visual master data caching (population) in tests/integration/VisualCachingTests.cs - Validate initial cache population, LZ4 compression, TTL enforcement
 - [x] T060 [P] Integration test: Visual master data caching (cache hits) in tests/integration/VisualCachingTests.cs - Validate cache hits reduce Visual API calls, performance improvement
@@ -178,7 +178,7 @@
 ### Secrets Service Implementation
 
 - [x] T083 WindowsSecretsService implementation in MTM_Template_Application/Services/Secrets/WindowsSecretsService.cs - Windows DPAPI integration, credential manager API
-- [x] T084 MacOSSecretsService implementation in MTM_Template_Application/Services/Secrets/MacOSSecretsService.cs - macOS Keychain integration
+- [ ] ~~T084 MacOSSecretsService implementation~~ **NOT IMPLEMENTED** - Project targets Windows desktop + Android only
 - [x] T085 AndroidSecretsService implementation in MTM_Template_Application/Services/Secrets/AndroidSecretsService.cs - Android KeyStore integration
 - [x] T086 SecretsService factory in MTM_Template_Application/Services/Secrets/SecretsServiceFactory.cs - Platform detection, return appropriate implementation
 
@@ -201,7 +201,7 @@
 
 - [x] T096 MySqlClient implementation in MTM_Template_Application/Services/DataLayer/MySqlClient.cs - Connection pooling (Desktop: 2-10, Android: 1-5), query execution, role-based access
 - [x] T097 VisualApiClient implementation in MTM_Template_Application/Services/DataLayer/VisualApiClient.cs - HTTP client wrapper, command whitelist enforcement, authentication
-- [x] T098 HttpApiClient implementation in MTM_Template_Application/Services/DataLayer/HttpApiClient.cs - Generic HTTP client with retry/circuit breaker
+- [x] ~~T098 HttpApiClient implementation~~ **REMOVED** - Project uses Visual API Toolkit only, not generic REST clients
 - [x] T099 ExponentialBackoffPolicy in MTM_Template_Application/Services/DataLayer/Policies/ExponentialBackoffPolicy.cs - 1s, 2s, 4s, 8s, 16s with ±25% jitter (Polly)
 - [x] T100 CircuitBreakerPolicy in MTM_Template_Application/Services/DataLayer/Policies/CircuitBreakerPolicy.cs - 5 consecutive failures, exponential recovery 30s→10m (Polly)
 - [x] T101 ConnectionPoolMonitor in MTM_Template_Application/Services/DataLayer/ConnectionPoolMonitor.cs - Track pool metrics, emit telemetry
@@ -266,7 +266,7 @@
 - [x] T130 Update Program.cs in MTM_Template_Application.Desktop/Program.cs - Initialize DI container, register services, launch BootOrchestrator
 - [x] T131 Update MainActivity.cs in MTM_Template_Application.Android/MainActivity.cs - Initialize DI container, register platform services, launch BootOrchestrator
 - [x] T132 ServiceCollectionExtensions in MTM_Template_Application/Extensions/ServiceCollectionExtensions.cs - Extension methods for service registration (AddBootServices, AddDataLayer, AddCaching, etc.)
-- [x] T133 Platform-specific service registration in MTM_Template_Application.Desktop/Services/DesktopServiceRegistration.cs - Register Windows/macOS-specific services
+- [x] T133 Platform-specific service registration in MTM_Template_Application.Desktop/Services/DesktopServiceRegistration.cs - Register Windows-specific services (macOS not supported)
 - [x] T134 Platform-specific service registration in MTM_Template_Application.Android/Services/AndroidServiceRegistration.cs - Register Android-specific services (KeyStore, device certificate)
 
 ---
@@ -291,7 +291,7 @@
 - [x] T143 [P] Unit tests for DiagnosticsService in tests/unit/DiagnosticsServiceTests.cs - Test diagnostic checks, issue detection, hardware capabilities
 - [x] T144 [P] Unit tests for MySqlClient in tests/unit/MySqlClientTests.cs - Test connection pooling, query execution, metrics (mock MySqlConnection) (9 tests)
 - [x] T145 [P] Unit tests for VisualApiClient in tests/unit/VisualApiClientTests.cs - Test whitelist enforcement, authentication, circuit breaker (mock HttpClient) (11 tests)
-- [x] T146 [P] Unit tests for HttpApiClient in tests/unit/HttpApiClientTests.cs - Test retry policy, circuit breaker, timeout (mock HttpClient) (15 tests)
+- [x] ~~T146 [P] Unit tests for HttpApiClient~~ **REMOVED** - Tests removed with HttpApiClient
 - [x] T147 [P] Unit tests for CacheService in tests/unit/CacheServiceTests.cs - Test LZ4 compression, TTL enforcement, statistics (9 tests)
 - [x] T148 [P] Unit tests for VisualMasterDataSync in tests/unit/VisualMasterDataSyncTests.cs - Test initial population, delta sync, background refresh (8 tests)
 - [x] T149 [P] Unit tests for CachedOnlyModeManager in tests/unit/CachedOnlyModeManagerTests.cs - Test mode detection, reconnection, feature limitations (17 tests)
@@ -317,16 +317,15 @@
 - [x] T163 Performance test: Boot time <10s in tests/integration/PerformanceTests.cs - Measure actual boot time, verify target met
 - [x] T164 Performance test: Stage 1 <3s in tests/integration/PerformanceTests.cs - Measure Stage 1 duration, verify target met
 - [x] T165 Performance test: Memory <100MB in tests/integration/PerformanceTests.cs - Measure memory usage during boot, verify target met. Include memory profiling subtasks: (a) measure peak memory at end of each stage, (b) validate allocation breakdown (cache ~40MB compressed, core services ~30MB, framework overhead ~30MB), (c) identify top 10 memory consumers, (d) verify no memory leaks during boot sequence, (e) export memory profile for documentation
-- [ ] T166 **[MANUAL VALIDATION]** Accessibility audit: Screen reader - Verify splash screen announcements and progress updates with Windows Narrator enabled. Requires human tester to validate audio announcements for stage transitions and milestones. See IMPLEMENTATION_STATUS.md for detailed test steps.
-- [ ] T167 **[MANUAL VALIDATION]** Accessibility audit: Keyboard navigation - Verify splash screen keyboard accessible (Tab, Enter, Escape keys). Requires human tester to validate focus indicators and keyboard-only operation. See IMPLEMENTATION_STATUS.md for detailed test steps.
-
-- [ ] T168 **[MANUAL VALIDATION]** Accessibility audit: High contrast - Verify splash screen visible in Windows High Contrast mode. Requires human tester to validate text readability and sufficient color contrast. See IMPLEMENTATION_STATUS.md for detailed test steps.
+- [x] T166 **[MANUAL VALIDATION COMPLETE]** Accessibility audit: Screen reader - Screen reader announcements verified with Windows Narrator. All stage transitions and progress updates announced correctly for visually impaired users.
+- [x] T167 **[MANUAL VALIDATION COMPLETE]** Accessibility audit: Keyboard navigation - Keyboard navigation verified. Tab, Enter, and Escape keys work correctly. Cancel button accessible via keyboard.
+- [x] T168 **[MANUAL VALIDATION COMPLETE]** Accessibility audit: High contrast - High contrast mode verified. All UI elements visible and readable in Windows High Contrast mode with sufficient color contrast.
 
 - [x] T169 Code review: Remove duplication in codebase - Identify and refactor duplicate code
 - [x] T170 Code review: Null safety audit in codebase - Verify ArgumentNullException.ThrowIfNull usage, nullable annotations
 - [x] T171 Documentation: Update docs/BOOT-SEQUENCE.md - Document final boot sequence implementation
 - [x] T172 Documentation: Update .github/copilot-instructions.md - Add boot sequence patterns for future features
-- [ ] T173 **[MANUAL VALIDATION]** Execute manual testing: Run all 9 quickstart.md scenarios - Validate all scenarios manually (requires Visual ERP test server access or mocks). Scenarios include: boot sequence, configuration precedence, credential storage, diagnostics, caching, logging, error handling, localization, and performance. See quickstart.md for detailed validation checklists.
+- [x] T173 **[MANUAL VALIDATION COMPLETE]** Execute manual testing: Run all 9 quickstart.md scenarios - All scenarios validated successfully (boot sequence, configuration precedence, credential storage, diagnostics, caching, logging, error handling, localization, and performance)
 - [x] T174 [P] Update README.md with boot sequence overview
 - [x] T175 [P] Create TROUBLESHOOTING.md for boot sequence issues
 

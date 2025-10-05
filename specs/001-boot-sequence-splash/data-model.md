@@ -1,7 +1,7 @@
 # Data Model: Boot Sequence Entities
 
-**Feature**: Boot Sequence — Splash-First, Services Initialization Order  
-**Date**: 2025-10-02  
+**Feature**: Boot Sequence — Splash-First, Services Initialization Order
+**Date**: 2025-10-02
 **Status**: Design Complete
 
 ## Entity Overview
@@ -28,7 +28,7 @@ Captures telemetry data during startup for monitoring and performance optimizati
 - `ErrorMessage` (string?): User-friendly error description
 - `ErrorDetails` (string?): Technical error details
 - `MemoryUsageMB` (int): Peak memory usage during boot
-- `PlatformInfo` (string): Windows, macOS, Linux, Android
+- `PlatformInfo` (string): Windows, Android (Note: macOS/Linux support deferred)
 - `AppVersion` (string): Application version
 
 **Relationships**:

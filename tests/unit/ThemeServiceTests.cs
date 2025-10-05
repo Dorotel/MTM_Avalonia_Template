@@ -1,5 +1,6 @@
 using System;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using MTM_Template_Application.Models.Theme;
 using MTM_Template_Application.Services.Theme;
 using NSubstitute;
@@ -19,7 +20,7 @@ public class ThemeServiceTests
     public void Constructor_WithNullDarkModeMonitor_ThrowsArgumentNullException()
     {
         // Arrange & Act
-        Action act = () => new ThemeService(null!);
+        Action act = () => new ThemeService(Substitute.For<ILogger<ThemeService>>(), null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
@@ -30,11 +31,11 @@ public class ThemeServiceTests
     public void Constructor_WithValidMonitor_CreatesServiceSuccessfully()
     {
         // Arrange
-        var darkModeMonitor = Substitute.For<OSDarkModeMonitor>();
+        var darkModeMonitor = Substitute.For<IOSDarkModeMonitor>();
         darkModeMonitor.IsOSDarkMode().Returns(false);
 
         // Act
-        var service = new ThemeService(darkModeMonitor);
+        var service = new ThemeService(Substitute.For<ILogger<ThemeService>>(), darkModeMonitor);
 
         // Assert
         service.Should().NotBeNull();
@@ -44,11 +45,11 @@ public class ThemeServiceTests
     public void Constructor_InitializesWithAutoTheme()
     {
         // Arrange
-        var darkModeMonitor = Substitute.For<OSDarkModeMonitor>();
+        var darkModeMonitor = Substitute.For<IOSDarkModeMonitor>();
         darkModeMonitor.IsOSDarkMode().Returns(false);
 
         // Act
-        var service = new ThemeService(darkModeMonitor);
+        var service = new ThemeService(Substitute.For<ILogger<ThemeService>>(), darkModeMonitor);
         var theme = service.GetCurrentTheme();
 
         // Assert
@@ -121,9 +122,9 @@ public class ThemeServiceTests
     public void SetTheme_ToAuto_UsesOSDarkModeSetting()
     {
         // Arrange
-        var darkModeMonitor = Substitute.For<OSDarkModeMonitor>();
+        var darkModeMonitor = Substitute.For<IOSDarkModeMonitor>();
         darkModeMonitor.IsOSDarkMode().Returns(true);
-        var service = new ThemeService(darkModeMonitor);
+        var service = new ThemeService(Substitute.For<ILogger<ThemeService>>(), darkModeMonitor);
 
         // Act
         service.SetTheme("Auto");
@@ -195,11 +196,11 @@ public class ThemeServiceTests
     public void Constructor_WithOSDarkModeEnabled_SetsAutoThemeAsDark()
     {
         // Arrange
-        var darkModeMonitor = Substitute.For<OSDarkModeMonitor>();
+        var darkModeMonitor = Substitute.For<IOSDarkModeMonitor>();
         darkModeMonitor.IsOSDarkMode().Returns(true);
 
         // Act
-        var service = new ThemeService(darkModeMonitor);
+        var service = new ThemeService(Substitute.For<ILogger<ThemeService>>(), darkModeMonitor);
         var theme = service.GetCurrentTheme();
 
         // Assert
@@ -210,9 +211,9 @@ public class ThemeServiceTests
     public void OSDarkModeChanged_WhenAutoTheme_UpdatesIsDarkMode()
     {
         // Arrange
-        var darkModeMonitor = Substitute.For<OSDarkModeMonitor>();
+        var darkModeMonitor = Substitute.For<IOSDarkModeMonitor>();
         darkModeMonitor.IsOSDarkMode().Returns(false);
-        var service = new ThemeService(darkModeMonitor);
+        var service = new ThemeService(Substitute.For<ILogger<ThemeService>>(), darkModeMonitor);
 
         // Act - Simulate OS dark mode change (actual event args type may vary)
         darkModeMonitor.IsOSDarkMode().Returns(true);
@@ -283,9 +284,9 @@ public class ThemeServiceTests
 
     private static ThemeService CreateThemeService()
     {
-        var darkModeMonitor = Substitute.For<OSDarkModeMonitor>();
+        var darkModeMonitor = Substitute.For<IOSDarkModeMonitor>();
         darkModeMonitor.IsOSDarkMode().Returns(false);
-        return new ThemeService(darkModeMonitor);
+        return new ThemeService(Substitute.For<ILogger<ThemeService>>(), darkModeMonitor);
     }
 
     #endregion

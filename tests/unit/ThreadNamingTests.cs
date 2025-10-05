@@ -28,11 +28,12 @@ public class ThreadNamingTests
         // Arrange
         string? capturedThreadName = null;
         var tcs = new TaskCompletionSource<bool>();
+        var expectedThreadName = "ThreadNamingTests.SetAndGetThreadName[Sync]";
 
         // Act
         _ = Task.Run(() =>
         {
-            Thread.CurrentThread.Name = "ThreadNamingTests.SetAndGetThreadName[Sync]";
+            Thread.CurrentThread.Name = expectedThreadName;
             capturedThreadName = Thread.CurrentThread.Name;
             Thread.Sleep(100); // Keep thread alive briefly
             tcs.SetResult(true);
@@ -42,7 +43,7 @@ public class ThreadNamingTests
 
         // Assert
         _output.WriteLine($"Captured thread name: {capturedThreadName}");
-        capturedThreadName.Should().Be("ThreadNamingTests-TaskRun-SyncTest");
+        capturedThreadName.Should().Be(expectedThreadName);
     }
 
     [Fact]
@@ -51,11 +52,12 @@ public class ThreadNamingTests
         // Arrange
         string? capturedThreadName = null;
         var tcs = new TaskCompletionSource<bool>();
+        var expectedThreadName = "ThreadNamingTests.SetThreadName_WithAsyncCode[Async]";
 
         // Act
         _ = Task.Factory.StartNew(async () =>
         {
-            Thread.CurrentThread.Name = "ThreadNamingTests.SetThreadName_WithAsyncCode[Async]";
+            Thread.CurrentThread.Name = expectedThreadName;
             capturedThreadName = Thread.CurrentThread.Name;
             _output.WriteLine($"Thread name set to: {capturedThreadName}");
             _output.WriteLine($"Thread ID: {Thread.CurrentThread.ManagedThreadId}");
@@ -73,7 +75,7 @@ public class ThreadNamingTests
 
         // Assert
         _output.WriteLine($"Final captured thread name: {capturedThreadName}");
-        capturedThreadName.Should().Be("ThreadNamingTests-TaskFactory-AsyncTest");
+        capturedThreadName.Should().Be(expectedThreadName);
     }
 
     [Fact]

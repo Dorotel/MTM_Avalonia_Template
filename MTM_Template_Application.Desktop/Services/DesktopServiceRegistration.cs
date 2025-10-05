@@ -7,7 +7,8 @@ using MTM_Template_Application.Services.Secrets;
 namespace MTM_Template_Application.Desktop.Services;
 
 /// <summary>
-/// Registers Desktop-specific services (Windows, macOS, Linux).
+/// Registers Desktop-specific services (Windows, Linux).
+/// Note: macOS support removed - project targets Windows desktop and Android only.
 /// </summary>
 public static class DesktopServiceRegistration
 {
@@ -45,11 +46,6 @@ public static class DesktopServiceRegistration
             return new WindowsSecretsService(loggerFactory.CreateLogger<WindowsSecretsService>());
         }
 
-        if (OperatingSystem.IsMacOS())
-        {
-            return new MacOSSecretsService(loggerFactory.CreateLogger<MacOSSecretsService>());
-        }
-
         if (OperatingSystem.IsLinux())
         {
             // Linux doesn't have platform-specific secrets service yet
@@ -60,6 +56,6 @@ public static class DesktopServiceRegistration
         }
 
         throw new PlatformNotSupportedException(
-            $"Desktop platform not supported: {Environment.OSVersion.Platform}");
+            $"Desktop platform not supported: {Environment.OSVersion.Platform}. Only Windows is currently supported.");
     }
 }

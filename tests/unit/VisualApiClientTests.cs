@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using MTM_Template_Application.Services.DataLayer;
 using MTM_Template_Application.Services.Secrets;
 using NSubstitute;
@@ -24,7 +25,7 @@ public class VisualApiClientTests
     public void Constructor_WithNullHttpClient_ThrowsArgumentNullException()
     {
         // Arrange & Act
-        Action act = () => new VisualApiClient(null!, "http://localhost", new[] { "TestCommand" });
+        Action act = () => new VisualApiClient(Substitute.For<ILogger<VisualApiClient>>(), null!, "http://localhost", new[] { "TestCommand" });
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
@@ -36,7 +37,7 @@ public class VisualApiClientTests
     {
         // Arrange & Act
         var httpClient = new HttpClient();
-        Action act = () => new VisualApiClient(httpClient, null!, new[] { "TestCommand" });
+        Action act = () => new VisualApiClient(Substitute.For<ILogger<VisualApiClient>>(), httpClient, null!, new[] { "TestCommand" });
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
@@ -48,7 +49,7 @@ public class VisualApiClientTests
     {
         // Arrange & Act
         var httpClient = new HttpClient();
-        Action act = () => new VisualApiClient(httpClient, "http://localhost", null!);
+        Action act = () => new VisualApiClient(Substitute.For<ILogger<VisualApiClient>>(), httpClient, "http://localhost", null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
@@ -216,7 +217,7 @@ public class VisualApiClientTests
         var httpClient = new HttpClient(handler) { BaseAddress = new Uri("http://localhost") };
         var wl = whitelist ?? new[] { "TestCommand" };
 
-        return new VisualApiClient(httpClient, "http://localhost", wl);
+        return new VisualApiClient(Substitute.For<ILogger<VisualApiClient>>(), httpClient, "http://localhost", wl);
     }
 
     private class TestResponse

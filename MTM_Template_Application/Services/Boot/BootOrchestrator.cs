@@ -95,6 +95,9 @@ public class BootOrchestrator : IBootOrchestrator
 
     public async Task ExecuteStage0Async(CancellationToken cancellationToken = default)
     {
+        // Ensure metrics are initialized (for tests that call individual stage methods)
+        EnsureMetricsInitialized();
+
         _logger.LogInformation("Executing Stage 0: Splash");
         var stageStopwatch = Stopwatch.StartNew();
 
@@ -119,6 +122,9 @@ public class BootOrchestrator : IBootOrchestrator
 
     public async Task ExecuteStage1Async(CancellationToken cancellationToken = default)
     {
+        // Ensure metrics are initialized (for tests that call individual stage methods)
+        EnsureMetricsInitialized();
+
         _logger.LogInformation("Executing Stage 1: Services Initialization");
         var stageStopwatch = Stopwatch.StartNew();
 
@@ -157,6 +163,9 @@ public class BootOrchestrator : IBootOrchestrator
 
     public async Task ExecuteStage2Async(CancellationToken cancellationToken = default)
     {
+        // Ensure metrics are initialized (for tests that call individual stage methods)
+        EnsureMetricsInitialized();
+
         _logger.LogInformation("Executing Stage 2: Application Ready");
         var stageStopwatch = Stopwatch.StartNew();
 
@@ -218,6 +227,18 @@ public class BootOrchestrator : IBootOrchestrator
                 AppVersion = typeof(BootOrchestrator).Assembly.GetName().Version?.ToString() ?? "Unknown",
                 SuccessStatus = BootStatus.InProgress
             };
+        }
+    }
+
+    private void EnsureMetricsInitialized()
+    {
+        lock (_metricsLock)
+        {
+            if (_currentMetrics == null)
+            {
+                // Initialize metrics for tests that call individual stage methods
+                InitializeMetrics(Guid.NewGuid(), DateTimeOffset.UtcNow);
+            }
         }
     }
 

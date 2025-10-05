@@ -16,15 +16,15 @@ What mechanism should be used for credential storage?
 
 | Option | Description |
 |--------|-------------|
-| A | Windows Credential Manager / macOS Keychain / Android KeyStore |
+| A | Windows Credential Manager / Android KeyStore |
 | B | Encrypted local database (SQLite with encryption) |
 | C | Encrypted configuration file (AES-256) |
 | D | External secrets manager (Azure Key Vault, AWS Secrets Manager) |
 | E | Hybrid: OS keychain for user credentials + external for app secrets |
 
-**Answer: A — Windows Credential Manager / macOS Keychain / Android KeyStore**
+**Answer: A — Windows Credential Manager / Android KeyStore**
 
-Reasoning: Leverages OS-native secure storage with hardware-backed encryption (TPM/Secure Enclave). No custom crypto implementation reduces security risks. Per-platform APIs handle multi-user scenarios correctly. Manufacturing environment likely lacks external secrets infrastructure (D).
+Reasoning: Leverages OS-native secure storage with hardware-backed encryption (TPM/Secure Enclave). No custom crypto implementation reduces security risks. Per-platform APIs handle multi-user scenarios correctly. Manufacturing environment likely lacks external secrets infrastructure (D). **Note**: macOS Keychain support deferred - project currently targets Windows desktop + Android only.
 
 ---
 
@@ -44,9 +44,9 @@ How should encryption keys be managed?
 | D | Hardware security module (TPM/Secure Enclave) |
 | E | Combination: Machine key + user passphrase (2-factor) |
 
-**Answer: B — Machine-specific key (DPAPI on Windows, equivalent on other OS)**
+**Answer: B — Machine-specific key (DPAPI on Windows, KeyStore on Android)**
 
-Reasoning: Integrated with answer Q1 - OS keychain APIs use DPAPI/Keychain/KeyStore automatically. User passphrases (A) add friction to manufacturing workflows; HSM (D) not available in typical deployments. Machine binding prevents credential portability (security feature).
+Reasoning: Integrated with answer Q1 - OS keychain APIs use DPAPI/KeyStore automatically. User passphrases (A) add friction to manufacturing workflows; HSM (D) not available in typical deployments. Machine binding prevents credential portability (security feature). **Note**: macOS equivalents deferred with macOS platform support.
 
 ---
 

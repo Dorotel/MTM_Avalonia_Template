@@ -1,7 +1,7 @@
 # Technology Research: Boot Sequence Implementation
 
-**Feature**: Boot Sequence — Splash-First, Services Initialization Order  
-**Date**: 2025-10-02  
+**Feature**: Boot Sequence — Splash-First, Services Initialization Order
+**Date**: 2025-10-02
 **Status**: Complete - All clarifications resolved
 
 ## Executive Summary
@@ -64,8 +64,8 @@ All technical unknowns resolved through comprehensive clarification sessions acr
 
 **Decision**: OS-native secure storage with machine binding
 
-**Storage Mechanism** [Q1]: Windows Credential Manager / macOS Keychain / Android KeyStore  
-**Encryption** [Q2]: Machine-specific keys (DPAPI on Windows, platform equivalents)
+**Storage Mechanism** [Q1]: Windows Credential Manager / Android KeyStore (macOS Keychain deferred)
+**Encryption** [Q2]: Machine-specific keys (DPAPI on Windows, KeyStore on Android)
 
 **Security Measures**:
 - Redaction scope [Q3]: Schema-marked sensitive fields + comprehensive pattern detection

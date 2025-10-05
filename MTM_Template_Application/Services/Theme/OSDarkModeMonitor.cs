@@ -4,15 +4,16 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace MTM_Template_Application.Services.Theme;
 
 /// <summary>
 /// Monitor OS dark mode changes and auto-switch when Theme=Auto
 /// </summary>
-public class OSDarkModeMonitor : IDisposable
+public class OSDarkModeMonitor : IOSDarkModeMonitor
 {
-    private readonly Thread? _pollingThread;
+    private readonly ILogger<OSDarkModeMonitor> _logger;
     private readonly CancellationTokenSource _cts;
     private readonly TimeSpan _pollingInterval;
     private bool _lastKnownDarkMode;
@@ -20,36 +21,47 @@ public class OSDarkModeMonitor : IDisposable
 
     public event EventHandler<DarkModeChangedEventArgs>? OnDarkModeChanged;
 
-    public OSDarkModeMonitor(TimeSpan? pollingInterval = null)
+    public OSDarkModeMonitor(
+        ILogger<OSDarkModeMonitor> logger,
+        TimeSpan? pollingInterval = null)
     {
+        ArgumentNullException.ThrowIfNull(logger);
+
+        _logger = logger;
         _lastKnownDarkMode = IsOSDarkMode();
         _pollingInterval = pollingInterval ?? TimeSpan.FromSeconds(5);
         _cts = new CancellationTokenSource();
 
-        // Create explicit thread for dark mode monitoring
-        _pollingThread = new Thread(MonitorDarkModeLoop)
-        {
-            Name = "OSDarkModeMonitor.MonitorDarkModeLoop",
-            IsBackground = true
-        };
-        _pollingThread.Start();
+        _logger.LogInformation("OSDarkModeMonitor initialized. Initial dark mode: {IsDark}, Polling interval: {Interval}s",
+            _lastKnownDarkMode, _pollingInterval.TotalSeconds);
+
+        // Start monitoring as a background task (non-blocking)
+        _ = Task.Run(async () => await MonitorDarkModeLoopAsync().ConfigureAwait(false), _cts.Token);
     }
 
-    private void MonitorDarkModeLoop()
+    private async Task MonitorDarkModeLoopAsync()
     {
+        _logger.LogDebug("Dark mode monitoring loop started");
 
         while (!_cts.Token.IsCancellationRequested)
         {
             try
             {
                 CheckForChanges();
-                Task.Delay(_pollingInterval, _cts.Token).Wait();
+                await Task.Delay(_pollingInterval, _cts.Token).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
+                _logger.LogDebug("Dark mode monitoring loop cancelled");
                 break;
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in dark mode monitoring loop");
+            }
         }
+
+        _logger.LogDebug("Dark mode monitoring loop ended");
     }
 
     public bool IsOSDarkMode()
@@ -57,10 +69,6 @@ public class OSDarkModeMonitor : IDisposable
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             return IsWindowsDarkMode();
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            return IsMacOSDarkMode();
         }
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
@@ -80,6 +88,10 @@ public class OSDarkModeMonitor : IDisposable
         var currentDarkMode = IsOSDarkMode();
         if (currentDarkMode != _lastKnownDarkMode)
         {
+            _logger.LogInformation("OS dark mode changed from {OldMode} to {NewMode}",
+                _lastKnownDarkMode ? "dark" : "light",
+                currentDarkMode ? "dark" : "light");
+
             _lastKnownDarkMode = currentDarkMode;
             OnDarkModeChanged?.Invoke(this, new DarkModeChangedEventArgs
             {
@@ -100,41 +112,16 @@ public class OSDarkModeMonitor : IDisposable
                 @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
 
             var value = key?.GetValue("AppsUseLightTheme");
-            return value is int intValue && intValue == 0;
+            var isDark = value is int intValue && intValue == 0;
+            _logger.LogDebug("Windows dark mode detected: {IsDark}", isDark);
+            return isDark;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "Failed to detect Windows dark mode");
             return false;
         }
 #pragma warning restore CA1416
-    }
-
-    private bool IsMacOSDarkMode()
-    {
-        try
-        {
-            var process = new System.Diagnostics.Process
-            {
-                StartInfo = new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = "defaults",
-                    Arguments = "read -g AppleInterfaceStyle",
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                }
-            };
-
-            process.Start();
-            var output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
-            return output.Trim().Equals("Dark", StringComparison.OrdinalIgnoreCase);
-        }
-        catch
-        {
-            return false;
-        }
     }
 
     private bool IsLinuxDarkMode()
@@ -159,10 +146,13 @@ public class OSDarkModeMonitor : IDisposable
             var output = process.StandardOutput.ReadToEnd();
             process.WaitForExit();
 
-            return output.Contains("dark", StringComparison.OrdinalIgnoreCase);
+            var isDark = output.Contains("dark", StringComparison.OrdinalIgnoreCase);
+            _logger.LogDebug("Linux dark mode detected: {IsDark}", isDark);
+            return isDark;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogWarning(ex, "Failed to detect Linux dark mode");
             return false;
         }
     }
@@ -174,18 +164,16 @@ public class OSDarkModeMonitor : IDisposable
             return;
         }
 
+        _logger.LogInformation("Disposing OSDarkModeMonitor");
+
         _disposed = true;
         _cts.Cancel();
 
-        if (_pollingThread != null && _pollingThread.IsAlive)
-        {
-            if (!_pollingThread.Join(TimeSpan.FromSeconds(2)))
-            {
-                // Thread didn't stop gracefully
-            }
-        }
+        // CancellationToken will stop the background task
 
         _cts.Dispose();
+
+        _logger.LogDebug("OSDarkModeMonitor disposed");
     }
 }
 

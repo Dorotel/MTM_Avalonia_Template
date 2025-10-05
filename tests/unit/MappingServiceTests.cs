@@ -3,7 +3,9 @@ using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using MTM_Template_Application.Services.Core;
+using NSubstitute;
 using Xunit;
 
 namespace MTM_Template_Tests.Unit;
@@ -19,8 +21,11 @@ public class MappingServiceTests
     [Fact]
     public void Constructor_WithNullMapper_ThrowsArgumentNullException()
     {
-        // Arrange & Act
-        Action act = () => new MappingService(null!);
+        // Arrange
+        var mockLogger = Substitute.For<ILogger<MappingService>>();
+
+        // Act
+        Action act = () => new MappingService(mockLogger, null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
@@ -31,11 +36,12 @@ public class MappingServiceTests
     public void Constructor_WithValidMapper_CreatesServiceSuccessfully()
     {
         // Arrange
+        var mockLogger = Substitute.For<ILogger<MappingService>>();
         var config = new MapperConfiguration(cfg => { });
         var mapper = config.CreateMapper();
 
         // Act
-        var service = new MappingService(mapper);
+        var service = new MappingService(mockLogger, mapper);
 
         // Assert
         service.Should().NotBeNull();
@@ -48,8 +54,12 @@ public class MappingServiceTests
     [Fact]
     public void Create_WithNoAssemblies_CreatesServiceWithCurrentAssembly()
     {
-        // Arrange & Act
-        var service = MappingService.Create();
+        // Arrange
+        var mockLoggerFactory = Substitute.For<ILoggerFactory>();
+        mockLoggerFactory.CreateLogger<MappingService>().Returns(Substitute.For<ILogger<MappingService>>());
+
+        // Act
+        var service = MappingService.Create(mockLoggerFactory);
 
         // Assert
         service.Should().NotBeNull();
@@ -59,10 +69,12 @@ public class MappingServiceTests
     public void Create_WithSpecificAssemblies_CreatesServiceWithProfiles()
     {
         // Arrange
+        var mockLoggerFactory = Substitute.For<ILoggerFactory>();
+        mockLoggerFactory.CreateLogger<MappingService>().Returns(Substitute.For<ILogger<MappingService>>());
         var assembly = Assembly.GetExecutingAssembly();
 
         // Act
-        var service = MappingService.Create(assembly);
+        var service = MappingService.Create(mockLoggerFactory, assembly);
 
         // Assert
         service.Should().NotBeNull();
@@ -72,6 +84,8 @@ public class MappingServiceTests
     public void Create_WithMultipleAssemblies_DiscoversProfilesFromAll()
     {
         // Arrange
+        var mockLoggerFactory = Substitute.For<ILoggerFactory>();
+        mockLoggerFactory.CreateLogger<MappingService>().Returns(Substitute.For<ILogger<MappingService>>());
         var assemblies = new[]
         {
             Assembly.GetExecutingAssembly(),
@@ -79,7 +93,7 @@ public class MappingServiceTests
         };
 
         // Act
-        var service = MappingService.Create(assemblies);
+        var service = MappingService.Create(mockLoggerFactory, assemblies);
 
         // Assert
         service.Should().NotBeNull();
@@ -209,6 +223,7 @@ public class MappingServiceTests
 
     private static MappingService CreateServiceWithTestProfile()
     {
+        var mockLogger = Substitute.For<ILogger<MappingService>>();
         var config = new MapperConfiguration(cfg =>
         {
             cfg.CreateMap<SourceModel, DestinationModel>()
@@ -217,7 +232,7 @@ public class MappingServiceTests
         });
 
         var mapper = config.CreateMapper();
-        return new MappingService(mapper);
+        return new MappingService(mockLogger, mapper);
     }
 
     #endregion

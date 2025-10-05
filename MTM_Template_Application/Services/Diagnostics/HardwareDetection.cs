@@ -1,7 +1,7 @@
 using System;
-using System.Threading;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading;
 using MTM_Template_Application.Models.Diagnostics;
 
 namespace MTM_Template_Application.Services.Diagnostics;
@@ -14,7 +14,7 @@ public class HardwareDetection
     /// <summary>
     /// Detect all hardware capabilities
     /// </summary>
-    public HardwareCapabilities DetectCapabilities()
+    public virtual HardwareCapabilities DetectCapabilities()
     {
         var capabilities = new HardwareCapabilities
         {
@@ -44,10 +44,6 @@ public class HardwareDetection
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 return GetLinuxTotalMemory();
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                return GetMacOSTotalMemory();
             }
 
             return 0;
@@ -91,10 +87,6 @@ public class HardwareDetection
         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             return "Linux";
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            return "macOS";
         }
         else
         {
@@ -165,39 +157,6 @@ public class HardwareDetection
                         return kb / 1024;
                     }
                 }
-            }
-        }
-        catch
-        {
-            // Fallback
-        }
-
-        return 0;
-    }
-
-    private long GetMacOSTotalMemory()
-    {
-        try
-        {
-            var process = new System.Diagnostics.Process
-            {
-                StartInfo = new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = "sysctl",
-                    Arguments = "-n hw.memsize",
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                }
-            };
-
-            process.Start();
-            var output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
-            if (long.TryParse(output.Trim(), out var bytes))
-            {
-                return bytes / (1024 * 1024);
             }
         }
         catch
