@@ -354,8 +354,9 @@
   - **Dependency**: T010, T011 complete (models exist), T002 complete (DB schema exists)
   - **Source**: `data-model.md` section 1, `contracts/configuration-service-contract.json`, spec.md FR-032
   - **Acceptance**: Contract tests T005, T006 now PASS, env var format validated, dynamic user folder location detection works, dynamic database connection selection works, all directories and config files created automatically at runtime, application works on fresh install without manual setup
+  - **Completed**: Enhanced ConfigurationService with runtime initialization, MySQL persistence, dynamic location detection, thread safety with ReaderWriterLockSlim, and environment variable validation. Removed duplicate ConfigurationService_Enhanced.cs file.
 
-- [ ] **T013a** Implement Visual API whitelist validation service
+- [x] **T013a** Implement Visual API whitelist validation service (✅ COMPLETED 2025-10-05)
   - Create `MTM_Template_Application/Services/Visual/VisualApiWhitelistValidator.cs`
   - Load whitelist from `appsettings.json` under `Visual:AllowedCommands` array
   - Implement `IsCommandAllowedAsync(string command, CancellationToken ct)` method
@@ -367,6 +368,7 @@
   - **Dependency**: T003 complete (appsettings.json updated with whitelist)
   - **Source**: spec.md FR-030, FR-031, Constitution Principle VIII
   - **Acceptance**: Contract test validates whitelist enforcement, citation format validation
+  - **Completed**: Created VisualApiWhitelistValidator and IVisualApiWhitelistValidator with all required validation methods
 
 - [ ] **T014** Enhance FeatureFlagEvaluator with deterministic rollout algorithm
   - Modify `MTM_Template_Application/Services/Configuration/FeatureFlagEvaluator.cs`
