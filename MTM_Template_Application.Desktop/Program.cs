@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using Avalonia;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MTM_Template_Application.Extensions;
-using MTM_Template_Application.Services.Secrets;
+using MTM_Template_Application.Desktop.Services;
 using MTM_Template_Application.ViewModels;
 using MTM_Template_Application.Views;
 using Serilog;
@@ -21,25 +20,49 @@ sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        // Set main thread name immediately
+        System.Threading.Thread.CurrentThread.Name = "Main-UI";
+
         // Configure Serilog early for boot logging
         ConfigureSerilog();
+        Log.Information("[Main] ========================================");
+        Log.Information("[Main] MTM Template Application Starting");
+        Log.Information("[Main] Platform: Desktop | .NET: {Framework}", Environment.Version);
+        Log.Information("[Main] Arguments: {Args}", args.Length > 0 ? string.Join(", ", args) : "(none)");
+        Log.Information("[Main] ========================================");
 
         try
         {
-            // Initialize DI container
+            Log.Information("[Main] Phase 1: Initializing Dependency Injection container");
             _serviceProvider = ConfigureServices();
+            Log.Information("[Main] Phase 1 Complete: DI container initialized");
 
-            // Start Avalonia application
-            BuildAvaloniaApp()
-                .StartWithClassicDesktopLifetime(args);
+            Log.Information("[Main] Phase 2: Building and starting Avalonia application");
+            Log.Verbose("[Main] About to call BuildAvaloniaApp()");
+            var appBuilder = BuildAvaloniaApp();
+            Log.Debug("[Main] AppBuilder created, calling StartWithClassicDesktopLifetime");
+            Log.Verbose("[Main] Flushing logs before Avalonia startup");
+            Log.CloseAndFlush();
+            System.Threading.Thread.Sleep(100); // Give logs time to flush
+
+            // Reconfigure logger for Avalonia lifetime
+            ConfigureSerilog();
+            Log.Information("[Main] Avalonia starting...");
+
+            appBuilder.StartWithClassicDesktopLifetime(args);
+
+            Log.Information("[Main] Application exited normally");
         }
         catch (Exception ex)
         {
-            Log.Fatal(ex, "Application terminated unexpectedly");
+            Log.Fatal(ex, "[Main] *** FATAL ERROR *** Application terminated unexpectedly");
+            Log.CloseAndFlush();
+            System.Threading.Thread.Sleep(200); // Ensure log is written
             throw;
         }
         finally
         {
+            Log.Information("[Main] Cleanup: Closing logger and disposing services");
             Log.CloseAndFlush();
             _serviceProvider?.Dispose();
         }
@@ -47,18 +70,18 @@ sealed class Program
 
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
-            .UsePlatformDetect()
-            .WithInterFont()
-            .LogToTrace()
-            .AfterSetup(builder =>
-            {
-                // Show splash screen after Avalonia is initialized
-                if (_serviceProvider != null)
-                {
-                    ShowSplashScreen();
-                }
-            });
+    {
+        Log.Verbose("[BuildAvaloniaApp] Creating AppBuilder");
+        var builder = AppBuilder.Configure<App>();
+        Log.Verbose("[BuildAvaloniaApp] Configuring platform detection");
+        builder.UsePlatformDetect();
+        Log.Verbose("[BuildAvaloniaApp] Configuring Inter font");
+        builder.WithInterFont();
+        Log.Verbose("[BuildAvaloniaApp] Enabling trace logging");
+        builder.LogToTrace();
+        Log.Debug("[BuildAvaloniaApp] AppBuilder configured successfully");
+        return builder;
+    }
 
     /// <summary>
     /// Configure Serilog for application logging.
@@ -66,21 +89,26 @@ sealed class Program
     private static void ConfigureSerilog()
     {
         Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
+            .MinimumLevel.Verbose()
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .Enrich.FromLogContext()
             .Enrich.WithProperty("Application", "MTM_Template_Application")
             .Enrich.WithProperty("Platform", "Desktop")
-            .WriteTo.Console()
+            .Enrich.WithProperty("MachineName", Environment.MachineName)
+            .Enrich.WithProperty("ProcessId", Environment.ProcessId)
+            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss.fff} {Level:u3}] {Message:lj}{NewLine}{Exception}")
             .WriteTo.File(
                 path: "logs/app-.txt",
                 rollingInterval: RollingInterval.Day,
                 retainedFileCountLimit: 7,
-                fileSizeLimitBytes: 10 * 1024 * 1024 // 10MB
+                fileSizeLimitBytes: 10 * 1024 * 1024, // 10MB
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}"
             )
             .CreateLogger();
 
-        Log.Information("Application starting...");
+        Log.Information("[ConfigureSerilog] Serilog configured: Console + File (logs/app-.txt)");
+        Log.Information("[ConfigureSerilog] Log levels: Debug (default), Information (Microsoft)");
+        Log.Information("[ConfigureSerilog] Machine: {Machine}, Process: {ProcessId}", Environment.MachineName, Environment.ProcessId);
     }
 
     /// <summary>
@@ -88,37 +116,50 @@ sealed class Program
     /// </summary>
     private static ServiceProvider ConfigureServices()
     {
-        var services = new ServiceCollection();
-
-        // Add logging
-        services.AddLogging(builder =>
+        try
         {
-            builder.ClearProviders();
-            builder.AddSerilog(dispose: true);
-        });
+            Log.Information("Configuring services...");
+            var services = new ServiceCollection();
 
-        // Build a temporary provider to get logger factory
-        var tempProvider = services.BuildServiceProvider();
-        var loggerFactory = tempProvider.GetRequiredService<ILoggerFactory>();
+            // Add Serilog.ILogger (required by LoggingService)
+            services.AddSingleton(Log.Logger);
+            Log.Debug("Registered Serilog.ILogger");
 
-        // Platform-specific secrets service (Windows)
-        ISecretsService secretsService = OperatingSystem.IsWindows()
-            ? new WindowsSecretsService(loggerFactory.CreateLogger<WindowsSecretsService>())
-            : OperatingSystem.IsMacOS()
-                ? new MacOSSecretsService(loggerFactory.CreateLogger<MacOSSecretsService>())
-                : throw new PlatformNotSupportedException("Unsupported platform for desktop application");
+            // Add Microsoft.Extensions.Logging with Serilog
+            services.AddLogging(builder =>
+            {
+                builder.ClearProviders();
+                builder.AddSerilog(dispose: true);
+            });
+            Log.Debug("Configured Microsoft.Extensions.Logging");
 
-        // Add all application services
-        services.AddAllServices(secretsService, includeVisualApi: true);
+            // Build a temporary provider to get logger factory
+            Log.Debug("Building temporary service provider for logger factory");
+            var tempProvider = services.BuildServiceProvider();
+            var loggerFactory = tempProvider.GetRequiredService<ILoggerFactory>();
+            Log.Debug("Logger factory obtained");
 
-        var provider = services.BuildServiceProvider();
+            // Register all Desktop platform services
+            Log.Information("Registering Desktop platform services...");
+            services.AddDesktopServices(loggerFactory, includeVisualApi: true);
+            Log.Information("Desktop services registered successfully");
 
-        // Dispose temp provider
-        tempProvider.Dispose();
+            Log.Information("Building final service provider...");
+            var provider = services.BuildServiceProvider();
+            Log.Information("Service provider built successfully");
 
-        Log.Information("Dependency injection container configured");
+            // Dispose temp provider
+            tempProvider.Dispose();
 
-        return provider;
+            Log.Information("Dependency injection container configured successfully");
+
+            return provider;
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "Failed to configure services");
+            throw;
+        }
     }
 
     /// <summary>
@@ -134,19 +175,25 @@ sealed class Program
 
         try
         {
+            Log.Information("Attempting to resolve SplashViewModel...");
             var splashViewModel = _serviceProvider.GetRequiredService<SplashViewModel>();
+            Log.Information("SplashViewModel resolved successfully");
+
+            Log.Information("Creating SplashWindow...");
             var splashWindow = new SplashWindow
             {
                 DataContext = splashViewModel
             };
+            Log.Information("SplashWindow created successfully");
 
+            Log.Information("Showing splash window...");
             splashWindow.Show();
 
-            Log.Information("Splash screen displayed");
+            Log.Information("Splash screen displayed successfully");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Failed to show splash screen");
+            Log.Fatal(ex, "Failed to show splash screen");
             throw;
         }
     }
@@ -157,5 +204,13 @@ sealed class Program
     public static T? GetService<T>() where T : class
     {
         return _serviceProvider?.GetService<T>();
+    }
+
+    /// <summary>
+    /// Get the service provider (for use by App.axaml.cs).
+    /// </summary>
+    public static IServiceProvider? GetServiceProvider()
+    {
+        return _serviceProvider;
     }
 }

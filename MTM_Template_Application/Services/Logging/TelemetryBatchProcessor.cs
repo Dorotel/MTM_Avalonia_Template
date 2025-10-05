@@ -17,7 +17,9 @@ public class TelemetryBatchProcessor : IDisposable
 
     private readonly List<LogEntry> _batchBuffer;
     private readonly int _batchSize;
-    private readonly Timer _flushTimer;
+    private readonly Thread _flushThread;
+    private readonly CancellationTokenSource _cts;
+    private readonly TimeSpan _flushInterval;
     private readonly SemaphoreSlim _bufferLock;
     private readonly Func<IEnumerable<LogEntry>, Task> _batchHandler;
     private bool _disposed;
@@ -43,7 +45,39 @@ public class TelemetryBatchProcessor : IDisposable
         _batchSize = batchSize;
         _batchBuffer = new List<LogEntry>(batchSize);
         _bufferLock = new SemaphoreSlim(1, 1);
-        _flushTimer = new Timer(OnFlushTimerElapsed, null, flushIntervalMs, flushIntervalMs);
+        _flushInterval = TimeSpan.FromMilliseconds(flushIntervalMs);
+        _cts = new CancellationTokenSource();
+
+        _flushThread = new Thread(FlushLoop)
+        {
+            Name = "TelemetryBatchProcessor.FlushLoop",
+            IsBackground = true
+        };
+        _flushThread.Start();
+    }
+
+    private void FlushLoop()
+    {
+
+        while (!_cts.Token.IsCancellationRequested)
+        {
+            try
+            {
+                Task.Delay(_flushInterval, _cts.Token).Wait();
+                if (!_disposed)
+                {
+                    FlushAsync().GetAwaiter().GetResult();
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception)
+            {
+                // Silently ignore flush errors
+            }
+        }
     }
 
     /// <summary>
@@ -131,26 +165,6 @@ public class TelemetryBatchProcessor : IDisposable
         }
     }
 
-    /// <summary>
-    /// Timer callback to flush periodically
-    /// </summary>
-    private async void OnFlushTimerElapsed(object? state)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        try
-        {
-            await FlushAsync();
-        }
-        catch (Exception)
-        {
-            // Silently ignore flush errors
-        }
-    }
-
     public void Dispose()
     {
         if (_disposed)
@@ -159,9 +173,13 @@ public class TelemetryBatchProcessor : IDisposable
         }
 
         _disposed = true;
+        _cts.Cancel();
 
-        // Stop the timer
-        _flushTimer?.Dispose();
+        // Wait for flush thread to stop
+        if (_flushThread != null && _flushThread.IsAlive)
+        {
+            _flushThread.Join(TimeSpan.FromSeconds(2));
+        }
 
         // Flush remaining entries
         try
@@ -173,6 +191,7 @@ public class TelemetryBatchProcessor : IDisposable
             // Silently ignore flush errors during disposal
         }
 
+        _cts.Dispose();
         _bufferLock?.Dispose();
     }
 }

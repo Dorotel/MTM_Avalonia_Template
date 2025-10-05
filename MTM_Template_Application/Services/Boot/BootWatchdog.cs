@@ -56,7 +56,7 @@ public class BootWatchdog
         _watchdogCts = new CancellationTokenSource();
         _stopwatch.Restart();
 
-        _watchdogTask = Task.Run(async () =>
+        _watchdogTask = Task.Factory.StartNew(async () =>
         {
             try
             {
@@ -79,7 +79,7 @@ public class BootWatchdog
                     stageNumber
                 );
             }
-        }, _watchdogCts.Token);
+        }, _watchdogCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default).Unwrap();
     }
 
     /// <summary>

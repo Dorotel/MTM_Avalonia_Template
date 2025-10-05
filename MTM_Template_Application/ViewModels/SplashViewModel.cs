@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -17,6 +18,10 @@ public partial class SplashViewModel : ObservableObject
     private readonly ILogger<SplashViewModel> _logger;
     private readonly IBootOrchestrator _bootOrchestrator;
     private CancellationTokenSource? _bootCancellationTokenSource;
+    private readonly List<string> _bootLogs = new();
+    private long _bootStartTicks;
+    private long _bootDurationMs;
+    private double _bootMemoryMB;
 
     [ObservableProperty]
     private int _progressPercentage;
@@ -65,6 +70,9 @@ public partial class SplashViewModel : ObservableObject
     public async Task StartBootSequenceAsync()
     {
         _logger.LogInformation("Starting boot sequence from SplashViewModel");
+        _bootLogs.Clear();
+        _bootStartTicks = DateTime.UtcNow.Ticks;
+        AddBootLog($"[{DateTime.Now:HH:mm:ss.fff}] Boot sequence started");
 
         _bootCancellationTokenSource = new CancellationTokenSource();
         IsBootInProgress = true;
@@ -75,6 +83,14 @@ public partial class SplashViewModel : ObservableObject
         try
         {
             var bootMetrics = await _bootOrchestrator.ExecuteBootSequenceAsync(_bootCancellationTokenSource.Token);
+
+            _bootDurationMs = bootMetrics.TotalDurationMs ?? 0;
+            _bootMemoryMB = bootMetrics.MemoryUsageMB;
+
+            AddBootLog($"[{DateTime.Now:HH:mm:ss.fff}] Boot completed successfully");
+            AddBootLog($"[{DateTime.Now:HH:mm:ss.fff}] Duration: {_bootDurationMs}ms");
+            AddBootLog($"[{DateTime.Now:HH:mm:ss.fff}] Memory: {_bootMemoryMB:F1}MB");
+            AddBootLog($"[{DateTime.Now:HH:mm:ss.fff}] Status: {bootMetrics.SuccessStatus}");
 
             _logger.LogInformation(
                 "Boot sequence completed. Duration: {DurationMs}ms, Status: {Status}",
@@ -90,6 +106,7 @@ public partial class SplashViewModel : ObservableObject
         catch (OperationCanceledException)
         {
             _logger.LogWarning("Boot sequence cancelled by user");
+            AddBootLog($"[{DateTime.Now:HH:mm:ss.fff}] ERROR: Boot cancelled by user");
             IsBootInProgress = false;
             HasError = true;
             ErrorMessage = "Boot sequence cancelled by user";
@@ -98,12 +115,36 @@ public partial class SplashViewModel : ObservableObject
         catch (Exception ex)
         {
             _logger.LogError(ex, "Boot sequence failed");
+            AddBootLog($"[{DateTime.Now:HH:mm:ss.fff}] ERROR: {ex.Message}");
             IsBootInProgress = false;
             HasError = true;
             ErrorMessage = ex.Message;
             StatusMessage = "Boot failed - please restart the application";
         }
     }
+
+    /// <summary>
+    /// Add a log entry to the boot log collection.
+    /// </summary>
+    private void AddBootLog(string message)
+    {
+        _bootLogs.Add(message);
+    }
+
+    /// <summary>
+    /// Get all collected boot logs.
+    /// </summary>
+    public IReadOnlyList<string> GetBootLogs() => _bootLogs.AsReadOnly();
+
+    /// <summary>
+    /// Get boot duration in milliseconds.
+    /// </summary>
+    public long GetBootDurationMs() => _bootDurationMs;
+
+    /// <summary>
+    /// Get boot memory usage in MB.
+    /// </summary>
+    public double GetBootMemoryMB() => _bootMemoryMB;
 
     /// <summary>
     /// Cancel the boot sequence (if user requests).
@@ -139,16 +180,22 @@ public partial class SplashViewModel : ObservableObject
         {
             CurrentStage = 0;
             StageName = "Stage 0: Splash";
+            if (e.ProgressPercentage == 0 || string.IsNullOrEmpty(e.StatusMessage) == false)
+            {
+                AddBootLog($"[{DateTime.Now:HH:mm:ss.fff}] Stage 0: {e.StatusMessage}");
+            }
         }
         else if (e.ProgressPercentage <= 75)
         {
             CurrentStage = 1;
             StageName = "Stage 1: Services";
+            AddBootLog($"[{DateTime.Now:HH:mm:ss.fff}] Stage 1: {e.StatusMessage}");
         }
         else
         {
             CurrentStage = 2;
             StageName = "Stage 2: Application";
+            AddBootLog($"[{DateTime.Now:HH:mm:ss.fff}] Stage 2: {e.StatusMessage}");
         }
 
         _logger.LogDebug(

@@ -54,7 +54,6 @@ public class ExponentialBackoffPolicyTests
     {
         // Arrange
         var attemptCount = 0;
-        var maxRetries = 5;
 
         Func<Task<bool>> operation = async () =>
         {

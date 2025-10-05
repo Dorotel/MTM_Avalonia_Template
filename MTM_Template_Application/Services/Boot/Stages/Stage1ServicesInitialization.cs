@@ -235,8 +235,14 @@ public class Stage1ServicesInitialization : IBootStage
         // These can run in parallel
         var tasks = new List<Task>
         {
-            Task.Run(() => { /* Validation service initialized via DI */ }, cancellationToken),
-            Task.Run(() => { /* Mapping service initialized via DI */ }, cancellationToken),
+            Task.Factory.StartNew(() =>
+            {
+                /* Validation service initialized via DI */
+            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default),
+            Task.Factory.StartNew(() =>
+            {
+                /* Mapping service initialized via DI */
+            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default),
             _messageBus.PublishAsync(new { Type = "BootStarted", Timestamp = DateTimeOffset.UtcNow })
         };
 

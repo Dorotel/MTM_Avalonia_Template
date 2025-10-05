@@ -105,13 +105,15 @@ public class LoggingService : ILoggingService
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         cts.CancelAfter(TimeSpan.FromSeconds(5)); // 5s timeout for flush
 
-        await Task.Run(() =>
+        var flushTask = Task.Factory.StartNew(() =>
         {
             if (_logger is Logger logger)
             {
                 logger.Dispose();
             }
-        });
+        }, TaskCreationOptions.LongRunning);
+
+        await flushTask;
     }
 
     /// <summary>

@@ -1,16 +1,139 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:MTM_Template_Application.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="MTM_Template_Application.Views.MainView"
-             x:DataType="vm:MainViewModel">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
-  </Design.DataContext>
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:MTM_Template_Application.ViewModels"
+    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+    x:Class="MTM_Template_Application.Views.MainView"
+    x:DataType="vm:MainViewModel"
+    x:CompileBindings="True">
+    <Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
 
-  <TextBlock Text="{CompiledBinding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <!-- Main application view for Android -->
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#2196F3" Padding="16">
+            <TextBlock Text="MTM Template Application"
+                FontSize="20"
+                FontWeight="SemiBold"
+                Foreground="White"
+                HorizontalAlignment="Center" />
+        </Border>
+
+        <!-- Main Content Area -->
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Margin="16" Spacing="16">
+
+                <!-- Welcome Message -->
+                <TextBlock Text="{CompiledBinding Greeting}"
+                    FontSize="24"
+                    FontWeight="Bold"
+                    HorizontalAlignment="Center"
+                    TextWrapping="Wrap" />
+
+                <!-- Application Info -->
+                <Border Background="#F5F5F5"
+                    BorderBrush="#E0E0E0"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Application Status"
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Foreground="#212121" />
+                        <TextBlock Text="✓ Boot sequence completed successfully"
+                            FontSize="14"
+                            Foreground="#4CAF50" />
+                        <TextBlock Text="✓ All services initialized"
+                            FontSize="14"
+                            Foreground="#4CAF50" />
+                        <TextBlock Text="✓ Ready for operation"
+                            FontSize="14"
+                            Foreground="#4CAF50" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Platform Info -->
+                <Border Background="#E3F2FD"
+                    BorderBrush="#2196F3"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Platform: Android"
+                            FontSize="14"
+                            Foreground="#1976D2" />
+                        <TextBlock Text="Framework: Avalonia UI 11.3+"
+                            FontSize="14"
+                            Foreground="#1976D2" />
+                        <TextBlock Text=".NET 9.0"
+                            FontSize="14"
+                            Foreground="#1976D2" />
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer -->
+        <Border Grid.Row="2" Background="#F5F5F5" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0"
+            Padding="16">
+            <StackPanel Spacing="8">
+
+                <!-- Boot Logs Section -->
+                <Expander Header="Boot Sequence Logs" IsExpanded="False"
+                    IsVisible="{CompiledBinding HasBootLogs}">
+                    <Border Background="#FAFAFA" BorderBrush="#E0E0E0" BorderThickness="1"
+                        CornerRadius="4" Padding="12" Margin="0,8,0,0">
+                        <StackPanel Spacing="8">
+
+                            <!-- Boot Metrics Summary -->
+                            <StackPanel Orientation="Horizontal" Spacing="16">
+                                <TextBlock
+                                    Text="{CompiledBinding BootDurationMs, StringFormat='Duration: {0}ms'}"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Foreground="#1976D2" />
+                                <TextBlock
+                                    Text="{CompiledBinding BootMemoryMB, StringFormat='Memory: {0:F1}MB'}"
+                                    FontSize="12"
+                                    FontWeight="Medium"
+                                    Foreground="#1976D2" />
+                            </StackPanel>
+
+                            <!-- Logs List -->
+                            <ScrollViewer MaxHeight="200" HorizontalScrollBarVisibility="Auto"
+                                VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{CompiledBinding BootLogs}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}"
+                                                FontSize="11"
+                                                FontFamily="Consolas,Courier New,monospace"
+                                                Foreground="#424242"
+                                                TextWrapping="NoWrap"
+                                                Margin="0,2" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+
+                        </StackPanel>
+                    </Border>
+                </Expander>
+
+                <!-- Copyright -->
+                <TextBlock Text="© 2025 MTM Template Application"
+                    FontSize="12"
+                    Foreground="#757575"
+                    HorizontalAlignment="Center"
+                    Margin="0,8,0,0" />
+            </StackPanel>
+        </Border>
+
+    </Grid>
 </UserControl>

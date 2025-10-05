@@ -13,7 +13,8 @@ namespace MTM_Template_Application.Services.DataLayer;
 public class ConnectionPoolMonitor : IDisposable
 {
     private readonly List<IConnectionMetricsProvider> _providers;
-    private readonly Timer _monitorTimer;
+    private readonly Thread _monitorThread;
+    private readonly CancellationTokenSource _cts;
     private readonly TimeSpan _monitorInterval;
     private readonly Action<Dictionary<string, ConnectionPoolMetrics>>? _metricsCallback;
     private bool _disposed;
@@ -28,8 +29,38 @@ public class ConnectionPoolMonitor : IDisposable
         _providers = providers.ToList();
         _monitorInterval = monitorInterval ?? TimeSpan.FromSeconds(30);
         _metricsCallback = metricsCallback;
+        _cts = new CancellationTokenSource();
 
-        _monitorTimer = new Timer(OnMonitorTick, null, _monitorInterval, _monitorInterval);
+        _monitorThread = new Thread(MonitorLoop)
+        {
+            Name = "ConnectionPoolMonitor.MonitorLoop",
+            IsBackground = true
+        };
+        _monitorThread.Start();
+    }
+
+    private void MonitorLoop()
+    {
+
+        while (!_cts.Token.IsCancellationRequested)
+        {
+            try
+            {
+                Task.Delay(_monitorInterval, _cts.Token).Wait();
+                if (!_disposed)
+                {
+                    OnMonitorTick();
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in connection pool monitor: {ex.Message}");
+            }
+        }
     }
 
     /// <summary>
@@ -62,10 +93,10 @@ public class ConnectionPoolMonitor : IDisposable
     public AggregatedConnectionMetrics GetAggregatedMetrics()
     {
         var allMetrics = GetCurrentMetrics();
-        var avgAcquireTime = allMetrics.Count > 0 
-            ? (long)allMetrics.Average(m => m.Value.AverageAcquireTimeMs) 
+        var avgAcquireTime = allMetrics.Count > 0
+            ? (long)allMetrics.Average(m => m.Value.AverageAcquireTimeMs)
             : 0;
-        
+
         return new AggregatedConnectionMetrics
         {
             TotalPools = allMetrics.Count,
@@ -79,9 +110,9 @@ public class ConnectionPoolMonitor : IDisposable
     }
 
     /// <summary>
-    /// Monitor timer callback
+    /// Monitor tick - collect and log metrics
     /// </summary>
-    private void OnMonitorTick(object? state)
+    private void OnMonitorTick()
     {
         if (_disposed)
         {
@@ -129,7 +160,14 @@ public class ConnectionPoolMonitor : IDisposable
         }
 
         _disposed = true;
-        _monitorTimer?.Dispose();
+        _cts.Cancel();
+
+        if (_monitorThread != null && _monitorThread.IsAlive)
+        {
+            _monitorThread.Join(TimeSpan.FromSeconds(2));
+        }
+
+        _cts.Dispose();
     }
 }
 

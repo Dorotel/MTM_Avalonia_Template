@@ -1,14 +1,375 @@
 <Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:vm="using:MTM_Template_Application.ViewModels"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:views="clr-namespace:MTM_Template_Application.Views"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-        x:Class="MTM_Template_Application.Views.MainWindow"
-        x:DataType="vm:MainViewModel"
-        x:CompileBindings="True"
-        Icon="/Assets/avalonia-logo.ico"
-        Title="MTM_Template_Application">
-        <views:MainView />
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:MTM_Template_Application.ViewModels"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="clr-namespace:MTM_Template_Application.Views"
+    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+    x:Class="MTM_Template_Application.Views.MainWindow"
+    x:DataType="vm:MainViewModel"
+    x:CompileBindings="True"
+    Icon="/Assets/avalonia-logo.ico"
+    Title="MTM Template Application"
+    Width="1200" Height="700"
+    MinWidth="800" MinHeight="600"
+    ExtendClientAreaToDecorationsHint="True"
+    ExtendClientAreaChromeHints="NoChrome"
+    ExtendClientAreaTitleBarHeightHint="40"
+    TransparencyLevelHint="AcrylicBlur"
+    Background="Transparent">
+    <Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
+
+    <!-- Desktop Main Window with Custom Title Bar -->
+    <Panel>
+        <!-- Main Background -->
+        <Border Background="#FFFFFF" CornerRadius="0">
+            <Grid RowDefinitions="40,*">
+
+                <!-- Custom Title Bar -->
+                <Border Grid.Row="0"
+                    Background="#2196F3"
+                    PointerPressed="TitleBar_PointerPressed"
+                    Cursor="Hand">
+                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="10,0">
+
+                        <!-- App Icon and Title -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12"
+                            VerticalAlignment="Center">
+                            <Viewbox Width="24" Height="24">
+                                <Canvas Width="24" Height="24">
+                                    <Ellipse Width="24" Height="24" Fill="White" Opacity="0.9" />
+                                    <TextBlock Text="M"
+                                        FontSize="14"
+                                        FontWeight="Bold"
+                                        Foreground="#2196F3"
+                                        Canvas.Left="7"
+                                        Canvas.Top="4" />
+                                </Canvas>
+                            </Viewbox>
+                            <TextBlock Text="MTM Template Application"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Foreground="White"
+                                VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <!-- Center Space -->
+                        <Panel Grid.Column="1" />
+
+                        <!-- Window Controls -->
+                        <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            Spacing="1"
+                            IsHitTestVisible="True">
+
+                            <!-- Minimize Button -->
+                            <Button Click="MinimizeWindow"
+                                Width="46" Height="40"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                CornerRadius="0"
+                                Padding="0"
+                                Cursor="Hand">
+                                <Button.Styles>
+                                    <Style Selector="Button:pointerover">
+                                        <Setter Property="Background" Value="#40FFFFFF" />
+                                    </Style>
+                                    <Style Selector="Button:pressed">
+                                        <Setter Property="Background" Value="#60FFFFFF" />
+                                    </Style>
+                                </Button.Styles>
+                                <Path Data="M 0,0 L 10,0"
+                                    Stroke="White"
+                                    StrokeThickness="1"
+                                    StrokeLineCap="Round"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center" />
+                            </Button>
+
+                            <!-- Maximize/Restore Button -->
+                            <Button Click="MaximizeWindow"
+                                Width="46" Height="40"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                CornerRadius="0"
+                                Padding="0"
+                                Cursor="Hand">
+                                <Button.Styles>
+                                    <Style Selector="Button:pointerover">
+                                        <Setter Property="Background" Value="#40FFFFFF" />
+                                    </Style>
+                                    <Style Selector="Button:pressed">
+                                        <Setter Property="Background" Value="#60FFFFFF" />
+                                    </Style>
+                                </Button.Styles>
+                                <Path Data="M 0,0 L 10,0 L 10,10 L 0,10 Z"
+                                    Stroke="White"
+                                    StrokeThickness="1"
+                                    Fill="Transparent"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center" />
+                            </Button>
+
+                            <!-- Close Button -->
+                            <Button Click="CloseWindow"
+                                Width="46" Height="40"
+                                Background="Transparent"
+                                BorderThickness="0"
+                                CornerRadius="0"
+                                Padding="0"
+                                Cursor="Hand">
+                                <Button.Styles>
+                                    <Style Selector="Button:pointerover">
+                                        <Setter Property="Background" Value="#E81123" />
+                                    </Style>
+                                    <Style Selector="Button:pressed">
+                                        <Setter Property="Background" Value="#C50F1F" />
+                                    </Style>
+                                </Button.Styles>
+                                <Canvas Width="10" Height="10">
+                                    <Path Data="M 0,0 L 10,10 M 0,10 L 10,0"
+                                        Stroke="White"
+                                        StrokeThickness="1"
+                                        StrokeLineCap="Round" />
+                                </Canvas>
+                            </Button>
+
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Main Content Area -->
+                <ScrollViewer Grid.Row="1">
+                    <Grid RowDefinitions="Auto,*,Auto" Margin="0">
+
+                        <!-- Header Section -->
+                        <Border Grid.Row="0"
+                            Background="#F5F5F5"
+                            BorderBrush="#E0E0E0"
+                            BorderThickness="0,0,0,1"
+                            Padding="32,24">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="{CompiledBinding Greeting}"
+                                    FontSize="28"
+                                    FontWeight="Bold"
+                                    Foreground="#212121" />
+                                <TextBlock Text="Desktop Application"
+                                    FontSize="16"
+                                    Foreground="#757575" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Main Content -->
+                        <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="32,32">
+
+                            <!-- Left Column: Status Cards -->
+                            <StackPanel Grid.Column="0" Spacing="20" Margin="0,0,16,0">
+
+                                <!-- Application Status Card -->
+                                <Border Background="White"
+                                    BorderBrush="#E0E0E0"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="24"
+                                    BoxShadow="0 2 8 0 #10000000">
+                                    <StackPanel Spacing="16">
+                                        <TextBlock Text="Application Status"
+                                            FontSize="20"
+                                            FontWeight="SemiBold"
+                                            Foreground="#212121" />
+
+                                        <StackPanel Spacing="12">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Border Background="#4CAF50"
+                                                    Width="6" Height="6"
+                                                    CornerRadius="3"
+                                                    VerticalAlignment="Center" />
+                                                <TextBlock
+                                                    Text="Boot sequence completed successfully"
+                                                    FontSize="14"
+                                                    Foreground="#424242" />
+                                            </StackPanel>
+
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Border Background="#4CAF50"
+                                                    Width="6" Height="6"
+                                                    CornerRadius="3"
+                                                    VerticalAlignment="Center" />
+                                                <TextBlock Text="All services initialized"
+                                                    FontSize="14"
+                                                    Foreground="#424242" />
+                                            </StackPanel>
+
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Border Background="#4CAF50"
+                                                    Width="6" Height="6"
+                                                    CornerRadius="3"
+                                                    VerticalAlignment="Center" />
+                                                <TextBlock Text="Ready for operation"
+                                                    FontSize="14"
+                                                    Foreground="#424242" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Platform Info Card -->
+                                <Border Background="White"
+                                    BorderBrush="#E0E0E0"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="24"
+                                    BoxShadow="0 2 8 0 #10000000">
+                                    <StackPanel Spacing="16">
+                                        <TextBlock Text="Platform Information"
+                                            FontSize="20"
+                                            FontWeight="SemiBold"
+                                            Foreground="#212121" />
+
+                                        <StackPanel Spacing="10">
+                                            <Grid ColumnDefinitions="120,*">
+                                                <TextBlock Grid.Column="0"
+                                                    Text="Platform:"
+                                                    FontSize="14"
+                                                    Foreground="#757575" />
+                                                <TextBlock Grid.Column="1"
+                                                    Text="Windows Desktop"
+                                                    FontSize="14"
+                                                    FontWeight="Medium"
+                                                    Foreground="#212121" />
+                                            </Grid>
+
+                                            <Grid ColumnDefinitions="120,*">
+                                                <TextBlock Grid.Column="0"
+                                                    Text="Framework:"
+                                                    FontSize="14"
+                                                    Foreground="#757575" />
+                                                <TextBlock Grid.Column="1"
+                                                    Text="Avalonia UI 11.3+"
+                                                    FontSize="14"
+                                                    FontWeight="Medium"
+                                                    Foreground="#212121" />
+                                            </Grid>
+
+                                            <Grid ColumnDefinitions="120,*">
+                                                <TextBlock Grid.Column="0"
+                                                    Text="Runtime:"
+                                                    FontSize="14"
+                                                    Foreground="#757575" />
+                                                <TextBlock Grid.Column="1"
+                                                    Text=".NET 9.0"
+                                                    FontSize="14"
+                                                    FontWeight="Medium"
+                                                    Foreground="#212121" />
+                                            </Grid>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+                            </StackPanel>
+
+                            <!-- Right Column: Boot Logs -->
+                            <Border Grid.Column="1"
+                                Background="White"
+                                BorderBrush="#E0E0E0"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="24"
+                                Margin="16,0,0,0"
+                                BoxShadow="0 2 8 0 #10000000"
+                                IsVisible="{CompiledBinding HasBootLogs}">
+                                <Grid RowDefinitions="Auto,Auto,*">
+
+                                    <!-- Boot Logs Header -->
+                                    <TextBlock Grid.Row="0"
+                                        Text="Boot Sequence Logs"
+                                        FontSize="20"
+                                        FontWeight="SemiBold"
+                                        Foreground="#212121"
+                                        Margin="0,0,0,16" />
+
+                                    <!-- Boot Metrics -->
+                                    <Border Grid.Row="1"
+                                        Background="#E3F2FD"
+                                        BorderBrush="#2196F3"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="16"
+                                        Margin="0,0,0,16">
+                                        <Grid ColumnDefinitions="*,*">
+                                            <StackPanel Grid.Column="0" Spacing="4">
+                                                <TextBlock Text="Duration"
+                                                    FontSize="12"
+                                                    Foreground="#1976D2"
+                                                    FontWeight="Medium" />
+                                                <TextBlock
+                                                    Text="{CompiledBinding BootDurationMs, StringFormat='{}{0}ms'}"
+                                                    FontSize="20"
+                                                    FontWeight="Bold"
+                                                    Foreground="#1565C0" />
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="1" Spacing="4">
+                                                <TextBlock Text="Memory Used"
+                                                    FontSize="12"
+                                                    Foreground="#1976D2"
+                                                    FontWeight="Medium" />
+                                                <TextBlock
+                                                    Text="{CompiledBinding BootMemoryMB, StringFormat='{}{0:F1}MB'}"
+                                                    FontSize="20"
+                                                    FontWeight="Bold"
+                                                    Foreground="#1565C0" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Logs ScrollViewer -->
+                                    <Border Grid.Row="2"
+                                        Background="#FAFAFA"
+                                        BorderBrush="#E0E0E0"
+                                        BorderThickness="1"
+                                        CornerRadius="4">
+                                        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                            HorizontalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{CompiledBinding BootLogs}"
+                                                Margin="12">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding}"
+                                                            FontSize="11"
+                                                            FontFamily="Consolas,Courier New,monospace"
+                                                            Foreground="#424242"
+                                                            TextWrapping="NoWrap"
+                                                            Margin="0,2" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                    </Border>
+
+                                </Grid>
+                            </Border>
+
+                        </Grid>
+
+                        <!-- Footer -->
+                        <Border Grid.Row="2"
+                            Background="#F5F5F5"
+                            BorderBrush="#E0E0E0"
+                            BorderThickness="0,1,0,0"
+                            Padding="32,16">
+                            <TextBlock Text="© 2025 MTM Template Application"
+                                FontSize="12"
+                                Foreground="#757575"
+                                HorizontalAlignment="Center" />
+                        </Border>
+
+                    </Grid>
+                </ScrollViewer>
+
+            </Grid>
+        </Border>
+    </Panel>
 </Window>

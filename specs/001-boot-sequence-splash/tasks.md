@@ -157,13 +157,13 @@
 ### Contract Tests (API Validation)
 
 - [x] T072 [P] Contract test: Visual API Toolkit whitelist validation in tests/contract/VisualApiContractTests.cs - Validate only whitelisted commands accepted (see visual-whitelist.md)
-- [x] T072A [P] Integration test: Boot cancellation during Stage 1 in tests/integration/BootSequenceTests.cs - Validate cancellation support (FR-009, FR-122): initiate boot sequence, invoke cancel during Stage 1 service initialization, verify CancellationToken propagated to all async operations, confirm resources released (connections closed, temp files cleaned), validate clean exit without exceptions, verify boot metrics recorded cancellation event
-- [x] T073 [P] Contract test: Visual API Toolkit authentication in tests/contract/VisualApiContractTests.cs - Validate device certificate + user credentials (Android)
-- [x] T074 [P] Contract test: Visual API Toolkit schema dictionary in tests/contract/VisualApiContractTests.cs - Validate table/column name resolution
-- [x] T075 [P] Contract test: HTTP API endpoint availability in tests/contract/HttpApiContractTests.cs - Validate Android HTTP API endpoints respond
-- [x] T076 [P] Contract test: MySQL connection string validation in tests/contract/MySqlContractTests.cs - Validate connection string format, role-based access
-- [x] T077 [P] Contract test: Diagnostics API checks in tests/contract/DiagnosticsContractTests.cs - Validate diagnostic check contracts (storage, permissions, network, hardware)
-- [x] T078 [P] Contract test: Android device certificate + two-factor auth in tests/contract/AndroidAuthContractTests.cs - Validate device cert stored in Android KeyStore + user credentials (FR-154)
+- [x] T073 [P] Integration test: Boot cancellation during Stage 1 in tests/integration/BootSequenceTests.cs - Validate cancellation support (FR-009, FR-122): initiate boot sequence, invoke cancel during Stage 1 service initialization, verify CancellationToken propagated to all async operations, confirm resources released (connections closed, temp files cleaned), validate clean exit without exceptions, verify boot metrics recorded cancellation event
+- [x] T074 [P] Contract test: Visual API Toolkit authentication in tests/contract/VisualApiContractTests.cs - Validate device certificate + user credentials (Android)
+- [x] T075 [P] Contract test: Visual API Toolkit schema dictionary in tests/contract/VisualApiContractTests.cs - Validate table/column name resolution
+- [x] T076 [P] Contract test: HTTP API endpoint availability in tests/contract/HttpApiContractTests.cs - Validate Android HTTP API endpoints respond
+- [x] T077 [P] Contract test: MySQL connection string validation in tests/contract/MySqlContractTests.cs - Validate connection string format, role-based access
+- [x] T078 [P] Contract test: Diagnostics API checks in tests/contract/DiagnosticsContractTests.cs - Validate diagnostic check contracts (storage, permissions, network, hardware)
+- [x] T079 [P] Contract test: Android device certificate + two-factor auth in tests/contract/AndroidAuthContractTests.cs - Validate device cert stored in Android KeyStore + user credentials (FR-154)
 
 ---
 
@@ -171,112 +171,112 @@
 
 ### Configuration Service Implementation
 
-- [x] T079 ConfigurationService implementation in MTM_Template_Application/Services/Configuration/ConfigurationService.cs - Layered precedence (env vars > user > app > defaults), hot-reload support
-- [x] T080 ConfigurationProfile persistence in MTM_Template_Application/Services/Configuration/ConfigurationPersistence.cs - Save/load profiles from local storage
-- [x] T081 FeatureFlag evaluation in MTM_Template_Application/Services/Configuration/FeatureFlagEvaluator.cs - Environment-based flag evaluation, rollout percentage
+- [x] T080 ConfigurationService implementation in MTM_Template_Application/Services/Configuration/ConfigurationService.cs - Layered precedence (env vars > user > app > defaults), hot-reload support
+- [x] T081 ConfigurationProfile persistence in MTM_Template_Application/Services/Configuration/ConfigurationPersistence.cs - Save/load profiles from local storage
+- [x] T082 FeatureFlag evaluation in MTM_Template_Application/Services/Configuration/FeatureFlagEvaluator.cs - Environment-based flag evaluation, rollout percentage
 
 ### Secrets Service Implementation
 
-- [x] T082 WindowsSecretsService implementation in MTM_Template_Application/Services/Secrets/WindowsSecretsService.cs - Windows DPAPI integration, credential manager API
-- [x] T083 MacOSSecretsService implementation in MTM_Template_Application/Services/Secrets/MacOSSecretsService.cs - macOS Keychain integration
-- [x] T084 AndroidSecretsService implementation in MTM_Template_Application/Services/Secrets/AndroidSecretsService.cs - Android KeyStore integration
-- [x] T085 SecretsService factory in MTM_Template_Application/Services/Secrets/SecretsServiceFactory.cs - Platform detection, return appropriate implementation
+- [x] T083 WindowsSecretsService implementation in MTM_Template_Application/Services/Secrets/WindowsSecretsService.cs - Windows DPAPI integration, credential manager API
+- [x] T084 MacOSSecretsService implementation in MTM_Template_Application/Services/Secrets/MacOSSecretsService.cs - macOS Keychain integration
+- [x] T085 AndroidSecretsService implementation in MTM_Template_Application/Services/Secrets/AndroidSecretsService.cs - Android KeyStore integration
+- [x] T086 SecretsService factory in MTM_Template_Application/Services/Secrets/SecretsServiceFactory.cs - Platform detection, return appropriate implementation
 
 ### Logging Service Implementation
 
-- [x] T086 LoggingService implementation in MTM_Template_Application/Services/Logging/LoggingService.cs - Serilog + OpenTelemetry integration, structured JSON format
-- [x] T087 PII redaction middleware in MTM_Template_Application/Services/Logging/PiiRedactionMiddleware.cs - Detect and redact sensitive data (SSN, credit cards, passwords)
-- [x] T088 Log rotation policy in MTM_Template_Application/Services/Logging/LogRotationPolicy.cs - 10MB max file size, 7 days retention
-- [x] T089 Telemetry batch processor in MTM_Template_Application/Services/Logging/TelemetryBatchProcessor.cs - Batch telemetry for efficient transmission
+- [x] T087 LoggingService implementation in MTM_Template_Application/Services/Logging/LoggingService.cs - Serilog + OpenTelemetry integration, structured JSON format
+- [x] T088 PII redaction middleware in MTM_Template_Application/Services/Logging/PiiRedactionMiddleware.cs - Detect and redact sensitive data (SSN, credit cards, passwords)
+- [x] T089 Log rotation policy in MTM_Template_Application/Services/Logging/LogRotationPolicy.cs - 10MB max file size, 7 days retention
+- [x] T090 Telemetry batch processor in MTM_Template_Application/Services/Logging/TelemetryBatchProcessor.cs - Batch telemetry for efficient transmission
 
 ### Diagnostics Service Implementation
 
-- [x] T089A DiagnosticsService implementation in MTM_Template_Application/Services/Diagnostics/DiagnosticsService.cs - Orchestrate all diagnostic checks
-- [x] T090 [P] StorageDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/StorageDiagnostic.cs - Verify storage availability, free space
-- [x] T091 [P] PermissionsDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/PermissionsDiagnostic.cs - Verify file system, camera, network permissions
-- [x] T092 [P] NetworkDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/NetworkDiagnostic.cs - Verify network connectivity (5s timeout)
-- [x] T093 [P] HardwareDetection service in MTM_Template_Application/Services/Diagnostics/HardwareDetection.cs - Detect memory, CPU, screen resolution, peripherals
+- [x] T091 DiagnosticsService implementation in MTM_Template_Application/Services/Diagnostics/DiagnosticsService.cs - Orchestrate all diagnostic checks
+- [x] T092 [P] StorageDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/StorageDiagnostic.cs - Verify storage availability, free space
+- [x] T093 [P] PermissionsDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/PermissionsDiagnostic.cs - Verify file system, camera, network permissions
+- [x] T094 [P] NetworkDiagnostic check in MTM_Template_Application/Services/Diagnostics/Checks/NetworkDiagnostic.cs - Verify network connectivity (5s timeout)
+- [x] T095 [P] HardwareDetection service in MTM_Template_Application/Services/Diagnostics/HardwareDetection.cs - Detect memory, CPU, screen resolution, peripherals
 
 ### Data Layer Implementation
 
-- [x] T094 MySqlClient implementation in MTM_Template_Application/Services/DataLayer/MySqlClient.cs - Connection pooling (Desktop: 2-10, Android: 1-5), query execution, role-based access
-- [x] T095 VisualApiClient implementation in MTM_Template_Application/Services/DataLayer/VisualApiClient.cs - HTTP client wrapper, command whitelist enforcement, authentication
-- [x] T096 HttpApiClient implementation in MTM_Template_Application/Services/DataLayer/HttpApiClient.cs - Generic HTTP client with retry/circuit breaker
-- [x] T097 ExponentialBackoffPolicy in MTM_Template_Application/Services/DataLayer/Policies/ExponentialBackoffPolicy.cs - 1s, 2s, 4s, 8s, 16s with ±25% jitter (Polly)
-- [x] T098 CircuitBreakerPolicy in MTM_Template_Application/Services/DataLayer/Policies/CircuitBreakerPolicy.cs - 5 consecutive failures, exponential recovery 30s→10m (Polly)
-- [x] T099 ConnectionPoolMonitor in MTM_Template_Application/Services/DataLayer/ConnectionPoolMonitor.cs - Track pool metrics, emit telemetry
+- [x] T096 MySqlClient implementation in MTM_Template_Application/Services/DataLayer/MySqlClient.cs - Connection pooling (Desktop: 2-10, Android: 1-5), query execution, role-based access
+- [x] T097 VisualApiClient implementation in MTM_Template_Application/Services/DataLayer/VisualApiClient.cs - HTTP client wrapper, command whitelist enforcement, authentication
+- [x] T098 HttpApiClient implementation in MTM_Template_Application/Services/DataLayer/HttpApiClient.cs - Generic HTTP client with retry/circuit breaker
+- [x] T099 ExponentialBackoffPolicy in MTM_Template_Application/Services/DataLayer/Policies/ExponentialBackoffPolicy.cs - 1s, 2s, 4s, 8s, 16s with ±25% jitter (Polly)
+- [x] T100 CircuitBreakerPolicy in MTM_Template_Application/Services/DataLayer/Policies/CircuitBreakerPolicy.cs - 5 consecutive failures, exponential recovery 30s→10m (Polly)
+- [x] T101 ConnectionPoolMonitor in MTM_Template_Application/Services/DataLayer/ConnectionPoolMonitor.cs - Track pool metrics, emit telemetry
 
 ### Cache Service Implementation
 
-- [x] T101 CacheService implementation in MTM_Template_Application/Services/Cache/CacheService.cs - In-memory cache with LZ4 compression, TTL enforcement
-- [x] T102 LZ4CompressionHandler in MTM_Template_Application/Services/Cache/LZ4CompressionHandler.cs - Compress/decompress cache entries
-- [x] T103 VisualMasterDataSync in MTM_Template_Application/Services/Cache/VisualMasterDataSync.cs - Initial population, delta sync, background refresh
-- [x] T104 CacheStalenessDetector in MTM_Template_Application/Services/Cache/CacheStalenessDetector.cs - Detect expired entries (Parts 24h, Others 7d), trigger refresh
-- [x] T105 CachedOnlyModeManager in MTM_Template_Application/Services/Cache/CachedOnlyModeManager.cs - Detect Visual unavailability, enable cached-only mode, reconnection detection
+- [x] T102 CacheService implementation in MTM_Template_Application/Services/Cache/CacheService.cs - In-memory cache with LZ4 compression, TTL enforcement
+- [x] T103 LZ4CompressionHandler in MTM_Template_Application/Services/Cache/LZ4CompressionHandler.cs - Compress/decompress cache entries
+- [x] T104 VisualMasterDataSync in MTM_Template_Application/Services/Cache/VisualMasterDataSync.cs - Initial population, delta sync, background refresh
+- [x] T105 CacheStalenessDetector in MTM_Template_Application/Services/Cache/CacheStalenessDetector.cs - Detect expired entries (Parts 24h, Others 7d), trigger refresh
+- [x] T106 CachedOnlyModeManager in MTM_Template_Application/Services/Cache/CachedOnlyModeManager.cs - Detect Visual unavailability, enable cached-only mode, reconnection detection
 
 ### Core Services Implementation
 
-- [x] T106 MessageBus implementation in MTM_Template_Application/Services/Core/MessageBus.cs - In-memory pub/sub, delivery guarantees, correlation IDs
-- [x] T107 ValidationService implementation in MTM_Template_Application/Services/Core/ValidationService.cs - FluentValidation integration, rule discovery (attributes + conventions + config)
-- [x] T108 MappingService implementation in MTM_Template_Application/Services/Core/MappingService.cs - AutoMapper integration, profile discovery
-- [x] T109 HealthCheckService in MTM_Template_Application/Services/Core/HealthCheckService.cs - Aggregate health checks from all services
+- [x] T107 MessageBus implementation in MTM_Template_Application/Services/Core/MessageBus.cs - In-memory pub/sub, delivery guarantees, correlation IDs
+- [x] T108 ValidationService implementation in MTM_Template_Application/Services/Core/ValidationService.cs - FluentValidation integration, rule discovery (attributes + conventions + config)
+- [x] T109 MappingService implementation in MTM_Template_Application/Services/Core/MappingService.cs - AutoMapper integration, profile discovery
+- [x] T110 HealthCheckService in MTM_Template_Application/Services/Core/HealthCheckService.cs - Aggregate health checks from all services
 
 ### Localization Service Implementation
 
-- [x] T110 LocalizationService implementation in MTM_Template_Application/Services/Localization/LocalizationService.cs - Culture switching, resource loading, missing translation tracking
-- [x] T111 MissingTranslationHandler in MTM_Template_Application/Services/Localization/MissingTranslationHandler.cs - Log missing translations, report to telemetry
-- [x] T112 CultureProvider in MTM_Template_Application/Services/Localization/CultureProvider.cs - Detect OS culture, fallback chain (selected > OS > en-US)
+- [x] T111 LocalizationService implementation in MTM_Template_Application/Services/Localization/LocalizationService.cs - Culture switching, resource loading, missing translation tracking
+- [x] T112 MissingTranslationHandler in MTM_Template_Application/Services/Localization/MissingTranslationHandler.cs - Log missing translations, report to telemetry
+- [x] T113 CultureProvider in MTM_Template_Application/Services/Localization/CultureProvider.cs - Detect OS culture, fallback chain (selected > OS > en-US)
 
 ### Theme Service Implementation
 
-- [x] T113 ThemeService implementation in MTM_Template_Application/Services/Theme/ThemeService.cs - Theme switching (Light/Dark/Auto), OS dark mode detection
-- [x] T114 OSDarkModeMonitor in MTM_Template_Application/Services/Theme/OSDarkModeMonitor.cs - Monitor OS dark mode changes, auto-switch when Theme=Auto
+- [x] T114 ThemeService implementation in MTM_Template_Application/Services/Theme/ThemeService.cs - Theme switching (Light/Dark/Auto), OS dark mode detection
+- [x] T115 OSDarkModeMonitor in MTM_Template_Application/Services/Theme/OSDarkModeMonitor.cs - Monitor OS dark mode changes, auto-switch when Theme=Auto
 
 ### Navigation Service Implementation
 
-- [x] T115 NavigationService implementation in MTM_Template_Application/Services/Navigation/NavigationService.cs - Stack-based navigation, history tracking, deep linking
-- [x] T116 UnsavedChangesGuard in MTM_Template_Application/Services/Navigation/UnsavedChangesGuard.cs - Prompt before navigation when unsaved changes exist
+- [x] T116 NavigationService implementation in MTM_Template_Application/Services/Navigation/NavigationService.cs - Stack-based navigation, history tracking, deep linking
+- [x] T117 UnsavedChangesGuard in MTM_Template_Application/Services/Navigation/UnsavedChangesGuard.cs - Prompt before navigation when unsaved changes exist
 
 ---
 
 ## Phase 3.6: Boot Orchestration
 
-- [x] T117 BootOrchestrator implementation in MTM_Template_Application/Services/Boot/BootOrchestrator.cs - Execute Stage 0→1→2, progress tracking, timeout enforcement, error recovery
-- [x] T118 Stage0Bootstrap implementation in MTM_Template_Application/Services/Boot/Stages/Stage0Bootstrap.cs - Splash window, watchdog (10s timeout), minimal services
-- [x] T119 Stage1ServicesInitialization implementation in MTM_Template_Application/Services/Boot/Stages/Stage1ServicesInitialization.cs - Initialize all core services (60s timeout), parallel start where possible
-- [x] T120 Stage2ApplicationReady implementation in MTM_Template_Application/Services/Boot/Stages/Stage2ApplicationReady.cs - Application shell, navigation, user session (15s timeout)
-- [x] T121 BootProgressCalculator in MTM_Template_Application/Services/Boot/BootProgressCalculator.cs - Calculate progress percentage based on service weights
-- [x] T122 BootWatchdog in MTM_Template_Application/Services/Boot/BootWatchdog.cs - Monitor stage timeouts, force failure on timeout, collect diagnostic bundle
-- [x] T123 ServiceDependencyResolver in MTM_Template_Application/Services/Boot/ServiceDependencyResolver.cs - Resolve service initialization order based on dependencies
-- [x] T124 ParallelServiceStarter in MTM_Template_Application/Services/Boot/ParallelServiceStarter.cs - Start independent services in parallel for performance
+- [x] T118 BootOrchestrator implementation in MTM_Template_Application/Services/Boot/BootOrchestrator.cs - Execute Stage 0→1→2, progress tracking, timeout enforcement, error recovery
+- [x] T119 Stage0Bootstrap implementation in MTM_Template_Application/Services/Boot/Stages/Stage0Bootstrap.cs - Splash window, watchdog (10s timeout), minimal services
+- [x] T120 Stage1ServicesInitialization implementation in MTM_Template_Application/Services/Boot/Stages/Stage1ServicesInitialization.cs - Initialize all core services (60s timeout), parallel start where possible
+- [x] T121 Stage2ApplicationReady implementation in MTM_Template_Application/Services/Boot/Stages/Stage2ApplicationReady.cs - Application shell, navigation, user session (15s timeout)
+- [x] T122 BootProgressCalculator in MTM_Template_Application/Services/Boot/BootProgressCalculator.cs - Calculate progress percentage based on service weights
+- [x] T123 BootWatchdog in MTM_Template_Application/Services/Boot/BootWatchdog.cs - Monitor stage timeouts, force failure on timeout, collect diagnostic bundle
+- [x] T124 ServiceDependencyResolver in MTM_Template_Application/Services/Boot/ServiceDependencyResolver.cs - Resolve service initialization order based on dependencies
+- [x] T125 ParallelServiceStarter in MTM_Template_Application/Services/Boot/ParallelServiceStarter.cs - Start independent services in parallel for performance
 
 ---
 
 ## Phase 3.7: Splash Screen UI
 
-- [x] T125 SplashViewModel in MTM_Template_Application/ViewModels/SplashViewModel.cs - [ObservableObject], [ObservableProperty] for progress/status/stage, [RelayCommand] for cancel (MVVM Toolkit)
-- [x] T126 SplashWindow.axaml in MTM_Template_Application/Views/SplashWindow.axaml - Theme-less XAML, progress bar, status text, accessibility support (no Theme V2 tokens)
-- [x] T127 SplashWindow.axaml.cs code-behind in MTM_Template_Application/Views/SplashWindow.axaml.cs - Wire up ViewModel, handle window events
-- [x] T128 ProgressAnimationBehavior in MTM_Template_Application/Behaviors/ProgressAnimationBehavior.cs - Smooth progress bar animation (avoid jitter)
+- [x] T126 SplashViewModel in MTM_Template_Application/ViewModels/SplashViewModel.cs - [ObservableObject], [ObservableProperty] for progress/status/stage, [RelayCommand] for cancel (MVVM Toolkit)
+- [x] T127 SplashWindow.axaml in MTM_Template_Application/Views/SplashWindow.axaml - Theme-less XAML, progress bar, status text, accessibility support (no Theme V2 tokens)
+- [x] T128 SplashWindow.axaml.cs code-behind in MTM_Template_Application/Views/SplashWindow.axaml.cs - Wire up ViewModel, handle window events
+- [x] T129 ProgressAnimationBehavior in MTM_Template_Application/Behaviors/ProgressAnimationBehavior.cs - Smooth progress bar animation (avoid jitter)
 
 ---
 
 ## Phase 3.8: Platform Entry Points
 
-- [x] T129 Update Program.cs in MTM_Template_Application.Desktop/Program.cs - Initialize DI container, register services, launch BootOrchestrator
-- [ ] T130 Update MainActivity.cs in MTM_Template_Application.Android/MainActivity.cs - Initialize DI container, register platform services, launch BootOrchestrator
-- [x] T131 ServiceCollectionExtensions in MTM_Template_Application/Extensions/ServiceCollectionExtensions.cs - Extension methods for service registration (AddBootServices, AddDataLayer, AddCaching, etc.)
-- [ ] T132 Platform-specific service registration in MTM_Template_Application.Desktop/Services/DesktopServiceRegistration.cs - Register Windows/macOS-specific services
-- [ ] T133 Platform-specific service registration in MTM_Template_Application.Android/Services/AndroidServiceRegistration.cs - Register Android-specific services (KeyStore, device certificate)
+- [x] T130 Update Program.cs in MTM_Template_Application.Desktop/Program.cs - Initialize DI container, register services, launch BootOrchestrator
+- [x] T131 Update MainActivity.cs in MTM_Template_Application.Android/MainActivity.cs - Initialize DI container, register platform services, launch BootOrchestrator
+- [x] T132 ServiceCollectionExtensions in MTM_Template_Application/Extensions/ServiceCollectionExtensions.cs - Extension methods for service registration (AddBootServices, AddDataLayer, AddCaching, etc.)
+- [x] T133 Platform-specific service registration in MTM_Template_Application.Desktop/Services/DesktopServiceRegistration.cs - Register Windows/macOS-specific services
+- [x] T134 Platform-specific service registration in MTM_Template_Application.Android/Services/AndroidServiceRegistration.cs - Register Android-specific services (KeyStore, device certificate)
 
 ---
 
 ## Phase 3.9: Error Handling and Recovery
 
-- [x] T134 GlobalExceptionHandler in MTM_Template_Application/Services/ErrorHandling/GlobalExceptionHandler.cs - Catch unhandled exceptions, log, create diagnostic bundle
-- [x] T135 ErrorCategorizer in MTM_Template_Application/Services/ErrorHandling/ErrorCategorizer.cs - Categorize errors (network, config, storage, permission)
-- [x] T136 RecoveryStrategy in MTM_Template_Application/Services/ErrorHandling/RecoveryStrategy.cs - Determine recovery action based on error category
-- [x] T137 DiagnosticBundleGenerator in MTM_Template_Application/Services/ErrorHandling/DiagnosticBundleGenerator.cs - Collect logs, config, system info into zip bundle
+- [x] T135 GlobalExceptionHandler in MTM_Template_Application/Services/ErrorHandling/GlobalExceptionHandler.cs - Catch unhandled exceptions, log, create diagnostic bundle
+- [x] T136 ErrorCategorizer in MTM_Template_Application/Services/ErrorHandling/ErrorCategorizer.cs - Categorize errors (network, config, storage, permission)
+- [x] T137 RecoveryStrategy in MTM_Template_Application/Services/ErrorHandling/RecoveryStrategy.cs - Determine recovery action based on error category
+- [x] T138 DiagnosticBundleGenerator in MTM_Template_Application/Services/ErrorHandling/DiagnosticBundleGenerator.cs - Collect logs, config, system info into zip bundle
 
 ---
 
@@ -284,52 +284,51 @@
 
 **Test each service implementation**
 
-- [x] T138 [P] Unit tests for ConfigurationService in tests/unit/ConfigurationServiceTests.cs - Test precedence, hot-reload, profile switching (7 tests)
-- [ ] T139 [P] Unit tests for WindowsSecretsService in tests/unit/WindowsSecretsServiceTests.cs - Test DPAPI encryption, storage, retrieval (mock DPAPI)
-- [ ] T140 [P] Unit tests for MacOSSecretsService in tests/unit/MacOSSecretsServiceTests.cs - Test Keychain integration (mock Keychain)
-- [ ] T141 [P] Unit tests for AndroidSecretsService in tests/unit/AndroidSecretsServiceTests.cs - Test KeyStore integration (mock KeyStore)
-- [ ] T142 [P] Unit tests for LoggingService in tests/unit/LoggingServiceTests.cs - Test structured logging, PII redaction, rotation
-- [ ] T143 [P] Unit tests for DiagnosticsService in tests/unit/DiagnosticsServiceTests.cs - Test diagnostic checks, issue detection, hardware capabilities
+- [x] T139 [P] Unit tests for ConfigurationService in tests/unit/ConfigurationServiceTests.cs - Test precedence, hot-reload, profile switching (7 tests)
+- [x] T140 [P] Unit tests for WindowsSecretsService in tests/unit/WindowsSecretsServiceTests.cs - Test DPAPI encryption, storage, retrieval (mock DPAPI)
+- [x] T141 [P] Unit tests for AndroidSecretsService in tests/unit/AndroidSecretsServiceTests.cs - Test KeyStore integration (mock KeyStore) (17 tests)
+- [x] T142 [P] Unit tests for LoggingService in tests/unit/LoggingServiceTests.cs - Test structured logging, PII redaction, rotation
+- [x] T143 [P] Unit tests for DiagnosticsService in tests/unit/DiagnosticsServiceTests.cs - Test diagnostic checks, issue detection, hardware capabilities
 - [x] T144 [P] Unit tests for MySqlClient in tests/unit/MySqlClientTests.cs - Test connection pooling, query execution, metrics (mock MySqlConnection) (9 tests)
-- [ ] T145 [P] Unit tests for VisualApiClient in tests/unit/VisualApiClientTests.cs - Test whitelist enforcement, authentication, circuit breaker (mock HttpClient)
-- [ ] T146 [P] Unit tests for HttpApiClient in tests/unit/HttpApiClientTests.cs - Test retry policy, circuit breaker, timeout (mock HttpClient)
+- [x] T145 [P] Unit tests for VisualApiClient in tests/unit/VisualApiClientTests.cs - Test whitelist enforcement, authentication, circuit breaker (mock HttpClient) (11 tests)
+- [x] T146 [P] Unit tests for HttpApiClient in tests/unit/HttpApiClientTests.cs - Test retry policy, circuit breaker, timeout (mock HttpClient) (15 tests)
 - [x] T147 [P] Unit tests for CacheService in tests/unit/CacheServiceTests.cs - Test LZ4 compression, TTL enforcement, statistics (9 tests)
-- [ ] T148 [P] Unit tests for VisualMasterDataSync in tests/unit/VisualMasterDataSyncTests.cs - Test initial population, delta sync, background refresh
-- [ ] T149 [P] Unit tests for CachedOnlyModeManager in tests/unit/CachedOnlyModeManagerTests.cs - Test mode detection, reconnection, feature limitations
-- [ ] T150 [P] Unit tests for MessageBus in tests/unit/MessageBusTests.cs - Test pub/sub, delivery guarantees, unsubscribe
-- [ ] T151 [P] Unit tests for ValidationService in tests/unit/ValidationServiceTests.cs - Test FluentValidation integration, rule discovery
-- [ ] T152 [P] Unit tests for MappingService in tests/unit/MappingServiceTests.cs - Test AutoMapper integration, profile discovery
-- [ ] T153 [P] Unit tests for LocalizationService in tests/unit/LocalizationServiceTests.cs - Test culture switching, missing translations, fallback
-- [ ] T154 [P] Unit tests for ThemeService in tests/unit/ThemeServiceTests.cs - Test theme switching, OS dark mode detection
-- [x] T154A [P] Unit tests for GlobalExceptionHandler in tests/unit/GlobalExceptionHandlerTests.cs - Test exception handling, logging, diagnostic bundle generation
-- [x] T154B [P] Unit tests for ErrorCategorizer in tests/unit/ErrorCategorizerTests.cs - Test error categorization, transient detection, criticality assessment
-- [x] T154C [P] Unit tests for RecoveryStrategy in tests/unit/RecoveryStrategyTests.cs - Test recovery action determination and execution
-- [x] T154D [P] Unit tests for DiagnosticBundleGenerator in tests/unit/DiagnosticBundleGeneratorTests.cs - Test bundle generation, compression, decompression
+- [x] T148 [P] Unit tests for VisualMasterDataSync in tests/unit/VisualMasterDataSyncTests.cs - Test initial population, delta sync, background refresh (8 tests)
+- [x] T149 [P] Unit tests for CachedOnlyModeManager in tests/unit/CachedOnlyModeManagerTests.cs - Test mode detection, reconnection, feature limitations (17 tests)
+- [x] T150 [P] Unit tests for MessageBus in tests/unit/MessageBusTests.cs - Test pub/sub, delivery guarantees, unsubscribe (14 tests)
+- [x] T151 [P] Unit tests for ValidationService in tests/unit/ValidationServiceTests.cs - Test FluentValidation integration, rule discovery (12 tests)
+- [x] T152 [P] Unit tests for MappingService in tests/unit/MappingServiceTests.cs - Test AutoMapper integration, profile discovery (11 tests)
+- [x] T153 [P] Unit tests for LocalizationService in tests/unit/LocalizationServiceTests.cs - Test culture switching, missing translations, fallback (13 tests)
+- [x] T154 [P] Unit tests for ThemeService in tests/unit/ThemeServiceTests.cs - Test theme switching, OS dark mode detection (15 tests)
+- [x] T155 [P] Unit tests for GlobalExceptionHandler in tests/unit/GlobalExceptionHandlerTests.cs - Test exception handling, logging, diagnostic bundle generation
+- [x] T156 [P] Unit tests for ErrorCategorizer in tests/unit/ErrorCategorizerTests.cs - Test error categorization, transient detection, criticality assessment
+- [x] T157 [P] Unit tests for RecoveryStrategy in tests/unit/RecoveryStrategyTests.cs - Test recovery action determination and execution
+- [x] T158 [P] Unit tests for DiagnosticBundleGenerator in tests/unit/DiagnosticBundleGeneratorTests.cs - Test bundle generation, compression, decompression
 
-- [ ] T155 [P] Unit tests for NavigationService in tests/unit/NavigationServiceTests.cs - Test navigation stack, history, deep linking, unsaved changes guard
-- [x] T156 [P] Unit tests for BootOrchestrator in tests/unit/BootOrchestratorTests.cs - Test stage execution, progress calculation, timeout enforcement, error recovery (9 tests)
-- [x] T157 [P] Unit tests for ExponentialBackoffPolicy in tests/unit/ExponentialBackoffPolicyTests.cs - Test retry delays, jitter, max retries (5 tests)
-- [x] T158 [P] Unit tests for CircuitBreakerPolicy in tests/unit/CircuitBreakerPolicyTests.cs - Test failure threshold, recovery delay, state transitions (8 tests)
+- [x] T159 [P] Unit tests for NavigationService in tests/unit/NavigationServiceTests.cs - Test navigation stack, history, deep linking, unsaved changes guard (16 tests)
+- [x] T160 [P] Unit tests for BootOrchestrator in tests/unit/BootOrchestratorTests.cs - Test stage execution, progress calculation, timeout enforcement, error recovery (9 tests)
+- [x] T161 [P] Unit tests for ExponentialBackoffPolicy in tests/unit/ExponentialBackoffPolicyTests.cs - Test retry delays, jitter, max retries (5 tests)
+- [x] T162 [P] Unit tests for CircuitBreakerPolicy in tests/unit/CircuitBreakerPolicyTests.cs - Test failure threshold, recovery delay, state transitions (8 tests)
 
 ---
 
 ## Phase 3.11: Polish and Validation
 
-- [ ] T159 Performance test: Boot time <10s in tests/integration/PerformanceTests.cs - Measure actual boot time, verify target met
-- [ ] T160 Performance test: Stage 1 <3s in tests/integration/PerformanceTests.cs - Measure Stage 1 duration, verify target met
-- [ ] T161 Performance test: Memory <100MB in tests/integration/PerformanceTests.cs - Measure memory usage during boot, verify target met. Include memory profiling subtasks: (a) measure peak memory at end of each stage, (b) validate allocation breakdown (cache ~40MB compressed, core services ~30MB, framework overhead ~30MB), (c) identify top 10 memory consumers, (d) verify no memory leaks during boot sequence, (e) export memory profile for documentation
-- [ ] T162 Accessibility audit: Screen reader in manual testing - Verify splash screen announcements, progress updates
-- [ ] T163 Accessibility audit: Keyboard navigation in manual testing - Verify splash screen keyboard accessible
+- [x] T163 Performance test: Boot time <10s in tests/integration/PerformanceTests.cs - Measure actual boot time, verify target met
+- [x] T164 Performance test: Stage 1 <3s in tests/integration/PerformanceTests.cs - Measure Stage 1 duration, verify target met
+- [x] T165 Performance test: Memory <100MB in tests/integration/PerformanceTests.cs - Measure memory usage during boot, verify target met. Include memory profiling subtasks: (a) measure peak memory at end of each stage, (b) validate allocation breakdown (cache ~40MB compressed, core services ~30MB, framework overhead ~30MB), (c) identify top 10 memory consumers, (d) verify no memory leaks during boot sequence, (e) export memory profile for documentation
+- [ ] T166 **[MANUAL VALIDATION]** Accessibility audit: Screen reader - Verify splash screen announcements and progress updates with Windows Narrator enabled. Requires human tester to validate audio announcements for stage transitions and milestones. See IMPLEMENTATION_STATUS.md for detailed test steps.
+- [ ] T167 **[MANUAL VALIDATION]** Accessibility audit: Keyboard navigation - Verify splash screen keyboard accessible (Tab, Enter, Escape keys). Requires human tester to validate focus indicators and keyboard-only operation. See IMPLEMENTATION_STATUS.md for detailed test steps.
 
-- [ ] T164 Accessibility audit: High contrast in manual testing - Verify splash screen visible in high contrast mode
+- [ ] T168 **[MANUAL VALIDATION]** Accessibility audit: High contrast - Verify splash screen visible in Windows High Contrast mode. Requires human tester to validate text readability and sufficient color contrast. See IMPLEMENTATION_STATUS.md for detailed test steps.
 
-- [ ] T165 Code review: Remove duplication in codebase - Identify and refactor duplicate code
-- [ ] T166 Code review: Null safety audit in codebase - Verify ArgumentNullException.ThrowIfNull usage, nullable annotations
-- [ ] T167 Documentation: Update docs/BOOT-SEQUENCE.md - Document final boot sequence implementation
-- [ ] T168 Documentation: Update .github/copilot-instructions.md - Add boot sequence patterns for future features
-- [ ] T169 Execute manual testing: Run all quickstart.md scenarios - Validate all 9 scenarios manually
-- [ ] T170 [P] Update README.md with boot sequence overview
-- [ ] T171 [P] Create TROUBLESHOOTING.md for boot sequence issues
+- [x] T169 Code review: Remove duplication in codebase - Identify and refactor duplicate code
+- [x] T170 Code review: Null safety audit in codebase - Verify ArgumentNullException.ThrowIfNull usage, nullable annotations
+- [x] T171 Documentation: Update docs/BOOT-SEQUENCE.md - Document final boot sequence implementation
+- [x] T172 Documentation: Update .github/copilot-instructions.md - Add boot sequence patterns for future features
+- [ ] T173 **[MANUAL VALIDATION]** Execute manual testing: Run all 9 quickstart.md scenarios - Validate all scenarios manually (requires Visual ERP test server access or mocks). Scenarios include: boot sequence, configuration precedence, credential storage, diagnostics, caching, logging, error handling, localization, and performance. See quickstart.md for detailed validation checklists.
+- [x] T174 [P] Update README.md with boot sequence overview
+- [x] T175 [P] Create TROUBLESHOOTING.md for boot sequence issues
 
 ---
 
@@ -343,16 +342,16 @@
 3. **Service Interfaces (T039-T054)** blocks service implementations and tests
 4. **Integration Tests (T055-T071)** MUST be written before corresponding implementations
 5. **Contract Tests (T072-T078)** MUST be written before API client implementations
-6. **Configuration (T079-T081)** blocks services that depend on configuration
-7. **Secrets (T082-T085)** blocks services that need credentials
-8. **Logging (T086-T089)** blocks all services (all services log)
-9. **Data Layer (T094-T099)** blocks cache and Visual integration
+6. **Configuration (T080-T082)** blocks services that depend on configuration
+7. **Secrets (T083-T086)** blocks services that need credentials
+8. **Logging (T087-T090)** blocks all services (all services log)
+9. **Data Layer (T096-T101)** blocks cache and Visual integration
 
-10. **Cache (T101-T105)** blocks cached-only mode
-11. **Boot Orchestration (T117-T124)** blocks platform entry points
-12. **Splash UI (T125-T128)** blocks platform entry points
-13. **Platform Entry Points (T129-T133)** final integration
-14. **Polish (T159-T171)** after implementation complete
+10. **Cache (T102-T106)** blocks cached-only mode
+11. **Boot Orchestration (T118-T125)** blocks platform entry points
+12. **Splash UI (T126-T129)** blocks platform entry points
+13. **Platform Entry Points (T130-T134)** final integration
+14. **Polish (T163-T175)** after implementation complete
 
 ### Parallelization Opportunities
 
@@ -361,7 +360,7 @@
 - Integration tests (T055-T071): Independent scenarios, can run in parallel
 - Contract tests (T072-T078): Independent APIs, can run in parallel
 - Diagnostic checks (T090-T093): Independent checks, can run in parallel
-- Unit tests (T138-T158): Independent services, can run in parallel
+- Unit tests (T139-T162): Independent services, can run in parallel
 
 ### Dependency Graph (Key Relationships)
 
@@ -378,24 +377,24 @@ T055-T078 (Tests) [P]
 T079-T081 (Configuration)
     ↓
 
-T082-T085 (Secrets) + T086-T089 (Logging) [P]
+T083-T086 (Secrets) + T087-T090 (Logging) [P]
     ↓
-T090-T093 (Diagnostics) [P] + T094-T099 (DataLayer) + T106-T109 (Core) [P]
+T091-T095 (Diagnostics) [P] + T096-T101 (DataLayer) + T107-T110 (Core) [P]
     ↓
-T101-T105 (Cache) + T110-T116 (App Services) [P]
+T102-T106 (Cache) + T111-T117 (App Services) [P]
 
 
     ↓
-T117-T124 (Boot Orchestration)
+T118-T125 (Boot Orchestration)
     ↓
-T125-T128 (Splash UI) [P]
+T126-T129 (Splash UI) [P]
     ↓
-T129-T133 (Platform Entry) + T134-T137 (Error Handling) [P]
+T130-T134 (Platform Entry) + T135-T138 (Error Handling) [P]
 
     ↓
-T138-T158 (Unit Tests) [P]
+T139-T162 (Unit Tests) [P]
     ↓
-T159-T171 (Polish)
+T163-T175 (Polish)
 ```
 
 ---
@@ -426,7 +425,7 @@ Example: "Integration test: Normal boot sequence in tests/integration/BootSequen
 ### Phase 4: Unit Tests (All Parallel)
 
 ```
-Launch T138-T158 together (21 test suites, all independent)
+Launch T139-T162 together (24 test suites, all independent)
 Example: "Unit tests for ConfigurationService in tests/unit/ConfigurationServiceTests.cs"
 ```
 
@@ -434,9 +433,9 @@ Example: "Unit tests for ConfigurationService in tests/unit/ConfigurationService
 
 ## Validation Checklist
 
-- [x] All contracts have corresponding tests (T072-T077 for Visual/HTTP/MySQL/Diagnostics)
+- [x] All contracts have corresponding tests (T072-T079 for Visual/HTTP/MySQL/Diagnostics)
 - [x] All entities have model tasks (T016-T038 cover 23 entities from data-model.md)
-- [x] All tests come before implementation (T055-T077 before T079-T137)
+- [x] All tests come before implementation (T055-T079 before T080-T138)
 - [x] Parallel tasks truly independent (all [P] tasks target different files)
 - [x] Each task specifies exact file path (all tasks include full path)
 - [x] No task modifies same file as another [P] task (verified - all [P] tasks are different files)
@@ -464,7 +463,7 @@ Example: "Unit tests for ConfigurationService in tests/unit/ConfigurationService
 
 ---
 
-**Total Tasks**: 172 (Setup: 15, Models: 23, Interfaces: 16, Tests: 25, Implementation: 59, UI: 4, Platform: 5, Error Handling: 4, Unit Tests: 21, Polish: 13)
+**Total Tasks**: 175 (Setup: 15, Models: 23, Interfaces: 16, Tests: 25, Implementation: 59, UI: 4, Platform: 5, Error Handling: 4, Unit Tests: 24, Polish: 13)
 
 **Estimated Duration**:
 

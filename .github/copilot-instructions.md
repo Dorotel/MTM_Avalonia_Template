@@ -455,6 +455,74 @@ Consider using these vetted packages:
 - Use HTTPS for all external API calls
 - Implement rate limiting for API endpoints
 
+## Boot Sequence Patterns (Feature 001)
+
+### Three-Stage Boot Architecture
+The application uses a strict three-stage boot sequence managed by `BootOrchestrator`:
+
+```csharp
+// Stage 0: Splash Screen (10s timeout)
+await orchestrator.ExecuteStage0Async();
+
+// Stage 1: Core Services (60s timeout, <3s target)
+await orchestrator.ExecuteStage1Async();
+
+// Stage 2: Application Ready (15s timeout)
+await orchestrator.ExecuteStage2Async();
+```
+
+### Service Registration Pattern
+All services use extension methods for clean DI registration:
+
+```csharp
+public static IServiceCollection AddBootServices(this IServiceCollection services)
+{
+    services.AddSingleton<IBootOrchestrator, BootOrchestrator>();
+    services.AddTransient<IBootStage, Stage0Bootstrap>();
+    return services;
+}
+```
+
+### Platform-Specific Services
+Use factory pattern for platform-dependent services:
+
+```csharp
+public static ISecretsService Create(ILoggerFactory loggerFactory)
+{
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        return new WindowsSecretsService(loggerFactory.CreateLogger<WindowsSecretsService>());
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        return new MacOSSecretsService(loggerFactory.CreateLogger<MacOSSecretsService>());
+    return new AndroidSecretsService(loggerFactory.CreateLogger<AndroidSecretsService>());
+}
+```
+
+### Performance Budgets
+- Total boot time: <10 seconds
+- Stage 1 (services): <3 seconds
+- Memory usage: <100MB (40MB cache + 30MB services + 30MB framework)
+
+### Error Handling Pattern
+Always use comprehensive error categorization:
+
+```csharp
+try
+{
+    await service.InitializeAsync(cancellationToken);
+}
+catch (OperationCanceledException)
+{
+    _logger.LogWarning("Operation cancelled");
+    // Clean shutdown
+}
+catch (Exception ex)
+{
+    var category = _errorCategorizer.Categorize(ex);
+    var recovery = _recoveryStrategy.DetermineAction(category);
+    // Show user-friendly error with recovery options
+}
+```
+
 ## When Creating New Features
 1. Check `.specify/features/` for existing specs
 2. Reference `memory/constitution.md` for project principles
