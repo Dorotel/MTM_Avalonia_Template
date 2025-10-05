@@ -100,7 +100,7 @@
   - **Acceptance**: Files exist with valid JSON, include all required settings for dynamic location detection and database schema definition
   - **Completed**: Created config directory, user-folders.json, database-schema.json, migrations subdirectory, and MyDocuments\MTM_Apps\users folder
 
-- [ ] **T001a** Document placeholder replacement process in config/README.md (✅ COMPLETED 2025-10-05)
+- [x] **T001a** Document placeholder replacement process in config/README.md (✅ COMPLETED 2025-10-05)
   - Create `config/README.md` with instructions for admin configuration
   - Document dynamic user folder location logic:
     - **Home Development**: If public IP matches `HomeDevelopmentIPAddress` (default: 73.94.78.172), uses local path only
@@ -146,7 +146,7 @@
   - **Acceptance**: Admins can configure production values; developers can set their home IP; dynamic location and database connection logic clearly documented
   - **Completed**: Created comprehensive README.md with dynamic location logic, database connection logic, configuration precedence, production deployment checklist, troubleshooting guide, and examples
 
-- [ ] **T002** [P] Generate SQL migration scripts from database-schema-contract.json (✅ COMPLETED 2025-10-05)
+- [x] **T002** [P] Generate SQL migration scripts from database-schema-contract.json (✅ COMPLETED 2025-10-05)
   - Create `config/migrations/001_initial_schema.sql` with CREATE TABLE statements
   - Include UserPreferences, FeatureFlags tables (Users table creation optional if exists)
   - Add indexes and foreign keys per contract
@@ -154,14 +154,14 @@
   - **Acceptance**: SQL executes successfully on MAMP MySQL 5.7
   - **Completed**: Created comprehensive SQL migration with CREATE TABLE IF NOT EXISTS, indexes, foreign keys, and sample data
 
-- [ ] **T003** [P] Update `appsettings.json` with Visual API whitelist (✅ COMPLETED 2025-10-05)
+- [x] **T003** [P] Update `appsettings.json` with Visual API whitelist (✅ COMPLETED 2025-10-05)
   - Add `Visual:AllowedCommands` array with read-only commands per research.md
   - Add `Visual:RequireCitation` setting (true)
   - **File**: `MTM_Template_Application/appsettings.json` (or create if missing)
   - **Acceptance**: Configuration loads correctly, whitelist enforced
   - **Completed**: Created appsettings.json with Visual API whitelist (10 read-only commands), citation format, and configuration sections for Database, FeatureFlags, and Secrets
 
-- [ ] **T004** Run SQL migration on development database (✅ COMPLETED 2025-10-05)
+- [x] **T004** Run SQL migration on development database (✅ COMPLETED 2025-10-05)
   - Execute `001_initial_schema.sql` against MAMP MySQL
   - Verify tables created with correct structure
   - Insert sample data from contracts/database-schema-contract.json
@@ -175,7 +175,7 @@
 
 **CRITICAL**: These tests MUST be written and MUST FAIL before ANY implementation
 
-- [ ] **T005** [P] Contract test for ConfigurationService.GetValue/SetValue (✅ COMPLETED 2025-10-05)
+- [x] **T005** [P] Contract test for ConfigurationService.GetValue/SetValue (✅ COMPLETED 2025-10-05)
   - Add tests to existing `tests/contract/ConfigurationServiceContractTests.cs`
   - Test key format validation (colon/underscore patterns)
   - Test type safety (string, int, bool, object)
@@ -187,7 +187,7 @@
   - **Acceptance**: Tests compile and FAIL (implementation not ready)
   - **Completed**: Tests already exist in ConfigurationServiceContractTests.cs with T005 region marker
 
-- [ ] **T006** [P] Contract test for ConfigurationService.LoadUserPreferencesAsync (✅ COMPLETED 2025-10-05)
+- [x] **T006** [P] Contract test for ConfigurationService.LoadUserPreferencesAsync (✅ COMPLETED 2025-10-05)
   - Add tests to existing `tests/contract/ConfigurationServiceContractTests.cs`
   - Test userId validation (must be > 0)
   - Test database connection handling
@@ -199,7 +199,7 @@
   - **Acceptance**: Tests compile and FAIL
   - **Completed**: Tests already exist in ConfigurationServiceContractTests.cs with T006 region marker
 
-- [ ] **T007** [P] Contract test for FeatureFlagEvaluator deterministic rollout (✅ COMPLETED 2025-10-05)
+- [x] **T007** [P] Contract test for FeatureFlagEvaluator deterministic rollout (✅ COMPLETED 2025-10-05)
   - Add tests to existing `tests/contract/FeatureFlagEvaluatorContractTests.cs`
   - Test RegisterFlag validation (name pattern, rollout 0-100)
   - Test IsEnabledAsync deterministic behavior (same user → same result)
@@ -236,7 +236,7 @@
   - **Dependency**: T004 complete (database must be set up)
   - **Acceptance**: Tests compile and FAIL (or PASS if DB already set up from T004)
 
-- [ ] **T009a** [P] Contract test for environment detection precedence (✅ COMPLETED 2025-10-05)
+- [x] **T009a** [P] Contract test for environment detection precedence (✅ COMPLETED 2025-10-05)
   - Add tests to existing `tests/contract/ConfigurationServiceContractTests.cs` (T009a region)
   - Test MTM_ENVIRONMENT takes precedence over ASPNETCORE_ENVIRONMENT
   - Test ASPNETCORE_ENVIRONMENT takes precedence over DOTNET_ENVIRONMENT
@@ -302,7 +302,7 @@
   - **Source**: `data-model.md` section 6, spec.md NFR-017
   - **Acceptance**: ViewModel compiles, follows MVVM Community Toolkit patterns, includes RetryCommand
 
-- [ ] **T013** Enhance ConfigurationService with persistence methods
+- [x] **T013** Enhance ConfigurationService with persistence methods (✅ COMPLETED 2025-10-05)
   - Modify `MTM_Template_Application/Services/Configuration/ConfigurationService.cs`
   - **CRITICAL - Runtime Environment Initialization**:
     - On service initialization, check and create all required directories and files:

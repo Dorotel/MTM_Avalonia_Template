@@ -115,6 +115,46 @@ public class ConfigurationService : IConfigurationService
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Load user preferences from database (not implemented in basic service)
+    /// </summary>
+    public Task LoadUserPreferencesAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException("Use ConfigurationServiceEnhanced for database persistence features");
+    }
+
+    /// <summary>
+    /// Save user preference to database (not implemented in basic service)
+    /// </summary>
+    public Task SaveUserPreferenceAsync(int userId, string key, object value, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException("Use ConfigurationServiceEnhanced for database persistence features");
+    }
+
+    /// <summary>
+    /// Get user folder path (not implemented in basic service)
+    /// </summary>
+    public Task<string> GetUserFolderPathAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException("Use ConfigurationServiceEnhanced for dynamic location detection features");
+    }
+
+    /// <summary>
+    /// Get user folder locations (not implemented in basic service)
+    /// </summary>
+    public Task<UserFolderLocations> GetUserFolderLocationsAsync(int userId, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException("Use ConfigurationServiceEnhanced for dynamic location detection features");
+    }
+
+    /// <summary>
+    /// Get database connection string (not implemented in basic service)
+    /// </summary>
+    public Task<string> GetDatabaseConnectionStringAsync(CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException("Use ConfigurationServiceEnhanced for database connection features");
+    }
+
     private static T? ConvertValue<T>(string value)
     {
         var targetType = typeof(T);

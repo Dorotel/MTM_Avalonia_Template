@@ -13,7 +13,9 @@ namespace MTM_Template_Tests.Contract;
 /// <summary>
 /// Contract tests for ISecretsService based on secrets-service-contract.json
 /// These tests MUST FAIL until the implementation is complete.
+/// Note: Platform-specific tests run only on their target platforms.
 /// </summary>
+#if WINDOWS
 public class SecretsServiceContractTests
 {
     private readonly ILogger<WindowsSecretsService> _logger;
@@ -136,7 +138,7 @@ public class SecretsServiceContractTests
 
     [Fact]
     [Trait("Category", "Contract")]
-    public async Task RetrieveSecretAsync_WithCorruptedStorage_ThrowsCryptographicException()
+    public void RetrieveSecretAsync_WithCorruptedStorage_ThrowsCryptographicException()
     {
         // Arrange
         // This test requires mocking corrupted storage scenario
@@ -295,3 +297,4 @@ public class SecretsServiceContractTests
 
     #endregion
 }
+#endif
