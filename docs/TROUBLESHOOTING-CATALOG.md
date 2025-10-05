@@ -80,5 +80,5 @@
 > - Use semantic headings and tables for clarity.
 > - Avoid hardcoded values; reference schema and field names.
 > - Link to logs and diagnostics where possible.
-> - Ensure cross-platform terminology (Windows, Linux, macOS, Android).
+> - Ensure cross-platform terminology (Windows desktop, Android; macOS/Linux deferred).
 > - Use concise, actionable steps.

@@ -104,6 +104,13 @@ public class Stage2ApplicationReady : IBootStage
     {
         _logger.LogDebug("Initializing localization service");
 
+        // Guard against null service (should never happen with proper DI)
+        if (_localizationService == null)
+        {
+            _logger.LogError("LocalizationService is null! This indicates a dependency injection configuration error.");
+            throw new InvalidOperationException("LocalizationService dependency was not properly injected.");
+        }
+
         // Get supported cultures
         var supportedCultures = _localizationService.GetSupportedCultures();
         _logger.LogInformation("Supported cultures: {CultureCount}", supportedCultures.Count);

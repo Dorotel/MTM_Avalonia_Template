@@ -154,7 +154,7 @@ As an operator, when I launch the application, I need a clear, informative start
 
 - **FR-053**: System MUST initialize MySqlClient for desktop application database
 - **FR-054**: System MUST initialize Visual API Toolkit client with read-only access for desktop
-- **FR-055**: System MUST initialize HTTP API client for Android devices (app data and Visual projections)
+- **FR-055**: System MUST initialize server API client for Android devices (connects to MTM server API for app data and Visual projections, not directly to Visual ERP)
 - **FR-056**: System MUST implement connection pooling with retry policies
 - **FR-057**: System MUST monitor connection health with automatic reconnection
 - **FR-058**: System MUST implement circuit breaker pattern to prevent cascading failures
@@ -365,6 +365,8 @@ This specification comprehensively covers the boot sequence orchestration system
 8. **Monitoring**: Boot metrics and service health checks are essential for production support
 9. **Admin Dashboard (FR-132)**: Deferred to post-MVP release. Initial release uses log file review for service monitoring.
 10. **API Documentation (FR-134)**: Deferred as development tooling requirement. Will be addressed through XML documentation comments and optional DocFX generation in polish phase.
+11. **Platform Support**: Project targets Windows desktop + Android. macOS and Linux desktop support deferred to future releases.
+12. **API Architecture**: No generic REST client (HttpApiClient) implemented. Desktop uses Visual API Toolkit directly; Android connects to MTM server API (server-to-Visual integration handled server-side).
 
 The feature is expansive with 160 functional requirements covering 13 distinct subsystems. Planning should consider breaking this into prioritized implementation phases while maintaining the core boot orchestration as the foundation.
 

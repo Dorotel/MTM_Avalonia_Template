@@ -22,11 +22,6 @@ public class SecretsServiceFactory
             return new WindowsSecretsService(loggerFactory.CreateLogger<WindowsSecretsService>());
         }
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            return new MacOSSecretsService(loggerFactory.CreateLogger<MacOSSecretsService>());
-        }
-
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
             // Check if this is Android

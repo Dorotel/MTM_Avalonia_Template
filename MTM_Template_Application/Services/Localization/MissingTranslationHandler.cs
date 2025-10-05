@@ -17,7 +17,7 @@ public class MissingTranslationHandler
         _missingTranslations = new ConcurrentDictionary<string, MissingTranslation>();
     }
 
-    public void ReportMissing(string key, string culture, string fallbackValue)
+    public virtual void ReportMissing(string key, string culture, string fallbackValue)
     {
         var compositeKey = $"{culture}:{key}";
 
@@ -38,7 +38,7 @@ public class MissingTranslationHandler
             });
     }
 
-    public MissingTranslation[] GetMissingTranslations()
+    public virtual MissingTranslation[] GetMissingTranslations()
     {
         return _missingTranslations.Values.ToArray();
     }

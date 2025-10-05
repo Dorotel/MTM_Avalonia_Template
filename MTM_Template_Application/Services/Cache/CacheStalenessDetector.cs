@@ -11,7 +11,7 @@ namespace MTM_Template_Application.Services.Cache;
 /// <summary>
 /// Detect expired entries (Parts 24h, Others 7d) and trigger refresh
 /// </summary>
-public class CacheStalenessDetector
+public class CacheStalenessDetector : ICacheStalenessDetector
 {
     private readonly ICacheService _cacheService;
     private readonly TimeSpan _partsTtl = TimeSpan.FromHours(24);
@@ -28,7 +28,7 @@ public class CacheStalenessDetector
     /// Detect all stale cache entries
     /// </summary>
 #pragma warning disable CS1998 // Async method lacks 'await' operators
-    public Task<List<StaleEntry>> DetectStaleEntriesAsync()
+    public virtual Task<List<StaleEntry>> DetectStaleEntriesAsync()
 #pragma warning restore CS1998
     {
         var staleEntries = new List<StaleEntry>();
@@ -44,7 +44,7 @@ public class CacheStalenessDetector
     /// Get entries nearing expiration
     /// </summary>
 #pragma warning disable CS1998 // Async method lacks 'await' operators
-    public Task<List<StaleEntry>> GetEntriesNearExpirationAsync()
+    public virtual Task<List<StaleEntry>> GetEntriesNearExpirationAsync()
 #pragma warning restore CS1998
     {
         var nearExpiration = new List<StaleEntry>();
@@ -60,7 +60,7 @@ public class CacheStalenessDetector
     /// <summary>
     /// Check if an entry is stale based on entity type
     /// </summary>
-    public bool IsStale(CacheEntry entry)
+    public virtual bool IsStale(CacheEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
 
@@ -75,7 +75,7 @@ public class CacheStalenessDetector
     /// <summary>
     /// Get TTL for entity type
     /// </summary>
-    public TimeSpan GetTtlForEntityType(string entityType)
+    public virtual TimeSpan GetTtlForEntityType(string entityType)
     {
         return entityType switch
         {
@@ -87,7 +87,7 @@ public class CacheStalenessDetector
     /// <summary>
     /// Check if entry is near expiration
     /// </summary>
-    public bool IsNearExpiration(CacheEntry entry)
+    public virtual bool IsNearExpiration(CacheEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
 

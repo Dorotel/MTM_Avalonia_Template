@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using MTM_Template_Application.Models.Cache;
 
 namespace MTM_Template_Application.Services.Cache;
@@ -12,6 +13,7 @@ namespace MTM_Template_Application.Services.Cache;
 /// </summary>
 public class CacheService : ICacheService
 {
+    private readonly ILogger<CacheService> _logger;
     private readonly ConcurrentDictionary<string, CacheEntry> _cache;
     private readonly LZ4CompressionHandler _compressionHandler;
     private readonly object _statsLock = new object();
@@ -19,12 +21,18 @@ public class CacheService : ICacheService
     private long _missCount;
     private long _evictionCount;
 
-    public CacheService(LZ4CompressionHandler compressionHandler)
+    public CacheService(
+        ILogger<CacheService> logger,
+        LZ4CompressionHandler compressionHandler)
     {
+        ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(compressionHandler);
 
+        _logger = logger;
         _cache = new ConcurrentDictionary<string, CacheEntry>();
         _compressionHandler = compressionHandler;
+
+        _logger.LogInformation("CacheService initialized with LZ4 compression");
     }
 
     /// <summary>
@@ -39,6 +47,7 @@ public class CacheService : ICacheService
             // Check if expired
             if (entry.ExpiresAtUtc.HasValue && entry.ExpiresAtUtc.Value < DateTimeOffset.UtcNow)
             {
+                _logger.LogDebug("Cache key {Key} expired, removing", key);
                 // Remove expired entry
                 _cache.TryRemove(key, out _);
                 IncrementMiss();
@@ -51,6 +60,7 @@ public class CacheService : ICacheService
             entry.AccessCount++;
 
             IncrementHit();
+            _logger.LogDebug("Cache hit for key: {Key}", key);
 
             // Decompress and deserialize
             var json = _compressionHandler.Decompress(entry.CompressedValue);
@@ -58,6 +68,7 @@ public class CacheService : ICacheService
         }
 
         IncrementMiss();
+        _logger.LogDebug("Cache miss for key: {Key}", key);
         return Task.FromResult<T?>(default);
     }
 
@@ -69,15 +80,24 @@ public class CacheService : ICacheService
         ArgumentNullException.ThrowIfNull(key);
         ArgumentNullException.ThrowIfNull(value);
 
+        _logger.LogDebug("Setting cache key: {Key}, Type: {Type}, Expiration: {Expiration}",
+            key, typeof(T).Name, expiration?.TotalSeconds.ToString() ?? "none");
+
         // Serialize and compress
         var json = JsonSerializer.Serialize(value);
         var compressed = _compressionHandler.Compress(json);
+
+        var uncompressedSize = System.Text.Encoding.UTF8.GetByteCount(json);
+        var compressionRatio = (double)compressed.Length / uncompressedSize;
+
+        _logger.LogDebug("Compressed {Original}B to {Compressed}B (ratio: {Ratio:F2})",
+            uncompressedSize, compressed.Length, compressionRatio);
 
         var entry = new CacheEntry
         {
             Key = key,
             CompressedValue = compressed,
-            UncompressedSizeBytes = System.Text.Encoding.UTF8.GetByteCount(json),
+            UncompressedSizeBytes = uncompressedSize,
             CreatedUtc = DateTimeOffset.UtcNow,
             ExpiresAtUtc = expiration.HasValue ? DateTimeOffset.UtcNow.Add(expiration.Value) : null,
             LastAccessedUtc = DateTimeOffset.UtcNow,
@@ -99,6 +119,7 @@ public class CacheService : ICacheService
 
         if (_cache.TryRemove(key, out _))
         {
+            _logger.LogDebug("Cache key removed: {Key}", key);
             IncrementEviction();
         }
         return Task.CompletedTask;
@@ -116,6 +137,8 @@ public class CacheService : ICacheService
         {
             _evictionCount += count;
         }
+
+        _logger.LogInformation("Cache cleared. {Count} entries removed", count);
         return Task.CompletedTask;
     }
 
@@ -162,6 +185,8 @@ public class CacheService : ICacheService
     /// </summary>
     public async Task RefreshAsync()
     {
+        _logger.LogDebug("Refreshing stale cache entries");
+
         var expiredKeys = new System.Collections.Generic.List<string>();
         var now = DateTimeOffset.UtcNow;
 
@@ -177,6 +202,8 @@ public class CacheService : ICacheService
         {
             await RemoveAsync(key);
         }
+
+        _logger.LogInformation("Cache refresh complete. {Count} expired entries removed", expiredKeys.Count);
     }
 
     private void IncrementHit()

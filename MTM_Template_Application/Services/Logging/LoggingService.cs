@@ -102,6 +102,8 @@ public class LoggingService : ILoggingService
     /// </summary>
     public async Task FlushAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         cts.CancelAfter(TimeSpan.FromSeconds(5)); // 5s timeout for flush
 

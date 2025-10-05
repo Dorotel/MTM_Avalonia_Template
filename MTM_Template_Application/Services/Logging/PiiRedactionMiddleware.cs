@@ -1,6 +1,6 @@
 using System;
-using System.Threading;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace MTM_Template_Application.Services.Logging;
 
@@ -19,7 +19,7 @@ public class PiiRedactionMiddleware
     private static readonly Regex Base64TokenPattern = new(@"\b[A-Za-z0-9+/]{20,}={0,2}\b", RegexOptions.Compiled);
 
     // Keywords that indicate sensitive data
-    private static readonly string[] SensitiveKeywords = 
+    private static readonly string[] SensitiveKeywords =
     {
         "password", "pwd", "pass", "secret", "token", "apikey", "api_key",
         "authorization", "bearer", "credential", "auth", "key", "private"
@@ -30,7 +30,7 @@ public class PiiRedactionMiddleware
     /// </summary>
     /// <param name="message">The message to redact</param>
     /// <returns>The redacted message</returns>
-    public string Redact(string message)
+    public virtual string Redact(string message)
     {
         if (string.IsNullOrEmpty(message))
         {

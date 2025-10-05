@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentValidation;
+using Microsoft.Extensions.Logging;
 using MTM_Template_Application.Models.Core;
 using MTM_Template_Application.Services.Core;
 using NSubstitute;
@@ -16,13 +17,20 @@ namespace MTM_Template_Tests.Unit;
 /// </summary>
 public class ValidationServiceTests
 {
+    private readonly ILogger<ValidationService> _mockLogger;
+
+    public ValidationServiceTests()
+    {
+        _mockLogger = Substitute.For<ILogger<ValidationService>>();
+    }
+
     #region Constructor Tests
 
     [Fact]
     public void Constructor_CreatesServiceSuccessfully()
     {
         // Arrange & Act
-        var service = new ValidationService();
+        var service = new ValidationService(_mockLogger);
 
         // Assert
         service.Should().NotBeNull();
@@ -36,7 +44,7 @@ public class ValidationServiceTests
     public void RegisterValidator_WithNullValidator_ThrowsArgumentNullException()
     {
         // Arrange
-        var service = new ValidationService();
+        var service = new ValidationService(_mockLogger);
 
         // Act
         Action act = () => service.RegisterValidator<TestModel>(null!);
@@ -50,7 +58,7 @@ public class ValidationServiceTests
     public void RegisterValidator_WithInvalidValidatorType_ThrowsArgumentException()
     {
         // Arrange
-        var service = new ValidationService();
+        var service = new ValidationService(_mockLogger);
         var invalidValidator = new object(); // Not an IValidator<T>
 
         // Act
@@ -65,7 +73,7 @@ public class ValidationServiceTests
     public void RegisterValidator_WithValidValidator_RegistersSuccessfully()
     {
         // Arrange
-        var service = new ValidationService();
+        var service = new ValidationService(_mockLogger);
         var validator = new TestModelValidator();
 
         // Act
@@ -83,7 +91,7 @@ public class ValidationServiceTests
     public async Task ValidateAsync_WithNullObject_ThrowsArgumentNullException()
     {
         // Arrange
-        var service = new ValidationService();
+        var service = new ValidationService(_mockLogger);
 
         // Act
         var act = async () => await service.ValidateAsync<TestModel>(null!);
@@ -97,7 +105,7 @@ public class ValidationServiceTests
     public async Task ValidateAsync_WithNoValidator_ReturnsValidResult()
     {
         // Arrange
-        var service = new ValidationService();
+        var service = new ValidationService(_mockLogger);
         var model = new TestModel { Name = "Test", Age = 25 };
 
         // Act
@@ -113,7 +121,7 @@ public class ValidationServiceTests
     public async Task ValidateAsync_WithRegisteredValidator_ValidatesCorrectly()
     {
         // Arrange
-        var service = new ValidationService();
+        var service = new ValidationService(_mockLogger);
         service.RegisterValidator<TestModel>(new TestModelValidator());
         var model = new TestModel { Name = "John", Age = 30 };
 
@@ -130,7 +138,7 @@ public class ValidationServiceTests
     public async Task ValidateAsync_WithInvalidObject_ReturnsValidationErrors()
     {
         // Arrange
-        var service = new ValidationService();
+        var service = new ValidationService(_mockLogger);
         service.RegisterValidator<TestModel>(new TestModelValidator());
         var model = new TestModel { Name = "", Age = -5 }; // Invalid
 
@@ -149,7 +157,7 @@ public class ValidationServiceTests
     public async Task ValidateAsync_WithPartiallyInvalidObject_ReturnsSpecificErrors()
     {
         // Arrange
-        var service = new ValidationService();
+        var service = new ValidationService(_mockLogger);
         service.RegisterValidator<TestModel>(new TestModelValidator());
         var model = new TestModel { Name = "John", Age = -5 }; // Only Age invalid
 
@@ -171,7 +179,7 @@ public class ValidationServiceTests
     public void GetRuleMetadata_WithNoValidator_ReturnsEmptyList()
     {
         // Arrange
-        var service = new ValidationService();
+        var service = new ValidationService(_mockLogger);
 
         // Act
         var metadata = service.GetRuleMetadata<TestModel>();
@@ -185,7 +193,7 @@ public class ValidationServiceTests
     public void GetRuleMetadata_WithRegisteredValidator_ReturnsRuleMetadata()
     {
         // Arrange
-        var service = new ValidationService();
+        var service = new ValidationService(_mockLogger);
         service.RegisterValidator<TestModel>(new TestModelValidator());
 
         // Act
@@ -205,7 +213,7 @@ public class ValidationServiceTests
     public async Task ValidateAsync_WithAutoDiscoverableValidator_DiscoversAndValidates()
     {
         // Arrange
-        var service = new ValidationService();
+        var service = new ValidationService(_mockLogger);
         var model = new TestModel { Name = "Auto", Age = 99 };
 
         // Act - First call should trigger auto-discovery

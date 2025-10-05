@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using MTM_Template_Application.Models.Navigation;
 using MTM_Template_Application.Services.Navigation;
 using NSubstitute;
@@ -23,7 +24,7 @@ public class NavigationServiceTests
     public void Constructor_WithNullUnsavedChangesGuard_ThrowsArgumentNullException()
     {
         // Arrange & Act
-        Action act = () => new NavigationService(null!);
+        Action act = () => new NavigationService(Substitute.For<ILogger<NavigationService>>(), null!);
 
         // Assert
         act.Should().Throw<ArgumentNullException>()
@@ -37,7 +38,7 @@ public class NavigationServiceTests
         var guard = Substitute.For<UnsavedChangesGuard>();
 
         // Act
-        var service = new NavigationService(guard);
+        var service = new NavigationService(Substitute.For<ILogger<NavigationService>>(), guard);
 
         // Assert
         service.Should().NotBeNull();
@@ -67,7 +68,7 @@ public class NavigationServiceTests
         // Arrange
         var guard = Substitute.For<UnsavedChangesGuard>();
         guard.CanNavigateAsync().Returns(true);
-        var service = new NavigationService(guard);
+        var service = new NavigationService(Substitute.For<ILogger<NavigationService>>(), guard);
 
         // Act
         await service.NavigateToAsync("HomeView");
@@ -104,7 +105,7 @@ public class NavigationServiceTests
         // Arrange
         var guard = Substitute.For<UnsavedChangesGuard>();
         guard.CanNavigateAsync().Returns(false); // User cancelled
-        var service = new NavigationService(guard);
+        var service = new NavigationService(Substitute.For<ILogger<NavigationService>>(), guard);
 
         // Navigate to initial view
         guard.CanNavigateAsync().Returns(true);
@@ -198,7 +199,7 @@ public class NavigationServiceTests
         // Arrange
         var guard = Substitute.For<UnsavedChangesGuard>();
         guard.CanNavigateAsync().Returns(true);
-        var service = new NavigationService(guard);
+        var service = new NavigationService(Substitute.For<ILogger<NavigationService>>(), guard);
 
         await service.NavigateToAsync("View1");
         await service.NavigateToAsync("View2");
@@ -271,7 +272,7 @@ public class NavigationServiceTests
         // Arrange
         var guard = Substitute.For<UnsavedChangesGuard>();
         guard.CanNavigateAsync().Returns(true);
-        var service = new NavigationService(guard);
+        var service = new NavigationService(Substitute.For<ILogger<NavigationService>>(), guard);
 
         await service.NavigateToAsync("View1");
         await service.NavigateToAsync("View2");
@@ -384,7 +385,7 @@ public class NavigationServiceTests
     {
         var guard = Substitute.For<UnsavedChangesGuard>();
         guard.CanNavigateAsync().Returns(true);
-        return new NavigationService(guard);
+        return new NavigationService(Substitute.For<ILogger<NavigationService>>(), guard);
     }
 
     #endregion

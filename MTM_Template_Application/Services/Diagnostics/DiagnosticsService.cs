@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using MTM_Template_Application.Models.Diagnostics;
 using MTM_Template_Application.Services.Diagnostics.Checks;
 
@@ -13,18 +14,25 @@ namespace MTM_Template_Application.Services.Diagnostics;
 /// </summary>
 public class DiagnosticsService : IDiagnosticsService
 {
+    private readonly ILogger<DiagnosticsService> _logger;
     private readonly IEnumerable<IDiagnosticCheck> _diagnosticChecks;
     private readonly HardwareDetection _hardwareDetection;
 
     public DiagnosticsService(
+        ILogger<DiagnosticsService> logger,
         IEnumerable<IDiagnosticCheck> diagnosticChecks,
         HardwareDetection hardwareDetection)
     {
+        ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(diagnosticChecks);
         ArgumentNullException.ThrowIfNull(hardwareDetection);
 
+        _logger = logger;
         _diagnosticChecks = diagnosticChecks;
         _hardwareDetection = hardwareDetection;
+
+        _logger.LogInformation("DiagnosticsService initialized with {CheckCount} diagnostic checks",
+            _diagnosticChecks.Count());
     }
 
     /// <summary>
@@ -32,18 +40,30 @@ public class DiagnosticsService : IDiagnosticsService
     /// </summary>
     public async Task<List<DiagnosticResult>> RunAllChecksAsync(CancellationToken cancellationToken = default)
     {
+        // Check cancellation before starting any work
+        cancellationToken.ThrowIfCancellationRequested();
+
+        _logger.LogInformation("Running all diagnostic checks ({Count} checks)", _diagnosticChecks.Count());
+
         var results = new List<DiagnosticResult>();
 
         // Run all checks in parallel
         var checkTasks = _diagnosticChecks.Select(async check =>
         {
             cancellationToken.ThrowIfCancellationRequested();
+            var checkName = check.GetType().Name;
+            _logger.LogDebug("Starting diagnostic check: {CheckName}", checkName);
+
             try
             {
-                return await check.RunAsync(cancellationToken);
+                var result = await check.RunAsync(cancellationToken);
+                _logger.LogInformation("Check {CheckName} completed with status: {Status}",
+                    checkName, result.Status);
+                return result;
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Check {CheckName} failed with exception", checkName);
                 return new DiagnosticResult
                 {
                     CheckName = check.GetType().Name,
@@ -62,6 +82,10 @@ public class DiagnosticsService : IDiagnosticsService
         var checkResults = await Task.WhenAll(checkTasks);
         results.AddRange(checkResults);
 
+        var failedCount = results.Count(r => r.Status == DiagnosticStatus.Failed);
+        _logger.LogInformation("All diagnostic checks completed. Total: {Total}, Failed: {Failed}",
+            results.Count, failedCount);
+
         return results;
     }
 
@@ -73,11 +97,14 @@ public class DiagnosticsService : IDiagnosticsService
         cancellationToken.ThrowIfCancellationRequested();
         ArgumentNullException.ThrowIfNull(checkName);
 
+        _logger.LogInformation("Running specific diagnostic check: {CheckName}", checkName);
+
         var check = _diagnosticChecks.FirstOrDefault(c =>
             c.GetType().Name.Equals(checkName, StringComparison.OrdinalIgnoreCase));
 
         if (check == null)
         {
+            _logger.LogWarning("Diagnostic check not found: {CheckName}", checkName);
             return new DiagnosticResult
             {
                 CheckName = checkName,
@@ -91,10 +118,14 @@ public class DiagnosticsService : IDiagnosticsService
 
         try
         {
-            return await check.RunAsync();
+            var result = await check.RunAsync();
+            _logger.LogInformation("Check {CheckName} completed with status: {Status}",
+                checkName, result.Status);
+            return result;
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Check {CheckName} failed with exception", checkName);
             return new DiagnosticResult
             {
                 CheckName = checkName,
@@ -115,6 +146,10 @@ public class DiagnosticsService : IDiagnosticsService
     /// </summary>
     public HardwareCapabilities GetHardwareCapabilities()
     {
-        return _hardwareDetection.DetectCapabilities();
+        _logger.LogDebug("Detecting hardware capabilities");
+        var capabilities = _hardwareDetection.DetectCapabilities();
+        _logger.LogInformation("Hardware detected: Platform={Platform}, Cores={Cores}, Memory={MemoryMB}MB",
+            capabilities.Platform, capabilities.ProcessorCount, capabilities.TotalMemoryMB);
+        return capabilities;
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using MTM_Template_Application.Models.Localization;
 
 namespace MTM_Template_Application.Services.Localization;
@@ -11,6 +12,7 @@ namespace MTM_Template_Application.Services.Localization;
 /// </summary>
 public class LocalizationService : ILocalizationService
 {
+    private readonly ILogger<LocalizationService> _logger;
     private readonly Dictionary<string, Dictionary<string, string>> _translations;
     private readonly MissingTranslationHandler _missingTranslationHandler;
     private readonly CultureProvider _cultureProvider;
@@ -20,12 +22,17 @@ public class LocalizationService : ILocalizationService
     public event EventHandler<LanguageChangedEventArgs>? OnLanguageChanged;
 
     public LocalizationService(
+        ILogger<LocalizationService> logger,
         MissingTranslationHandler missingTranslationHandler,
         CultureProvider cultureProvider)
     {
+        ArgumentNullException.ThrowIfNull(logger);
         ArgumentNullException.ThrowIfNull(missingTranslationHandler);
         ArgumentNullException.ThrowIfNull(cultureProvider);
 
+        _logger = logger;
+
+        _logger = logger;
         _translations = new Dictionary<string, Dictionary<string, string>>();
         _missingTranslationHandler = missingTranslationHandler;
         _cultureProvider = cultureProvider;
@@ -33,6 +40,9 @@ public class LocalizationService : ILocalizationService
         _supportedCultures = new List<string> { "en-US", "es-ES", "fr-FR", "de-DE" };
 
         InitializeTranslations();
+
+        _logger.LogInformation("LocalizationService initialized. Current culture: {Culture}, Supported: {Supported}",
+            _currentCulture.Name, string.Join(", ", _supportedCultures));
     }
 
     public string GetString(string key, params object[] args)
@@ -44,6 +54,7 @@ public class LocalizationService : ILocalizationService
         if (_translations.TryGetValue(cultureName, out var cultureTranslations) &&
             cultureTranslations.TryGetValue(key, out var translation))
         {
+            _logger.LogDebug("Translation found for key: {Key} in culture: {Culture}", key, cultureName);
             return args.Length > 0 ? string.Format(translation, args) : translation;
         }
 
@@ -53,11 +64,14 @@ public class LocalizationService : ILocalizationService
             _translations.TryGetValue(fallbackCulture.Name, out var fallbackTranslations) &&
             fallbackTranslations.TryGetValue(key, out var fallbackTranslation))
         {
+            _logger.LogWarning("Translation key {Key} not found in {Culture}, using fallback: {Fallback}",
+                key, cultureName, fallbackCulture.Name);
             _missingTranslationHandler.ReportMissing(key, _currentCulture.Name, fallbackTranslation);
             return args.Length > 0 ? string.Format(fallbackTranslation, args) : fallbackTranslation;
         }
 
         // Return key as fallback
+        _logger.LogError("Translation key {Key} not found in {Culture} or fallback cultures", key, cultureName);
         _missingTranslationHandler.ReportMissing(key, _currentCulture.Name, key);
         return $"[{key}]";
     }
@@ -65,6 +79,8 @@ public class LocalizationService : ILocalizationService
     public void SetCulture(string cultureName)
     {
         ArgumentNullException.ThrowIfNull(cultureName);
+
+        _logger.LogInformation("Setting culture to: {Culture}", cultureName);
 
         try
         {
@@ -75,6 +91,9 @@ public class LocalizationService : ILocalizationService
             CultureInfo.CurrentCulture = newCulture;
             CultureInfo.CurrentUICulture = newCulture;
 
+            _logger.LogInformation("Culture changed from {OldCulture} to {NewCulture}",
+                oldCulture.Name, newCulture.Name);
+
             OnLanguageChanged?.Invoke(this, new LanguageChangedEventArgs
             {
                 OldCulture = oldCulture.Name,
@@ -83,6 +102,7 @@ public class LocalizationService : ILocalizationService
         }
         catch (CultureNotFoundException ex)
         {
+            _logger.LogError(ex, "Culture '{Culture}' is not supported", cultureName);
             throw new ArgumentException($"Culture '{cultureName}' is not supported", nameof(cultureName), ex);
         }
     }

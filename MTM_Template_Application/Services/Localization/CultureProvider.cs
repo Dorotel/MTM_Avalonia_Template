@@ -15,7 +15,7 @@ public class CultureProvider
         _defaultCulture = new CultureInfo("en-US");
     }
 
-    public CultureInfo GetCurrentCulture()
+    public virtual CultureInfo GetCurrentCulture()
     {
         try
         {
@@ -27,7 +27,7 @@ public class CultureProvider
         }
     }
 
-    public CultureInfo? GetFallbackCulture(CultureInfo current)
+    public virtual CultureInfo? GetFallbackCulture(CultureInfo current)
     {
         // Fallback chain: specific culture > parent culture > en-US
         if (!current.IsNeutralCulture && current.Parent != CultureInfo.InvariantCulture)
@@ -43,7 +43,7 @@ public class CultureProvider
         return null;
     }
 
-    public CultureInfo GetOSCulture()
+    public virtual CultureInfo GetOSCulture()
     {
         return CultureInfo.InstalledUICulture;
     }
