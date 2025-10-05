@@ -17,6 +17,7 @@ using MTM_Template_Application.Services.Logging;
 using MTM_Template_Application.Services.Navigation;
 using MTM_Template_Application.Services.Secrets;
 using MTM_Template_Application.Services.Theme;
+using MTM_Template_Application.Services.Visual;
 using MTM_Template_Application.ViewModels;
 
 namespace MTM_Template_Application.Extensions;
@@ -175,6 +176,14 @@ public static class ServiceCollectionExtensions
             });
         }
         Serilog.Log.Verbose("[DI] IMySqlClient registered");
+
+        // Visual API Whitelist Validator
+        if (includeVisualApi)
+        {
+            Serilog.Log.Verbose("[DI] Registering IVisualApiWhitelistValidator");
+            services.AddSingleton<IVisualApiWhitelistValidator, VisualApiWhitelistValidator>();
+            Serilog.Log.Verbose("[DI] IVisualApiWhitelistValidator registered");
+        }
 
         // Visual API client (not available on Android)
         if (includeVisualApi)
