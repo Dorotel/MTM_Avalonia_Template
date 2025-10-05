@@ -1,0 +1,236 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Database Schema Contract",
+  "description": "Contract for database tables supporting configuration system",
+  "version": "1.0.0",
+  "database": {
+    "engine": "MySQL",
+    "version": "5.7",
+    "charset": "utf8mb4",
+    "collation": "utf8mb4_general_ci"
+  },
+  "tables": {
+    "UserPreferences": {
+      "description": "Stores user-specific configuration preferences",
+      "columns": {
+        "PreferenceId": {
+          "type": "INT",
+          "constraints": ["PRIMARY KEY", "AUTO_INCREMENT"],
+          "description": "Unique preference identifier"
+        },
+        "UserId": {
+          "type": "INT",
+          "constraints": ["NOT NULL", "FOREIGN KEY REFERENCES Users(UserId) ON DELETE CASCADE"],
+          "description": "User who owns this preference"
+        },
+        "PreferenceKey": {
+          "type": "VARCHAR(255)",
+          "constraints": ["NOT NULL"],
+          "pattern": "^[A-Za-z0-9:]+$",
+          "description": "Configuration key (hierarchical, colon-separated)",
+          "examples": ["Display.Theme", "Filter.DefaultLocation", "Sort.OrderBy"]
+        },
+        "PreferenceValue": {
+          "type": "TEXT",
+          "constraints": ["NULL"],
+          "maxLength": 65535,
+          "description": "Preference value (can be JSON for complex types)"
+        },
+        "Category": {
+          "type": "VARCHAR(100)",
+          "constraints": ["NULL"],
+          "description": "Preference category for grouping",
+          "examples": ["Display", "Filters", "Sort", "UI"]
+        },
+        "LastUpdated": {
+          "type": "DATETIME",
+          "constraints": ["NOT NULL", "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"],
+          "description": "Timestamp of last update"
+        }
+      },
+      "indexes": [
+        {
+          "name": "UK_UserPreferences",
+          "type": "UNIQUE",
+          "columns": ["UserId", "PreferenceKey"],
+          "description": "Prevents duplicate keys for same user"
+        },
+        {
+          "name": "IDX_UserId",
+          "type": "INDEX",
+          "columns": ["UserId"],
+          "description": "Speeds up user-specific queries"
+        },
+        {
+          "name": "IDX_Category",
+          "type": "INDEX",
+          "columns": ["Category"],
+          "description": "Speeds up category-filtered queries"
+        }
+      ],
+      "sampleData": [
+        {
+          "PreferenceId": 1,
+          "UserId": 42,
+          "PreferenceKey": "Display.Theme",
+          "PreferenceValue": "Dark",
+          "Category": "Display",
+          "LastUpdated": "2025-10-05T14:30:00Z"
+        },
+        {
+          "PreferenceId": 2,
+          "UserId": 42,
+          "PreferenceKey": "Filter.DefaultLocation",
+          "PreferenceValue": "WH-01",
+          "Category": "Filters",
+          "LastUpdated": "2025-10-05T14:35:00Z"
+        }
+      ]
+    },
+    "FeatureFlags": {
+      "description": "Stores feature flags synced from server (launcher integration)",
+      "columns": {
+        "FlagId": {
+          "type": "INT",
+          "constraints": ["PRIMARY KEY", "AUTO_INCREMENT"],
+          "description": "Unique flag identifier"
+        },
+        "FlagName": {
+          "type": "VARCHAR(255)",
+          "constraints": ["NOT NULL", "UNIQUE"],
+          "pattern": "^[A-Za-z0-9._-]+$",
+          "description": "Feature flag name",
+          "examples": ["Visual.UseForItems", "OfflineModeAllowed"]
+        },
+        "IsEnabled": {
+          "type": "BOOLEAN",
+          "constraints": ["NOT NULL", "DEFAULT FALSE"],
+          "description": "Whether flag is enabled"
+        },
+        "Environment": {
+          "type": "VARCHAR(50)",
+          "constraints": ["NULL"],
+          "enum": [null, "Development", "Staging", "Production"],
+          "description": "Environment restriction (NULL = all environments)"
+        },
+        "RolloutPercentage": {
+          "type": "INT",
+          "constraints": ["NOT NULL", "DEFAULT 0", "CHECK (RolloutPercentage BETWEEN 0 AND 100)"],
+          "description": "Percentage of users who see this feature"
+        },
+        "AppVersion": {
+          "type": "VARCHAR(50)",
+          "constraints": ["NULL"],
+          "pattern": "^\\d+\\.\\d+\\.\\d+$",
+          "description": "Application version this flag is tied to",
+          "examples": ["1.0.0", "1.2.5"]
+        },
+        "UpdatedAt": {
+          "type": "DATETIME",
+          "constraints": ["NOT NULL", "DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"],
+          "description": "Timestamp of last update"
+        }
+      },
+      "indexes": [
+        {
+          "name": "IDX_FlagName",
+          "type": "INDEX",
+          "columns": ["FlagName"],
+          "description": "Speeds up flag lookup by name"
+        },
+        {
+          "name": "IDX_AppVersion",
+          "type": "INDEX",
+          "columns": ["AppVersion"],
+          "description": "Speeds up version-specific queries"
+        }
+      ],
+      "sampleData": [
+        {
+          "FlagId": 1,
+          "FlagName": "Visual.UseForItems",
+          "IsEnabled": true,
+          "Environment": "Development",
+          "RolloutPercentage": 100,
+          "AppVersion": "1.0.0",
+          "UpdatedAt": "2025-10-05T14:30:00Z"
+        },
+        {
+          "FlagId": 2,
+          "FlagName": "OfflineModeAllowed",
+          "IsEnabled": true,
+          "Environment": null,
+          "RolloutPercentage": 50,
+          "AppVersion": "1.0.0",
+          "UpdatedAt": "2025-10-05T14:30:00Z"
+        }
+      ]
+    },
+    "Users": {
+      "description": "User accounts (referenced by UserPreferences)",
+      "note": "Table may already exist; included for FK reference",
+      "columns": {
+        "UserId": {
+          "type": "INT",
+          "constraints": ["PRIMARY KEY", "AUTO_INCREMENT"]
+        },
+        "Username": {
+          "type": "VARCHAR(100)",
+          "constraints": ["NOT NULL", "UNIQUE"]
+        },
+        "DisplayName": {
+          "type": "VARCHAR(255)",
+          "constraints": ["NULL"]
+        },
+        "IsActive": {
+          "type": "BOOLEAN",
+          "constraints": ["NOT NULL", "DEFAULT TRUE"]
+        },
+        "CreatedAt": {
+          "type": "DATETIME",
+          "constraints": ["NOT NULL", "DEFAULT CURRENT_TIMESTAMP"]
+        },
+        "LastLoginAt": {
+          "type": "DATETIME",
+          "constraints": ["NULL"]
+        }
+      }
+    }
+  },
+  "relationships": {
+    "UserPreferences_Users": {
+      "type": "MANY_TO_ONE",
+      "from": "UserPreferences.UserId",
+      "to": "Users.UserId",
+      "onDelete": "CASCADE",
+      "description": "Each preference belongs to one user; deleting user deletes preferences"
+    }
+  },
+  "migrationStrategy": {
+    "initialSetup": [
+      "1. Generate SQL from database-schema.json",
+      "2. Review and adjust for existing schema conflicts",
+      "3. Execute CREATE TABLE statements in order: Users → UserPreferences, FeatureFlags",
+      "4. Verify indexes and foreign keys created successfully"
+    ],
+    "updates": [
+      "Use ALTER TABLE for schema evolution",
+      "Version schema changes in migration files",
+      "Test migrations on development database first"
+    ]
+  },
+  "dataRetention": {
+    "UserPreferences": "Retained until user deleted or admin cleanup",
+    "FeatureFlags": "Retained until superseded by new app version",
+    "Users": "Admins can mark inactive and purge data after review"
+  },
+  "performance": {
+    "UserPreferences": {
+      "readQuery": "SELECT * FROM UserPreferences WHERE UserId = ? (<10ms with index)",
+      "writeQuery": "INSERT INTO UserPreferences ... ON DUPLICATE KEY UPDATE (<20ms)"
+    },
+    "FeatureFlags": {
+      "loadAll": "SELECT * FROM FeatureFlags WHERE AppVersion = ? (<50ms, typically <20 rows)"
+    }
+  }
+}

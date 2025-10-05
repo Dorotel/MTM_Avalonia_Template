@@ -30,6 +30,8 @@ When working with specifications, always reference:
 - Example: `create-new-feature.sh --json "{ARGS}"` returns `{"BRANCH_NAME": "...", "SPEC_FILE": "..."}`
 
 ## Active Technologies
+- [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION] (002-environment-and-configuration)
+- [if applicable, e.g., PostgreSQL, CoreData, files or N/A] (002-environment-and-configuration)
 
 ### Core Stack (001-boot-sequence-splash)
 - **Framework**: C# .NET 9.0 with nullable reference types enabled
@@ -433,13 +435,9 @@ Consider using these vetted packages:
 - `Material.Avalonia` or `Citrus.Avalonia` - Material/Fluent themes
 
 ## Recent Changes
+- 002-environment-and-configuration: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
 - **2025-10-03**: Added Avalonia-specific best practices from AvaloniaUI organization
 - **2025-10-03**: Corrected XAML binding syntax to use `CompiledBinding` with `x:DataType`
-- **2025-10-03**: Enhanced Copilot instructions with spec-kit integration
-- **001-boot-sequence-splash**: Added full observability stack (Serilog, OpenTelemetry)
-- **001-boot-sequence-splash**: Added resilience patterns (Polly)
-- **001-boot-sequence-splash**: Added validation (FluentValidation) and mapping (AutoMapper)
-- **001-boot-sequence-splash**: Initial Avalonia + MVVM + MySQL setup
 
 ## Performance Guidelines
 - Use LZ4 compression for cached data

@@ -20,11 +20,19 @@ Execution steps:
    - (Optionally capture `IMPL_PLAN`, `TASKS` for future chained flows.)
    - If JSON parsing fails, abort and instruct user to re-run `/specify` or verify feature branch environment.
 
+   **Check for existing clarification-needed file**: Before proceeding with normal clarification workflow, check if `{FEATURE_DIR}/clarification-needed.md` exists. If found:
+   - Load the file and extract the blocked context (which command generated it, what progress was made, what clarification is needed)
+   - Present the clarification questions from that file to the user interactively
+   - Once answered, integrate answers into the spec.md
+   - Rename `clarification-needed.md` to `clarification-needed-complete.md` to mark resolution
+   - Report completion and suggest re-running the original blocked command (e.g., "/tasks" or "/implement")
+   - Exit clarification workflow (do not proceed with normal ambiguity scanning)
+
 2. Load the current spec file. **Detect if the spec contains multiple distinct features** by scanning for:
    - Multiple top-level "Feature Specification:" headings, OR
    - Multiple major feature sections enumerated in the document (e.g., numbered feature lists like "1. Splash Screen, 2. Configuration Service, 3. Logging Service"), OR
    - Explicit statement that this is a multi-feature specification (look for phrases like "Features/Implementations Covered by This Document" or similar enumeration)
-   
+
    **If multiple features detected**:
    - Set mode to **Multi-Feature Clarification Mode**
    - Question limit is **UNLIMITED** (ignore the 5-question interactive limit)
@@ -32,10 +40,10 @@ Execution steps:
    - Generate comprehensive question sets for each feature independently
    - All questions will be written to files (no interactive questioning for multi-feature specs)
    - After creating all clarification files, provide a summary table showing question counts per feature
-   
+
    **If single feature detected**:
    - Proceed with standard single-feature mode (5-question interactive limit applies)
-   
+
    Perform a structured ambiguity & coverage scan using this taxonomy. For each category, mark status: Clear / Partial / Missing. Produce an internal coverage map used for prioritization (do not output raw map unless no questions will be asked).
 
    Functional Scope & Behavior:
@@ -93,21 +101,26 @@ Execution steps:
    - Information is better deferred to planning phase (note internally)
 
 3. Generate (internally) a prioritized queue of candidate clarification questions. Apply these constraints based on mode:
-   
+
+   **CRITICAL**: All questions MUST be phrased in plain, non-technical business language. Avoid developer jargon like "API contract", "throw exception", "async methods", "return values", etc. Focus on **user-observable behavior** and **business outcomes**. Think: "What would a business stakeholder need to know?" not "What would a developer implement?"
+
    **Multi-Feature Mode** (detected in step 2):
    - **UNLIMITED questions** per feature (no quota restrictions)
    - For each distinct feature identified, generate a complete question set covering all ambiguities
    - Each question must be answerable with EITHER:
-      * A short multiple‑choice selection (5–10 distinct, mutually exclusive options), OR
-      * A one-word / short‑phrase answer (explicitly constrain: "Answer in <=5 words")
+      - A short multiple‑choice selection (5–10 distinct, mutually exclusive options), OR
+      - A one-word / short‑phrase answer (explicitly constrain: "Answer in <=5 words")
    - Group questions by feature, maintaining category taxonomy within each feature
    - All questions go directly to files (no interactive questioning)
-   
+   - **Use plain business language** - avoid technical terminology
+
    **Single-Feature Mode**:
    - Maximum of 10 total questions across the whole session
    - Each question must be answerable with EITHER:
-      * A short multiple‑choice selection (5–10 distinct, mutually exclusive options), OR
-      * A one-word / short‑phrase answer (explicitly constrain: "Answer in <=5 words")
+      - A short multiple‑choice selection (5–10 distinct, mutually exclusive options), OR
+      - A one-word / short‑phrase answer (explicitly constrain: "Answer in <=5 words")
+   - **Use plain business language** - avoid technical terminology like "API", "exception", "async", "return value", etc.
+   - Focus on **user-observable behavior** and **business outcomes**, not implementation details
    - Only include questions whose answers materially impact architecture, data modeling, task decomposition, test design, UX behavior, operational readiness, or compliance validation
    - Ensure category coverage balance: attempt to cover the highest impact unresolved categories first; avoid asking two low-impact questions when a single high-impact area (e.g., security posture) is unresolved
    - Exclude questions already answered, trivial stylistic preferences, or plan-level execution details (unless blocking correctness)
@@ -117,9 +130,13 @@ Execution steps:
 
 4. Sequential questioning loop (interactive):
     - **Multi-Feature Mode Pre-check**: If Multi-Feature Clarification Mode is active:
-       * Create directory `{FEATURE_DIR}/clarify/` if it doesn't exist
-       * For EACH distinct feature identified, create a separate file: `{FEATURE_DIR}/clarify/outstanding-questions-[feature-name]-{YYYY-MM-DD}.md`
-       * Format each file as:
+       - Create directory `{FEATURE_DIR}/clarify/` if it doesn't exist
+       - For EACH distinct feature identified, create a separate file: `{FEATURE_DIR}/clarify/outstanding-questions-[feature-name]-{YYYY-MM-DD}.md`
+       - Format each file as:
+
+
+
+
          ```markdown
          # Outstanding Clarification Questions: [Feature Name] - {YYYY-MM-DD}
 
@@ -143,28 +160,44 @@ Execution steps:
          [For short answer:]
          Format: Short answer (<=5 words)
 
-         ---
-         [Repeat for each question]
-         ```
-       * After creating all feature-specific clarification files, inform user with a summary table:
+
+       - ---
+
+
+       - [Repeat for each question]
+
+
+       - ```
+
+
+       - After creating all feature-specific clarification files, inform user with a summary table:
+
          ```
          Multi-feature specification detected. Generated clarification files:
 
          | Feature | Questions | File Path |
-         |---------|-----------|-----------|
+
+       - |---------|-----------|-----------|
          | [Feature 1] | {N} | {filepath} |
          | [Feature 2] | {N} | {filepath} |
-         | ... | ... | ... |
-         
+-
+       - | ... | ... | ... |
+
+
          Total: {X} features, {Y} total questions
+-
+--
 
          Please review each file and address high-priority questions in the spec, then re-run `/clarify` to continue.
          ```
-       * Exit clarification loop (no interactive questioning for multi-feature specs)
-    
+-
+       - Exit clarification loop (no interactive questioning for multi-feature specs)
+
+
     - **Single-Feature Mode Pre-loop check**: If the prioritized queue contains MORE than 5 questions:
-       * Create directory `{FEATURE_DIR}/clarify/` if it doesn't exist.
-       * Create file `{FEATURE_DIR}/clarify/outstanding-questions-{YYYY-MM-DD}.md` with all questions formatted as:
+       - Create directory `{FEATURE_DIR}/clarify/` if it doesn't exist.
+       - Create file `{FEATURE_DIR}/clarify/outstanding-questions-{YYYY-MM-DD}.md` with all questions formatted as:
+
          ```markdown
          # Outstanding Clarification Questions - {YYYY-MM-DD}
 
@@ -173,96 +206,124 @@ Execution steps:
          ## Questions
 
          ### Q1: [Category] - [Question text]
-         **Impact**: [High/Medium/Low]
-         **Category**: [Functional Scope/Data Model/etc.]
 
-         [For multiple choice:]
-         | Option | Description |
-         |--------|-------------|
-         | A | ... |
-         | B | ... |
+       - **Impact**: [High/Medium/Low]
+       - **Category**: [Functional Scope/Data Model/etc.]
 
-         [For short answer:]
-         Format: Short answer (<=5 words)
+       - [For multiple choice:]
+       - | Option | Description |
 
-         ---
-         [Repeat for each question]
+
+       - |--------|-------------|
+       - | A | ... |
+
+       - | B | ... |
+-
+       - [For short answer:]
+
+
+       - Format: Short answer (<=5 words)
+-
+
+       - ---
+       - [Repeat for each question]
+
+       - ```
+
+
+
+       - Inform user: "Generated {N} clarification questions (exceeds interactive limit of 5). Created file at: {filepath}. Please review and address high-priority questions in the spec, then re-run `/clarify` to continue."
+       - Exit clarification loop (do not ask any questions interactively).
+
+    - *-If 5 or fewer questions**, proceed with interactive loop:
+       - Present EXACTLY ONE question at a time.
+-
+       - **Start with a concrete example scenario** that illustrates when/why this clarification matters. Format as:
+
          ```
-       * Inform user: "Generated {N} clarification questions (exceeds interactive limit of 5). Created file at: {filepath}. Please review and address high-priority questions in the spec, then re-run `/clarify` to continue."
-       * Exit clarification loop (do not ask any questions interactively).
-    - **If 5 or fewer questions**, proceed with interactive loop:
-       * Present EXACTLY ONE question at a time.
-       * For multiple‑choice questions render options as a Markdown table:
+-
+       - **📋 Example Scenario**: [1-2 sentences describing a real-world situation where this ambiguity would cause problems or confusion]
+       - ```
 
-          | Option | Description |
+       - For multiple‑choice questions render options as a Markdown table:
+-
+--
+       -  | Option | Description |
           |--------|-------------|
           | A | <Option A description> |
-          | B | <Option B description> |
-          | C | <Option C description> | (add D/E as needed up to 5)
-          | Short | Provide a different short answer (<=5 words) | (Include only if free-form alternative is appropriate)
-
-       * For short‑answer style (no meaningful discrete options), output a single line after the question: `Format: Short answer (<=5 words)`.
-       * After the user answers:
-          - Validate the answer maps to one option or fits the <=5 word constraint.
-          - If ambiguous, ask for a quick disambiguation (count still belongs to same question; do not advance).
-          - Once satisfactory, record it in working memory (do not yet write to disk) and move to the next queued question.
-       * Stop asking further questions when:
-          - All critical ambiguities resolved early (remaining queued items become unnecessary), OR
+--
+       -  | B | <Option B description> |
+       -  | C | <Option C description> | (add D/E as needed up to 5)
+       -  | Short | Provide a different short answer (<=5 words) | (Include only if free-form alternative is appropriate)
+-
+       - **After the options table**, provide YOUR RECOMMENDATION in a clearly labeled section explaining which option you would recommend and why from a business/UX perspective. Format as:
+--
+       - ```
+         **💡 Recommendation**: [Option Letter] - [1-2 sentence explanation of why this option best balances user experience, reliability, and maintainability]
+         ```
+--
+       - For short‑answer style (no meaningful discrete options), output a single line after the question: `Format: Short answer (<=5 words)`.
+       - After the user answers:
+       -  - Validate the answer maps to one option or fits the <=5 word constraint.
+       -  - If ambiguous, ask for a quick disambiguation (count still belongs to same question; do not advance).
+       -  - Once satisfactory, record it in working memory (do not yet write to disk) and move to the next queued question.
+       - Stop asking further questions when:
+       -  - All critical ambiguities resolved early (remaining queued items become unnecessary), OR
           - User signals completion ("done", "good", "no more"), OR
           - You reach 5 asked questions.
-       * Never reveal future queued questions in advance.
-       * If no valid questions exist at start, immediately report no critical ambiguities.
-
-5. Integration after EACH accepted answer (incremental update approach):
-    - Maintain in-memory representation of the spec (loaded once at start) plus the raw file contents.
-    - For the first integrated answer in this session:
-       * Ensure a `## Clarifications` section exists (create it just after the highest-level contextual/overview section per the spec template if missing).
-       * Under it, create (if not present) a `### Session YYYY-MM-DD` subheading for today.
+       - Never reveal future queued questions in advance.
+       - If no valid questions exist at start, immediately report no critical ambiguities.
+-
+5. Inte-ration after EACH accepted answer (incremental update approach):
+    - M-intain in-memory representation of the spec (loaded once at start) plus the raw file contents.
+    - F-r the first integrated answer in this session:
+       - Ensure a `## Clarifications` section exists (create it just after the highest-level contextual/overview section per the spec template if missing).
+       - Under it, create (if not present) a `### Session YYYY-MM-DD` subheading for today.
     - Append a bullet line immediately after acceptance: `- Q: <question> → A: <final answer>`.
     - Then immediately apply the clarification to the most appropriate section(s):
-       * Functional ambiguity → Update or add a bullet in Functional Requirements.
-       * User interaction / actor distinction → Update User Stories or Actors subsection (if present) with clarified role, constraint, or scenario.
-       * Data shape / entities → Update Data Model (add fields, types, relationships) preserving ordering; note added constraints succinctly.
-       * Non-functional constraint → Add/modify measurable criteria in Non-Functional / Quality Attributes section (convert vague adjective to metric or explicit target).
-       * Edge case / negative flow → Add a new bullet under Edge Cases / Error Handling (or create such subsection if template provides placeholder for it).
-       * Terminology conflict → Normalize term across spec; retain original only if necessary by adding `(formerly referred to as "X")` once.
+       - Functional ambiguity → Update or add a bullet in Functional Requirements.
+       - User interaction / actor distinction → Update User Stories or Actors subsection (if present) with clarified role, constraint, or scenario.
+       - Data shape / entities → Update Data Model (add fields, types, relationships) preserving ordering; note added constraints succinctly.
+       - Non-functional constraint → Add/modify measurable criteria in Non-Functional / Quality Attributes section (convert vague adjective to metric or explicit target).
+       - Edge case / negative flow → Add a new bullet under Edge Cases / Error Handling (or create such subsection if template provides placeholder for it).
+       - Terminology conflict → Normalize term across spec; retain original only if necessary by adding `(formerly referred to as "X")` once.
     - If the clarification invalidates an earlier ambiguous statement, replace that statement instead of duplicating; leave no obsolete contradictory text.
     - Save the spec file AFTER each integration to minimize risk of context loss (atomic overwrite).
     - Preserve formatting: do not reorder unrelated sections; keep heading hierarchy intact.
     - Keep each inserted clarification minimal and testable (avoid narrative drift).
-
-6. Validation (performed after EACH write plus final pass):
-   - Clarifications session contains exactly one bullet per accepted answer (no duplicates).
-   - Total asked (accepted) questions ≤ 5.
+-
+6.-Validation (performed after EACH write plus final pass):
+  -- Clarifications session contains exactly one bullet per accepted answer (no duplicates).
+  -- Total asked (accepted) questions ≤ 5.
    - Updated sections contain no lingering vague placeholders the new answer was meant to resolve.
    - No contradictory earlier statement remains (scan for now-invalid alternative choices removed).
    - Markdown structure valid; only allowed new headings: `## Clarifications`, `### Session YYYY-MM-DD`.
    - Terminology consistency: same canonical term used across all updated sections.
 
 7. Write the updated spec back to `FEATURE_SPEC`.
-
-8. Report completion (after questioning loop ends or early termination):
-   - Number of questions asked & answered.
-   - Path to updated spec.
+-
+8.-Report completion (after questioning loop ends or early termination):
+  -- Number of questions asked & answered.
+  -- Path to updated spec.
    - Sections touched (list names).
    - Coverage summary table listing each taxonomy category with Status: Resolved (was Partial/Missing and addressed), Deferred (exceeds question quota or better suited for planning), Clear (already sufficient), Outstanding (still Partial/Missing but low impact).
    - If any Outstanding or Deferred remain, recommend whether to proceed to `/plan` or run `/clarify` again later post-plan.
    - Suggested next command.
 
 Behavior rules:
-- If no meaningful ambiguities found (or all potential questions would be low-impact), respond: "No critical ambiguities detected worth formal clarification." and suggest proceeding.
-- If spec file missing, instruct user to run `/specify` first (do not create a new spec here).
-- **Multi-Feature Mode**: Question limit is UNLIMITED. Generate comprehensive question sets for each feature and create separate clarification files per feature.
-- **Single-Feature Mode**: Never exceed 5 total asked questions (clarification retries for a single question do not count as new questions).
+- -f no meaningful ambiguities found (or all potential questions would be low-impact), respond: "No critical ambiguities detected worth formal clarification." and suggest proceeding.
+- -f spec file missing, instruct user to run `/specify` first (do not create a new spec here).
+- -*Multi-Feature Mode**: Question limit is UNLIMITED. Generate comprehensive question sets for each feature and create separate clarification files per feature.
+- -*Single-Feature Mode**: Never exceed 5 total asked questions (clarification retries for a single question do not count as new questions).
 - If more than 5 questions generated in single-feature mode, create the outstanding questions file at `{FEATURE_DIR}/clarify/outstanding-questions-{YYYY-MM-DD}.md` and exit instead of asking interactively.
 - Avoid speculative tech stack questions unless the absence blocks functional clarity.
 - Respect user early termination signals ("stop", "done", "proceed").
 - If no questions asked due to full coverage, output a compact coverage summary (all categories Clear) then suggest advancing.
 - If quota reached with unresolved high-impact categories remaining, explicitly flag them under Deferred with rationale.
 - Multi-feature detection criteria:
-  * Look for enumerated lists of features/implementations in overview sections
-  * Check for phrases like "Features/Implementations Covered by This Document"
-  * Identify documents with 10+ distinct functional requirement groupings that represent separate subsystems
-  * When in doubt, treat large specifications (100+ requirements spanning multiple subsystems) as multi-feature
+  - Look for enumerated lists of features/implementations in overview sections
+  - Check for phrases like "Features/Implementations Covered by This Document"
+  - Identify documents with 10+ distinct functional requirement groupings that represent separate subsystems
+  - When in doubt, treat large specifications (100+ requirements spanning multiple subsystems) as multi-feature
 
 Context for prioritization: $ARGUMENTS
