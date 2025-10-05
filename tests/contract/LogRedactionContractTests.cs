@@ -257,13 +257,15 @@ public class LogRedactionContractTests : IDisposable
         // Act & Assert
         foreach (var key in testCases)
         {
-            _logSink.LogEvents.Clear(); // Clear between tests
+            // Record count before test
+            var beforeCount = _logSink.LogEvents.Count();
 
             var task = service.SetValue(key, "TestPassword123", CancellationToken.None);
             task.Wait();
 
-            var logMessages = _logSink.LogEvents.Select(e => e.RenderMessage()).ToList();
-            var containsPassword = logMessages.Any(msg => msg.Contains("TestPassword123"));
+            // Get only new log events after this operation
+            var newLogMessages = _logSink.LogEvents.Skip(beforeCount).Select(e => e.RenderMessage()).ToList();
+            var containsPassword = newLogMessages.Any(msg => msg.Contains("TestPassword123"));
 
             containsPassword.Should().BeFalse(
                 $"Password value should be redacted for key '{key}' regardless of case");

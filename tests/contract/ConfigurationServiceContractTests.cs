@@ -36,7 +36,7 @@ public class ConfigurationServiceContractTests
         var value = service.GetValue<int>("API:TimeoutSeconds", 30);
 
         // Assert
-        value.Should().BeOfType<int>();
+        value.Should().Be(value); // Value is int type
     }
 
     [Fact]
@@ -81,17 +81,18 @@ public class ConfigurationServiceContractTests
         if (expectedType == typeof(int))
         {
             var value = service.GetValue<int>(key, 0);
-            value.Should().BeOfType<int>();
+            value.Should().BeGreaterThanOrEqualTo(0); // Type is validated by compilation
         }
         else if (expectedType == typeof(string))
         {
             var value = service.GetValue<string>(key, "");
-            value.Should().BeOfType<string>();
+            value.Should().NotBeNull(); // Type is validated by compilation
         }
         else if (expectedType == typeof(bool))
         {
             var value = service.GetValue<bool>(key, false);
-            value.Should().BeOfType<bool>();
+            // Type is validated by compilation - bool can only be true or false
+            (value == true || value == false).Should().BeTrue();
         }
     }
 
@@ -151,7 +152,7 @@ public class ConfigurationServiceContractTests
 
     [Fact]
     [Trait("Category", "Contract")]
-    public void GetValue_PerformanceTarget_LessThan10Milliseconds()
+    public async Task GetValue_PerformanceTarget_LessThan10Milliseconds()
     {
         // Arrange
         var service = new ConfigurationService(_logger);
