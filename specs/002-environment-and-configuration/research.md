@@ -99,6 +99,7 @@ This feature extends the partially implemented configuration system from Boot Fe
 - Required citation format: "Reference-{File Name} - {Chapter/Section/Page}"
 
 **Example appsettings.json**:
+
 ```json
 {
   "Visual": {
@@ -213,6 +214,7 @@ This feature extends the partially implemented configuration system from Boot Fe
 ## Database Schema Design
 
 **UserPreferences Table**:
+
 ```sql
 CREATE TABLE UserPreferences (
     PreferenceId INT PRIMARY KEY AUTO_INCREMENT,
@@ -227,6 +229,7 @@ CREATE TABLE UserPreferences (
 ```
 
 **Users Table** (if not exists):
+
 ```sql
 CREATE TABLE Users (
     UserId INT PRIMARY KEY AUTO_INCREMENT,
@@ -239,6 +242,7 @@ CREATE TABLE Users (
 ```
 
 **FeatureFlags Table** (for launcher sync):
+
 ```sql
 CREATE TABLE FeatureFlags (
     FlagId INT PRIMARY KEY AUTO_INCREMENT,

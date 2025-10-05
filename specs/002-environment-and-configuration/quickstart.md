@@ -23,6 +23,7 @@ This quickstart provides executable test scenarios that validate the complete En
    - `appsettings.json` has Visual API whitelist
 
 ### Test Data
+
 ```sql
 -- Insert test user
 INSERT INTO Users (UserId, Username, DisplayName, IsActive)
@@ -50,11 +51,13 @@ VALUES
 ### Test Steps
 
 1. **Set environment variable**:
+
    ```powershell
    $env:MTM_API_TIMEOUT = "120"
    ```
 
 2. **Run application and check config service**:
+
    ```csharp
    var configService = serviceProvider.GetRequiredService<IConfigurationService>();
 
@@ -93,6 +96,7 @@ VALUES
 ### Test Steps
 
 1. **Load user preferences**:
+
    ```csharp
    var configService = serviceProvider.GetRequiredService<IConfigurationService>();
    await configService.LoadUserPreferencesAsync(userId: 99, CancellationToken.None);
@@ -106,11 +110,13 @@ VALUES
    ```
 
 2. **Update preference at runtime**:
+
    ```csharp
    await configService.SetValue("Display.Theme", "Light", CancellationToken.None);
    ```
 
 3. **Verify database persistence**:
+
    ```sql
    SELECT PreferenceValue FROM UserPreferences
    WHERE UserId = 99 AND PreferenceKey = 'Display.Theme';
@@ -118,6 +124,7 @@ VALUES
    ```
 
 4. **Restart application and reload**:
+
    ```csharp
    // Simulate restart (clear in-memory cache)
    await configService.ReloadAsync(CancellationToken.None);
@@ -141,6 +148,7 @@ VALUES
 ### Test Steps
 
 1. **Simulate credential storage corruption**:
+
    ```csharp
    var secretsService = serviceProvider.GetRequiredService<ISecretsService>();
 
@@ -149,6 +157,7 @@ VALUES
    ```
 
 2. **Attempt credential retrieval**:
+
    ```csharp
    string? username = null;
    bool dialogShown = false;
@@ -196,6 +205,7 @@ VALUES
 ### Test Steps
 
 1. **Register feature flag with 50% rollout**:
+
    ```csharp
    var flagEvaluator = serviceProvider.GetRequiredService<FeatureFlagEvaluator>();
 
@@ -210,6 +220,7 @@ VALUES
    ```
 
 2. **Evaluate for same user multiple times**:
+
    ```csharp
    int userId = 42;
 
@@ -223,6 +234,7 @@ VALUES
    ```
 
 3. **Evaluate for different users**:
+
    ```csharp
    var results = new Dictionary<int, bool>();
 
@@ -252,6 +264,7 @@ VALUES
 ### Test Steps
 
 1. **Trigger non-critical error (invalid type)**:
+
    ```csharp
    // Set environment variable to invalid integer
    Environment.SetEnvironmentVariable("MTM_API_TIMEOUT", "NotANumber");
@@ -274,6 +287,7 @@ VALUES
    ```
 
 2. **Trigger critical error (database connection)**:
+
    ```csharp
    // Simulate database unavailable (stop MAMP MySQL)
 
@@ -314,11 +328,13 @@ VALUES
 ### Test Steps
 
 1. **Set environment to Development**:
+
    ```powershell
    $env:MTM_ENVIRONMENT = "Development"
    ```
 
 2. **Register environment-specific flag**:
+
    ```csharp
    var flagEvaluator = serviceProvider.GetRequiredService<FeatureFlagEvaluator>();
 
@@ -342,6 +358,7 @@ VALUES
    ```
 
 3. **Evaluate flags**:
+
    ```csharp
    var devEnabled = await flagEvaluator.IsEnabledAsync("Debug.ShowSqlQueries");
    var prodEnabled = await flagEvaluator.IsEnabledAsync("Production.AdvancedFeature");
@@ -351,11 +368,13 @@ VALUES
    ```
 
 4. **Change environment**:
+
    ```powershell
    $env:MTM_ENVIRONMENT = "Production"
    ```
 
 5. **Re-evaluate flags**:
+
    ```csharp
    await configService.ReloadAsync(CancellationToken.None);
 
@@ -380,6 +399,7 @@ VALUES
 ### Test Steps
 
 1. **Load whitelist from appsettings.json**:
+
    ```csharp
    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
    var allowedCommands = configuration.GetSection("Visual:AllowedCommands").Get<string[]>();
@@ -390,6 +410,7 @@ VALUES
    ```
 
 2. **Test command validation**:
+
    ```csharp
    bool IsCommandAllowed(string command)
    {
@@ -403,6 +424,7 @@ VALUES
    ```
 
 3. **Test citation requirement**:
+
    ```csharp
    var requireCitation = configuration.GetValue<bool>("Visual:RequireCitation");
    Assert.True(requireCitation);
@@ -424,6 +446,7 @@ VALUES
 ## Performance Validation
 
 ### Configuration Lookup (<10ms)
+
 ```csharp
 var stopwatch = Stopwatch.StartNew();
 for (int i = 0; i < 1000; i++)
@@ -437,6 +460,7 @@ Assert.True(avgTime < 10, $"Average lookup time {avgTime}ms exceeds 10ms target"
 ```
 
 ### Credential Retrieval (<100ms)
+
 ```csharp
 var stopwatch = Stopwatch.StartNew();
 var username = await secretsService.RetrieveSecretAsync("Visual.Username", CancellationToken.None);
@@ -446,6 +470,7 @@ Assert.True(stopwatch.ElapsedMilliseconds < 100, $"Credential retrieval took {st
 ```
 
 ### Feature Flag Evaluation (<5ms)
+
 ```csharp
 var stopwatch = Stopwatch.StartNew();
 for (int i = 0; i < 1000; i++)

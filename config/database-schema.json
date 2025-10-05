@@ -1,0 +1,50 @@
+{
+  "ConnectionSettings": {
+    "HomeDevelopmentIPAddress": "73.94.78.172",
+    "HomeDatabase": {
+      "Host": "localhost",
+      "Port": 3306,
+      "Database": "mtm_template_dev",
+      "Description": "MAMP MySQL 5.7 local development"
+    },
+    "ProductionDatabase": {
+      "Host": "mtmanu-sql01",
+      "Port": 3306,
+      "Database": "mtm_template_prod",
+      "Description": "Production MySQL server"
+    },
+    "ConnectionTimeoutSeconds": 5,
+    "EnableConnectionPooling": true,
+    "MaxPoolSize": 100,
+    "MinPoolSize": 5
+  },
+  "Schema": {
+    "Tables": {
+      "UserPreferences": {
+        "Columns": [
+          {"Name": "UserId", "Type": "INT", "Nullable": false, "PrimaryKey": true},
+          {"Name": "ConfigKey", "Type": "VARCHAR(255)", "Nullable": false, "PrimaryKey": true},
+          {"Name": "ConfigValue", "Type": "TEXT", "Nullable": true},
+          {"Name": "LastModified", "Type": "DATETIME", "Nullable": false, "Default": "CURRENT_TIMESTAMP"}
+        ],
+        "Indexes": [
+          {"Name": "UK_UserPreferences", "Type": "UNIQUE", "Columns": ["UserId", "ConfigKey"]},
+          {"Name": "IX_UserPreferences_UserId", "Type": "INDEX", "Columns": ["UserId"]}
+        ]
+      },
+      "FeatureFlags": {
+        "Columns": [
+          {"Name": "FlagName", "Type": "VARCHAR(255)", "Nullable": false, "PrimaryKey": true},
+          {"Name": "IsEnabled", "Type": "BOOLEAN", "Nullable": false, "Default": false},
+          {"Name": "Environment", "Type": "VARCHAR(50)", "Nullable": true},
+          {"Name": "RolloutPercentage", "Type": "INT", "Nullable": false, "Default": 0},
+          {"Name": "AppVersion", "Type": "VARCHAR(50)", "Nullable": true},
+          {"Name": "LastModified", "Type": "DATETIME", "Nullable": false, "Default": "CURRENT_TIMESTAMP"}
+        ],
+        "Indexes": [
+          {"Name": "IX_FeatureFlags_Environment", "Type": "INDEX", "Columns": ["Environment"]}
+        ]
+      }
+    }
+  }
+}

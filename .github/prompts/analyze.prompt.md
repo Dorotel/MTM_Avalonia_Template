@@ -1,5 +1,5 @@
 ---
-description: Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md, and tasks.md after task generation.
+description: Perform a non-destructive cross-artifact consistency and quality analysis across spec.md, plan.md, and tasks.md after task generation. Outputs comprehensive report to {FEATURE_DIR}/AnalysisReport.md.
 ---
 
 The user input to you can be provided directly by the agent or as a command argument - you **MUST** consider it before proceeding with the prompt (if not empty).
@@ -8,9 +8,11 @@ User input:
 
 $ARGUMENTS
 
-Goal: Identify inconsistencies, duplications, ambiguities, and underspecified items across the three core artifacts (`spec.md`, `plan.md`, `tasks.md`) before implementation. This command MUST run only after `/tasks` has successfully produced a complete `tasks.md`.
+Goal: Identify inconsistencies, duplications, ambiguities, and underspecified items across the three core artifacts (`spec.md`, `plan.md`, `tasks.md`) before implementation. This command MUST run only after `/tasks` has successfully produced a complete `tasks.md`. Analysis report is written to `{FEATURE_DIR}/AnalysisReport.md`.
 
-STRICTLY READ-ONLY: Do **not** modify any files. Output a structured analysis report. Offer an optional remediation plan (user must explicitly approve before any follow-up editing commands would be invoked manually).
+Output Behavior: The analysis generates a comprehensive Markdown report saved to `{FEATURE_DIR}/AnalysisReport.md` (creating or overwriting if exists). A summary is output to chat with link to full report. The report file becomes the source of truth for all findings, coverage statistics, and remediation recommendations.
+
+STRICTLY READ-ONLY (with report output): Do **not** modify spec.md, plan.md, or tasks.md files. Write findings to AnalysisReport.md. Offer optional remediation plan (user must explicitly approve before any follow-up editing).
 
 Constitution Authority: The project constitution (`.specify/memory/constitution.md`) is **non-negotiable** within this analysis scope. Constitution conflicts are automatically CRITICAL and require adjustment of the spec, plan, or tasks—not dilution, reinterpretation, or silent ignoring of the principle. If a principle itself needs to change, that must occur in a separate, explicit constitution update outside `/analyze`.
 
@@ -30,10 +32,10 @@ Execution steps:
    - Parse tasks.md: Task IDs, descriptions, phase grouping, parallel markers [P], referenced file paths.
    - Load constitution `.specify/memory/constitution.md` for principle validation.
    - **IF EXISTS**: Load clarify/ folder for clarification validation:
-     * Check for `{FEATURE_DIR}/clarify/outstanding-questions-*.md` files
-     * Extract all answered questions (look for `**Answer:` or `Answer:` patterns)
-     * Build clarification decision inventory for cross-reference
-     * Validate that clarification answers are reflected in spec.md and plan.md
+     - Check for `{FEATURE_DIR}/clarify/outstanding-questions-*.md` files
+     - Extract all answered questions (look for `**Answer:` or `Answer:` patterns)
+     - Build clarification decision inventory for cross-reference
+     - Validate that clarification answers are reflected in spec.md and plan.md
 
 3. Build internal semantic models:
    - Requirements inventory: Each functional + non-functional requirement with a stable key (derive slug based on imperative phrase; e.g., "User can upload file" -> `user-can-upload-file`).
@@ -78,30 +80,91 @@ Execution steps:
    - MEDIUM: Terminology drift, missing non-functional task coverage, underspecified edge case.
    - LOW: Style/wording improvements, minor redundancy not affecting execution order.
 
-6. Produce a Markdown report (no file writes) with sections:
+6. Generate comprehensive Markdown report and write to `{FEATURE_DIR}/AnalysisReport.md`:
 
-   ### Specification Analysis Report
-   | ID | Category | Severity | Location(s) | Summary | Recommendation |
-   |----|----------|----------|-------------|---------|----------------|
-   | A1 | Duplication | HIGH | spec.md:L120-134 | Two similar requirements ... | Merge phrasing; keep clearer version |
+   ```markdown
+   ## Specification Analysis Report - {Feature Name}
+
+   **Feature**: {Feature Name}
+   **Generated**: {YYYY-MM-DD}
+   **Artifacts Analyzed**: spec.md, plan.md, tasks.md, constitution.md {version}
+   **Status**: {Status summary}
+
+   ---
+
+   ### Executive Summary
+
+   {Brief overview: total issues by severity, coverage statistics, constitutional compliance}
+
+   ---
+
+   ### Analysis Findings
+
+   | ID  | Category    | Severity | Location(s)      | Summary                      | Recommendation                       |
+   | --- | ----------- | -------- | ---------------- | ---------------------------- | ------------------------------------ |
+   | A1  | Duplication | HIGH     | spec.md:L120-134 | Two similar requirements ... | Merge phrasing; keep clearer version |
+
    (Add one row per finding; generate stable IDs prefixed by category initial.)
 
-   Additional subsections:
-   - Coverage Summary Table:
-     | Requirement Key | Has Task? | Task IDs | Notes |
-   - Constitution Alignment Issues (if any)
-   - Unmapped Tasks (if any)
-   - Metrics:
-     * Total Requirements
-     * Total Tasks
-     * Coverage % (requirements with >=1 task)
-     * Ambiguity Count
-     * Duplication Count
-     * Critical Issues Count
+   ---
 
-7. At end of report, output a concise Next Actions block:
+   ### Coverage Summary
+
+   #### Requirements Coverage Matrix
+
+   | Requirement Key | Requirement Summary | Has Task? | Task IDs | Notes |
+   | --------------- | ------------------- | --------- | -------- | ----- |
+
+   **Coverage Statistics:**
+   - **Total Requirements**: {count} ({FR count} Functional + {NFR count} Non-Functional)
+   - **Requirements with Tasks**: {count} ({percentage}%)
+   - **Requirements without Tasks**: {count} ({percentage}%)
+
+   ---
+
+   ### Constitution Alignment Issues
+
+   **Status**: {PASS/FAIL summary}
+
+   {List any principle violations with evidence and remediation}
+
+   ---
+
+   ### Unmapped Tasks
+
+   {List any tasks without clear requirement mapping}
+
+   ---
+
+   ### Cross-Artifact Metrics
+
+   | Metric                     | Value                   | Target | Status  |
+   | -------------------------- | ----------------------- | ------ | ------- |
+   | Total Requirements         | {count}                 | N/A    | ℹ️       |
+   | Total Tasks                | {count}                 | N/A    | ℹ️       |
+   | Requirements with >=1 Task | {count} ({percentage}%) | 100%   | {✅/⚠️}   |
+   | Tasks with >=1 Requirement | {count} ({percentage}%) | 100%   | {✅/⚠️}   |
+   | Critical Issues            | {count}                 | 0      | {✅/⚠️/❌} |
+   | High Issues                | {count}                 | <5     | {✅/⚠️/❌} |
+   | Medium Issues              | {count}                 | <10    | {✅/⚠️/❌} |
+   | Low Issues                 | {count}                 | <15    | {✅/⚠️/❌} |
+   | Ambiguity Count            | {count}                 | <5     | {✅/⚠️}   |
+   | Duplication Count          | {count}                 | <3     | {✅/⚠️}   |
+   | Constitutional Violations  | {count}                 | 0      | {✅/❌}   |
+
+   **Overall Quality Score**: {score}/100
+   ```
+
+   After writing the report file, output to chat:
+   - File location: `{FEATURE_DIR}/AnalysisReport.md`
+   - Executive summary (2-3 sentences)
+   - Critical/High issue count
+   - Link to full report
+
+7. Append to report file a Next Actions section:
    - If CRITICAL issues exist: Recommend resolving before `/implement`.
-   - **If CRITICAL ambiguities detected** (vague requirements, conflicting specifications, missing acceptance criteria that block implementation correctness): Create `{FEATURE_DIR}/clarification-needed.md` with:
+   - **If CRITICAL ambiguities detected** (vague requirements, conflicting specifications, missing acceptance criteria that block implementation correctness): Also create `{FEATURE_DIR}/clarification-needed.md` with:
+
      ```markdown
      # Clarification Needed - Analysis Found Critical Ambiguities
      **Generated by**: /analyze command
@@ -122,17 +185,39 @@ Execution steps:
      ## Recommendation
      Run /clarify to resolve these ambiguities before proceeding with /implement.
      ```
-     Inform user: "Analysis complete. Found [N] critical ambiguities. Created {FEATURE_DIR}/clarification-needed.md. Run /clarify to resolve before implementation."
-   - If only LOW/MEDIUM: User may proceed, but provide improvement suggestions.
-   - Provide explicit command suggestions: e.g., "Run /specify with refinement", "Run /plan to adjust architecture", "Manually edit tasks.md to add coverage for 'performance-metrics'".
 
-8. Ask the user: "Would you like me to suggest concrete remediation edits for the top N issues?" (Do NOT apply them automatically.)
+     Inform user in chat: "Analysis complete. Found [N] critical ambiguities. Created {FEATURE_DIR}/clarification-needed.md. Run /clarify to resolve before implementation."
+   - If only LOW/MEDIUM: User may proceed, but provide improvement suggestions in report.
+   - Provide explicit command suggestions in report: e.g., "Run /specify with refinement", "Run /plan to adjust architecture", "Manually edit tasks.md to add coverage for 'performance-metrics'".
+
+8. Output to chat:
+
+   ```
+   ✅ Analysis Complete
+
+   📄 Report: {FEATURE_DIR}/AnalysisReport.md
+
+   📊 Summary:
+   - {Total Issues} issues found ({Critical} Critical, {High} High, {Medium} Medium, {Low} Low)
+   - {Coverage}% requirement coverage
+   - Constitutional compliance: {PASS/FAIL}
+
+   {If issues exist:}
+   ⚠️ Action Required: Review AnalysisReport.md for details
+   {If CRITICAL:}
+   🚫 BLOCKED: Resolve CRITICAL issues before /implement
+   {If only LOW/MEDIUM:}
+   ✅ Ready for /implement (improvements recommended)
+   ```
+
+9. Ask the user: "Would you like me to suggest concrete remediation edits for the top N issues or apply fixes automatically?" (Do NOT apply them automatically without explicit approval.)
 
 Behavior rules:
-- NEVER modify files.
-- NEVER hallucinate missing sections—if absent, report them.
-- KEEP findings deterministic: if rerun without changes, produce consistent IDs and counts.
-- LIMIT total findings in the main table to 50; aggregate remainder in a summarized overflow note.
-- If zero issues found, emit a success report with coverage statistics and proceed recommendation.
+- **ALWAYS write report to `{FEATURE_DIR}/AnalysisReport.md`** (create or overwrite if exists)
+- Generate report even if zero issues found (success report with coverage statistics)
+- NEVER hallucinate missing sections—if absent, report them in the file
+- KEEP findings deterministic: if rerun without changes, produce consistent IDs and counts
+- LIMIT total findings in the main table to 50; aggregate remainder in summarized overflow note
+- Provide chat summary but keep detailed findings in the report file
 
 Context: $ARGUMENTS

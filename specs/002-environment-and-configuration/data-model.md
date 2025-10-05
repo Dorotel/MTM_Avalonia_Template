@@ -432,6 +432,58 @@ Task ResolveErrorAsync(string key, CancellationToken ct = default);
 - Modal dialog: Blocks UI until user addresses issue
 - Log all errors with Serilog (structured logging)
 
+#### Severity Classification Criteria
+
+**Critical Severity** (Modal Dialog - Blocks UI):
+- Database connection failures preventing data persistence
+- Required Visual ERP credentials missing or invalid
+- Configuration keys marked as `IsCritical=true` in ConfigurationService
+- OS-native secure storage completely unavailable (not just corrupted)
+- Invalid critical settings that prevent core functionality
+
+**Warning Severity** (Status Bar - Non-intrusive):
+- Invalid data types in environment variables (non-critical keys)
+- Missing optional configuration keys (fallback to defaults used)
+- User preference load failures (can continue with application defaults)
+- Feature flag registration errors (flag treated as disabled)
+- Performance threshold warnings (slow database queries)
+
+**Info Severity** (Status Bar - FYI only):
+- Configuration changes successfully persisted to database
+- Feature flag updates applied successfully
+- Credentials re-saved successfully after recovery
+- Environment variable overrides applied
+- Cache refresh completed
+
+#### Sample User-Friendly Error Messages
+
+**Critical Errors** (Modal Dialog):
+```
+Title: "Database Connection Required"
+Message: "We couldn't connect to the application database. Please check that MySQL is running on port 3306."
+UserAction: "Click 'Retry' to attempt reconnection, or contact your system administrator if the problem persists."
+
+Title: "Visual ERP Login Required"
+Message: "We couldn't access your saved Visual ERP login information. Please enter your username and password to continue."
+UserAction: "Enter your credentials below and click 'Save' to continue."
+
+Title: "Configuration Error"
+Message: "The database connection string is missing. This setting is required for the application to work."
+UserAction: "Please set the MTM_DB_CONNECTION environment variable and restart the application."
+```
+
+**Warning Errors** (Status Bar):
+```
+Message: "Invalid filter setting 'ABC' - using default filter instead"
+Details: "The 'Display.DefaultFilter' setting should be a number. Using default value '0'."
+
+Message: "Feature flag 'NewReportUI' not found - feature disabled"
+Details: "The requested feature flag has not been registered. Contact support if you need this feature enabled."
+
+Message: "Unable to load user preferences from database - using defaults"
+Details: "Could not retrieve saved preferences for user 'jsmith'. All settings will use application defaults."
+```
+
 ---
 
 ## Configuration Files
@@ -534,13 +586,13 @@ Task ResolveErrorAsync(string key, CancellationToken ct = default);
 
 ## Validation Summary
 
-| Entity | Key Validations |
-|--------|----------------|
-| ConfigurationService | Key format, type matching, thread safety |
-| UserPreferences | UserId FK, unique key per user, TEXT size limits |
-| FeatureFlag | Name alphanumeric, rollout 0-100, valid environment |
-| ConfigurationError | Severity enum, required user action for Critical |
-| CredentialDialogViewModel | Username min 3, password min 8 chars |
+| Entity                    | Key Validations                                     |
+| ------------------------- | --------------------------------------------------- |
+| ConfigurationService      | Key format, type matching, thread safety            |
+| UserPreferences           | UserId FK, unique key per user, TEXT size limits    |
+| FeatureFlag               | Name alphanumeric, rollout 0-100, valid environment |
+| ConfigurationError        | Severity enum, required user action for Critical    |
+| CredentialDialogViewModel | Username min 3, password min 8 chars                |
 
 ---
 

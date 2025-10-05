@@ -165,13 +165,7 @@
 - **FR-031b**: Android MUST access Visual data via MTM Server API projections only. Server executes Visual API Toolkit commands server-side.
 
 #### Configuration Persistence
-- **FR-032**: System MUST persist user-set configuration values across application restarts using dual-storage approach: (1) Admin-configured central server path for user folders MUST be specified in `config/user-folders.json` configuration file with the following dynamic location detection logic:
-  - **Home Development Detection**: Check public ISP IP address (via external service). If IP matches `HomeDevelopmentIPAddress` setting (default: `73.94.78.172`), use local path only.
-  - **On-Premises Network Drive**: If ISP IP does NOT match home IP, attempt to access network drive path `NetworkDrivePath` setting (default: `\\mtmanu-fs01\Expo Drive\MH_RESOURCE\MTM_Apps\Users`). Test accessibility with 2-second timeout.
-  - **Local Fallback Path**: `{MyDocuments}\MTM_Apps\users` (used when home development OR network drive inaccessible).
-  - **Dual-Write Strategy**: When both local and network paths are accessible (on-premises with working network), write user data to BOTH locations for redundancy. Network path is primary; local is backup.
-  - **Dynamic Detection**: Location detection occurs before each user folder access, with 5-minute cache to minimize external IP checks and network tests.
-  (2) Database schema configuration file for user preferences MUST be located in `config/database-schema.json` and define table structures, column types, constraints, and relationships for user preferences storage.
+- **FR-032**: System MUST persist user-set configuration values across application restarts using dual-storage approach: (1) Admin-configured central server path for user folders MUST be specified in `config/user-folders.json` configuration file (with placeholder value for admin to configure); default location is user's MyDocuments folder. (2) Database schema configuration file for user preferences MUST be located in `config/database-schema.json` and define table structures, column types, constraints, and relationships for user preferences storage.
 - **FR-033**: System MUST NOT persist environment variable overrides (they remain environment-specific).
 - **FR-034**: System MUST persist credentials in OS-native secure storage (not configuration files).
 

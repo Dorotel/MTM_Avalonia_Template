@@ -1,6 +1,63 @@
 # MTM_Avalonia_Template Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2025-10-03
+Auto-generated from all feature plans. Last updated: 2025-10-05
+
+## Priority Guidelines for GitHub Copilot
+
+When generating code for this repository, **ALWAYS** follow this priority order:
+
+1. **Version Compatibility**: Detect and respect the exact versions of languages, frameworks, and libraries defined in `Directory.Packages.props` and `.csproj` files. Never use features beyond detected versions.
+2. **Codebase Patterns**: Scan existing code for established patterns before generating new code. Consistency with existing code takes precedence over external best practices.
+3. **Constitutional Principles**: Follow `.specify/memory/constitution.md` - these principles are non-negotiable.
+4. **Spec-Driven Context**: Reference feature specifications in `.specify/features/` for requirements and implementation guidance.
+5. **Code Quality**: Prioritize maintainability, performance, security, accessibility, and testability in all generated code.
+
+## Technology Version Detection (MANDATORY)
+
+Before generating ANY code, scan the codebase to identify exact versions:
+
+### Language & Framework Versions
+- **Language**: C# with `<LangVersion>latest</LangVersion>` targeting .NET 9.0 (`<TargetFramework>net9.0</TargetFramework>`)
+- **Nullable Reference Types**: ENABLED (`<Nullable>enable</Nullable>`) - ALL projects require explicit nullability annotations
+- **Avalonia UI**: Version **11.3.6** (`Directory.Packages.props`) - Use only Avalonia 11.x features
+- **MVVM Toolkit**: CommunityToolkit.Mvvm **8.4.0** - Use source generators (`[ObservableProperty]`, `[RelayCommand]`)
+- **Compiled Bindings**: DEFAULT (`<AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>`)
+
+### Key Package Versions (from Directory.Packages.props)
+
+```xml
+Avalonia: 11.3.6
+CommunityToolkit.Mvvm: 8.4.0
+Microsoft.Extensions.DependencyInjection: 9.0.0
+Serilog.Extensions.Logging: 8.0.0
+Polly: 8.4.2
+AutoMapper: 13.0.1
+FluentValidation: 11.10.0
+MySql.Data: 9.0.0
+K4os.Compression.LZ4: 1.3.8
+xUnit: 2.9.2
+NSubstitute: 5.1.0
+FluentAssertions: 6.12.1
+```
+
+**CRITICAL**: Never suggest features, APIs, or syntax not available in these exact versions.
+
+## Codebase Scanning Instructions
+
+When generating or modifying code:
+
+1. **Find Similar Files**: Locate files similar to the one being created/modified (same layer, similar purpose)
+2. **Analyze Patterns**: Extract patterns for:
+   - Naming conventions (classes, methods, properties, fields)
+   - File organization and structure
+   - Error handling approaches
+   - Logging patterns
+   - Documentation style
+   - Testing patterns
+   - Dependency injection usage
+3. **Follow Consistency**: Use the most consistent patterns found in the codebase
+4. **Prioritize Recent Code**: When conflicting patterns exist, prefer patterns in newer files or files with higher test coverage
+5. **Never Introduce New Patterns**: Do NOT introduce patterns not found in existing codebase without explicit approval
 
 ## Spec-Driven Development Context
 
@@ -32,13 +89,13 @@ When working with specifications, always reference:
 ## Active Technologies
 - [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION] (002-environment-and-configuration)
 - [if applicable, e.g., PostgreSQL, CoreData, files or N/A] (002-environment-and-configuration)
+- MAMP MySQL 5.7 (UserPreferences, FeatureFlags tables) + OS-native secure storage (DPAPI/KeyStore for credentials) (002-environment-and-configuration)
 
 ### Core Stack (001-boot-sequence-splash)
 - **Framework**: C# .NET 9.0 with nullable reference types enabled
 - **UI Framework**: Avalonia 11.3+
 - **MVVM Toolkit**: CommunityToolkit.Mvvm 8.3+
 - **Database**: MySQL.Data (MAMP MySQL 5.7)
-- **HTTP Client**: HttpClient (Visual API Toolkit integration)
 - **Observability**: Serilog + OpenTelemetry
 - **Resilience**: Polly
 - **Mapping**: AutoMapper
@@ -50,6 +107,16 @@ When working with specifications, always reference:
 - MySQL 5.7 (MAMP) - Local database
 - Visual ERP - Read-only via API Toolkit
 - Local cache with LZ4 compression
+
+## Context Files Priority
+
+When generating code, consult these files in order:
+
+1. **`.specify/features/`** - Feature specifications with requirements and acceptance criteria
+2. **`.specify/memory/constitution.md`** - Project governing principles (non-negotiable)
+3. **`.github/copilot-instructions.md`** - This file (project-wide standards)
+4. **`.github/instructions/*.instructions.md`** - Domain-specific pattern guides
+5. **Existing codebase** - Similar files in the same layer/domain
 
 ## Project Structure
 
@@ -79,6 +146,57 @@ MTM_Avalonia_Template/
 └── .github/
     └── copilot-instructions.md
 ```
+
+## Technology-Specific Guidelines
+
+### .NET 9.0 & C# Latest Guidelines
+
+**CRITICAL**: This project uses .NET 9.0 with C# latest features. Always:
+- Detect `<TargetFramework>net9.0</TargetFramework>` before generating code
+- Use `<LangVersion>latest</LangVersion>` features appropriate for .NET 9.0
+- Respect `<Nullable>enable</Nullable>` - ALL reference types must have explicit nullability
+- Never use APIs introduced after .NET 9.0
+
+**Patterns to Follow** (scan codebase for examples):
+- LINQ usage patterns (prefer method syntax for complex queries)
+- Async/await patterns (always include `CancellationToken`)
+- Dependency injection patterns (constructor injection)
+- Collection types (prefer `List<T>`, `Dictionary<TKey, TValue>` over arrays)
+- Exception handling (use specific exception types, structured logging)
+
+### Avalonia 11.3.6 UI Framework Guidelines
+
+**CRITICAL**: This project uses Avalonia 11.3.6 with CompiledBindings enabled by default.
+
+**Mandatory XAML Patterns**:
+- **ALWAYS** use `x:DataType` on Window/UserControl root elements
+- **ALWAYS** use `{CompiledBinding}` syntax (NEVER `{Binding}` or `{ReflectionBinding}`)
+- **ALWAYS** set `x:CompileBindings="True"` on root elements (already default, but be explicit)
+- **ALWAYS** include `Design.DataContext` for design-time support
+
+**Scan for Examples**: Look at existing `.axaml` files in `Views/` directory for:
+- Namespace declarations (`xmlns:vm="using:MTM_Template_Application.ViewModels"`)
+- Binding syntax patterns
+- Layout control usage (Grid, StackPanel, DockPanel)
+- Style application patterns
+- Resource reference patterns
+
+### CommunityToolkit.Mvvm 8.4.0 Guidelines
+
+**CRITICAL**: Use ONLY CommunityToolkit.Mvvm patterns (NEVER ReactiveUI).
+
+**Mandatory Patterns**:
+- `[ObservableProperty]` for all bindable properties (generates property with notification)
+- `[RelayCommand]` for all commands (generates ICommand implementation)
+- `partial class` modifier required for source generators
+- Inherit from `ObservableObject` or `ObservableRecipient`
+- Use `[NotifyCanExecuteChangedFor(nameof(CommandName))]` for command enablement
+
+**Scan for Examples**: Look at existing ViewModels in `ViewModels/` directory for:
+- Property declaration patterns
+- Command implementation patterns
+- Constructor injection patterns
+- Validation integration patterns
 
 ## Code Style & Standards
 
@@ -435,9 +553,9 @@ Consider using these vetted packages:
 - `Material.Avalonia` or `Citrus.Avalonia` - Material/Fluent themes
 
 ## Recent Changes
-- 002-environment-and-configuration: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
-- **2025-10-03**: Added Avalonia-specific best practices from AvaloniaUI organization
-- **2025-10-03**: Corrected XAML binding syntax to use `CompiledBinding` with `x:DataType`
+- 002-environment-and-configuration: Added C# .NET 9.0 with nullable reference types enabled
+- 002-environment-and-configuration: Added C# .NET 9.0 with nullable reference types enabled
+- 002-environment-and-configuration: Added C# .NET 9.0 with nullable reference types enabled
 
 ## Performance Guidelines
 - Use LZ4 compression for cached data
@@ -521,26 +639,65 @@ catch (Exception ex)
 }
 ```
 
-## When Creating New Features
-1. Check `.specify/features/` for existing specs
-2. Reference `memory/constitution.md` for project principles
-3. Run appropriate spec-kit command (`/specify`, `/plan`, etc.)
-4. Parse JSON output from scripts before using file paths
-5. Follow MVVM pattern: Model → ViewModel → View
-6. **Always use `x:DataType` and `CompiledBinding` in XAML**
-7. Write tests before implementation (TDD)
-8. Update this file if new technologies are introduced
+## Workflow: Creating New Features
+
+When creating new features, follow this strict order:
+
+1. **Scan for Similar Features**: Find existing features in `.specify/features/` with similar requirements
+2. **Check Constitution**: Reference `.specify/memory/constitution.md` for non-negotiable principles
+3. **Run Spec-Kit Commands**:
+   - `/specify` - Create feature specification
+   - `/clarify` - Resolve ambiguities before planning
+   - `/plan` - Generate technical implementation plan
+   - `/tasks` - Break down into actionable tasks
+   - `/analyze` - Verify consistency before implementation
+   - `/implement` - Execute implementation
+4. **Parse JSON Output**: ALWAYS parse script JSON output before using file paths
+5. **Scan Existing Code**: Find similar files and extract patterns before writing code
+6. **Follow MVVM Pattern**: Model → Service → ViewModel → View (with proper DI)
+7. **Use TDD**: Write tests before implementation (see existing test patterns)
+8. **Validate Implementation**: Run validation scripts before PR
+9. **Update Documentation**: Add patterns to this file if introducing new approaches
+
+## Pattern-First Code Generation
+
+Before generating ANY code:
+
+1. **Identify the layer**: ViewModel, Service, Model, View, Infrastructure?
+2. **Find 2-3 similar files**: Same layer, similar purpose
+3. **Extract patterns**:
+   - File/class naming convention
+   - Constructor injection pattern
+   - Error handling approach
+   - Logging style and detail level
+   - Async pattern usage
+   - Null handling approach
+   - Test coverage style
+4. **Apply patterns consistently**: Match the established patterns exactly
+5. **Validate against conventions**: Ensure nullable annotations, cancellation tokens, etc.
 
 ## Common Pitfalls to Avoid
-- ❌ Don't use `!` null-forgiving operator without clear justification
-- ❌ Don't mix UI logic in ViewModels (keep ViewModels testable)
-- ❌ Don't use string concatenation for SQL (use parameterized queries)
-- ❌ Don't ignore cancellation tokens in async methods
-- ❌ Don't catch generic `Exception` without rethrowing or logging
-- ❌ Don't block async code with `.Result` or `.Wait()`
+
+### CRITICAL (Will Break Build or Runtime)
 - ❌ **Don't use `{Binding}` without `x:CompileBindings`** - always use `{CompiledBinding}`
-- ❌ Don't forget `x:DataType` on root XAML elements
+- ❌ Don't forget `x:DataType` on root XAML elements (build error with CompiledBindings)
+- ❌ Don't use APIs not available in detected versions (e.g., .NET 10 features in .NET 9)
+- ❌ Don't use ReactiveUI patterns (use CommunityToolkit.Mvvm only)
+- ❌ Don't block async code with `.Result` or `.Wait()` (deadlock risk)
+
+### HIGH (Violates Project Standards)
+- ❌ Don't use `!` null-forgiving operator without clear justification (nullable violations)
+- ❌ Don't mix UI logic in ViewModels (keep ViewModels testable, no Avalonia types)
+- ❌ Don't use string concatenation for SQL (use parameterized queries - security)
+- ❌ Don't ignore cancellation tokens in async methods (violates async patterns)
+- ❌ Don't catch generic `Exception` without rethrowing or logging (lose error context)
+
+### MEDIUM (Style/Consistency Issues)
 - ❌ Don't use `ConfigureAwait(false)` in UI code (only in libraries)
+- ❌ Don't introduce patterns not found in existing codebase (inconsistency)
+- ❌ Don't skip constructor null checks (`ArgumentNullException.ThrowIfNull`)
+- ❌ Don't hardcode strings that should be in configuration
+- ❌ Don't log sensitive data (passwords, tokens, PII)
 
 <!-- MANUAL ADDITIONS START -->
 ## User: John Koll (GitHub Username: Dorotel)
