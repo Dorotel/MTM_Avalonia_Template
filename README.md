@@ -42,6 +42,50 @@ dotnet run --project src/MTM_Template_Application.Desktop
 dotnet test
 ```
 
+## Spec-Driven Development
+
+This project uses **GitHub Spec Kit** for specification-driven development. Each feature has:
+
+- **spec.md** - Functional requirements and acceptance criteria
+- **plan.md** - Technical architecture and implementation approach
+- **tasks.md** - Detailed task breakdown with completion tracking
+- **quickstart.md** - Validation scenarios for testing
+
+### Feature Validation
+
+When a feature reaches 100% task completion, run the validation script:
+
+```powershell
+# Validate current feature (auto-detects from branch)
+.\.specify\scripts\powershell\validate-implementation.ps1
+
+# Validate specific feature
+.\.specify\scripts\powershell\validate-implementation.ps1 001-boot-sequence-splash
+
+# Generate JSON output for CI/CD
+.\.specify\scripts\powershell\validate-implementation.ps1 -Json
+
+# Strict mode (fail on warnings)
+.\.specify\scripts\powershell\validate-implementation.ps1 -Strict
+```
+
+The validation script performs:
+- ✅ Task completion verification (100% required)
+- ✅ Functional requirement mapping
+- ✅ Constitutional compliance audit
+- ✅ Build validation (clean build required)
+- ✅ Test execution (all tests must pass)
+- ✅ Code quality assessment
+- ✅ Documentation validation
+- ✅ Security and performance review
+
+**Validation Thresholds:**
+- **PASS**: Ready for merge (0 blocking issues)
+- **CONDITIONAL PASS**: Merge with follow-up tasks (<5 non-critical issues)
+- **FAIL**: Cannot merge (blocking issues exist)
+
+See `.github/prompts/validate-implementation.prompt.md` for detailed validation criteria.
+
 ## Boot Sequence
 
 The application uses a three-stage boot sequence for optimal startup performance:
