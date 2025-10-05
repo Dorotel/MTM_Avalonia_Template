@@ -36,7 +36,19 @@ public class OSDarkModeMonitor : IOSDarkModeMonitor
             _lastKnownDarkMode, _pollingInterval.TotalSeconds);
 
         // Start monitoring as a background task (non-blocking)
-        _ = Task.Run(async () => await MonitorDarkModeLoopAsync().ConfigureAwait(false), _cts.Token);
+        // Note: Don't pass cancellation token to Task.Run - handle cancellation inside the task
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await MonitorDarkModeLoopAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                // Suppress all exceptions from background task to prevent unobserved task exceptions
+                _logger.LogDebug(ex, "Dark mode monitoring task ended");
+            }
+        });
     }
 
     private async Task MonitorDarkModeLoopAsync()
@@ -52,6 +64,7 @@ public class OSDarkModeMonitor : IOSDarkModeMonitor
             }
             catch (OperationCanceledException)
             {
+                // Expected during shutdown - exit gracefully
                 _logger.LogDebug("Dark mode monitoring loop cancelled");
                 break;
             }

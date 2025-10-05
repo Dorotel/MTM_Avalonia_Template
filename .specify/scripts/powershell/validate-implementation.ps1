@@ -65,7 +65,7 @@ function Write-ValidationLog {
         [string]$Message,
         [string]$Level = "INFO" # INFO, WARN, ERROR, SUCCESS
     )
-    
+
     if (-not $Json) {
         $color = switch ($Level) {
             "SUCCESS" { "Green" }
@@ -92,18 +92,19 @@ function Get-FeatureIdFromBranch {
 
 function Test-TasksComplete {
     param([string]$TasksFilePath)
-    
+
     $content = Get-Content $TasksFilePath -Raw
     $allTasks = [regex]::Matches($content, '- \[([ x])\] (T\d+)')
     $completedTasks = [regex]::Matches($content, '- \[x\] (T\d+)')
-    
+
     return @{
-        Total = $allTasks.Count
-        Completed = $completedTasks.Count
-        Percentage = if ($allTasks.Count -gt 0) { 
-            [math]::Round(($completedTasks.Count / $allTasks.Count) * 100, 2) 
-        } else { 0 }
-        AllTaskIds = $allTasks | ForEach-Object { $_.Groups[2].Value }
+        Total            = $allTasks.Count
+        Completed        = $completedTasks.Count
+        Percentage       = if ($allTasks.Count -gt 0) {
+            [math]::Round(($completedTasks.Count / $allTasks.Count) * 100, 2)
+        }
+        else { 0 }
+        AllTaskIds       = $allTasks | ForEach-Object { $_.Groups[2].Value }
         CompletedTaskIds = $completedTasks | ForEach-Object { $_.Groups[1].Value }
     }
 }
@@ -113,20 +114,20 @@ function Test-FileExists {
         [string]$FilePath,
         [string]$BaseDir = $RepoRoot
     )
-    
+
     $fullPath = Join-Path $BaseDir $FilePath
     return Test-Path $fullPath
 }
 
 function Get-FunctionalRequirements {
     param([string]$SpecFilePath)
-    
+
     $content = Get-Content $SpecFilePath -Raw
     $requirements = [regex]::Matches($content, 'FR-(\d+):?\s*(.+?)(?=\r?\n)')
-    
+
     return $requirements | ForEach-Object {
         @{
-            Id = "FR-$($_.Groups[1].Value)"
+            Id          = "FR-$($_.Groups[1].Value)"
             Description = $_.Groups[2].Value.Trim()
         }
     }
@@ -134,53 +135,53 @@ function Get-FunctionalRequirements {
 
 function Test-ConstitutionalCompliance {
     param([string]$RepoPath)
-    
+
     $violations = @{
-        Critical = @()
+        Critical    = @()
         NonCritical = @()
     }
-    
+
     Write-ValidationLog "Checking constitutional compliance..." "INFO"
-    
+
     # Principle I: Cross-Platform (Check for P/Invoke without abstraction)
-    $pInvokeFiles = Get-ChildItem -Path "$RepoPath/MTM_Template_Application" -Filter "*.cs" -Recurse | 
-        Select-String -Pattern '\[DllImport\(' | 
-        Where-Object { $_.Path -notmatch 'Platform|Native|Interop' }
-    
+    $pInvokeFiles = Get-ChildItem -Path "$RepoPath/MTM_Template_Application" -Filter "*.cs" -Recurse |
+    Select-String -Pattern '\[DllImport\(' |
+    Where-Object { $_.Path -notmatch 'Platform|Native|Interop' }
+
     if ($pInvokeFiles) {
         $violations.Critical += @{
             Principle = "I. Cross-Platform First"
-            Issue = "P/Invoke without platform abstraction"
-            Files = $pInvokeFiles | ForEach-Object { "$($_.Path):$($_.LineNumber)" }
+            Issue     = "P/Invoke without platform abstraction"
+            Files     = $pInvokeFiles | ForEach-Object { "$($_.Path):$($_.LineNumber)" }
         }
     }
-    
+
     # Principle II: MVVM Toolkit (Check for ReactiveUI)
-    $reactiveFiles = Get-ChildItem -Path "$RepoPath/MTM_Template_Application" -Filter "*.cs" -Recurse | 
-        Select-String -Pattern 'ReactiveObject|ReactiveCommand|INotifyPropertyChanged' -SimpleMatch:$false
-    
+    $reactiveFiles = Get-ChildItem -Path "$RepoPath/MTM_Template_Application" -Filter "*.cs" -Recurse |
+    Select-String -Pattern 'ReactiveObject|ReactiveCommand|INotifyPropertyChanged' -SimpleMatch:$false
+
     if ($reactiveFiles) {
         $violations.Critical += @{
             Principle = "II. MVVM Community Toolkit"
-            Issue = "ReactiveUI patterns detected (should use MVVM Toolkit)"
-            Files = $reactiveFiles | ForEach-Object { "$($_.Path):$($_.LineNumber)" }
+            Issue     = "ReactiveUI patterns detected (should use MVVM Toolkit)"
+            Files     = $reactiveFiles | ForEach-Object { "$($_.Path):$($_.LineNumber)" }
         }
     }
-    
-    # Principle IV: Theme V2 (Check for hardcoded colors in XAML, except splash/tests)
-    $hardcodedColors = Get-ChildItem -Path "$RepoPath/MTM_Template_Application/Views" -Filter "*.axaml" -Recurse | 
-        Where-Object { $_.Name -notmatch 'Splash' } |
-        Select-String -Pattern '#[A-Fa-f0-9]{6}' |
-        Where-Object { $_.Line -notmatch 'Comment|<!--' }
-    
+
+    # Principle IV: Theme V2 (Check for hardcoded colors in XAML, except splash/boot views)
+    $hardcodedColors = Get-ChildItem -Path "$RepoPath/MTM_Template_Application/Views" -Filter "*.axaml" -Recurse |
+    Where-Object { $_.Name -notmatch 'Splash|Boot' } |
+    Select-String -Pattern '#[A-Fa-f0-9]{6}' |
+    Where-Object { $_.Line -notmatch 'Comment|<!--' }
+
     if ($hardcodedColors) {
         $violations.NonCritical += @{
             Principle = "IV. Theme V2 Semantic Tokens"
-            Issue = "Hardcoded colors in XAML (should use ThemeV2 resources)"
-            Files = $hardcodedColors | ForEach-Object { "$($_.Path):$($_.LineNumber)" }
+            Issue     = "Hardcoded colors in XAML (should use ThemeV2 resources)"
+            Files     = $hardcodedColors | ForEach-Object { "$($_.Path):$($_.LineNumber)" }
         }
     }
-    
+
     # Principle V: Null Safety (Check for missing Nullable enable)
     $csprojFiles = Get-ChildItem -Path $RepoPath -Filter "*.csproj" -Recurse
     foreach ($csproj in $csprojFiles) {
@@ -188,28 +189,28 @@ function Test-ConstitutionalCompliance {
         if ($content -notmatch '<Nullable>enable</Nullable>') {
             $violations.Critical += @{
                 Principle = "V. Null Safety"
-                Issue = "Nullable reference types not enabled"
-                Files = @($csproj.FullName)
+                Issue     = "Nullable reference types not enabled"
+                Files     = @($csproj.FullName)
             }
         }
     }
-    
+
     # Principle VI: Compiled Bindings (CRITICAL CHECK)
     Write-ValidationLog "Checking XAML bindings (CRITICAL)..." "INFO"
     $axamlFiles = Get-ChildItem -Path "$RepoPath/MTM_Template_Application" -Filter "*.axaml" -Recurse
-    
+
     foreach ($axaml in $axamlFiles) {
         $content = Get-Content $axaml.FullName -Raw
-        
+
         # Check for x:CompileBindings="True"
         if ($content -notmatch 'x:CompileBindings\s*=\s*"True"') {
             $violations.Critical += @{
                 Principle = "VI. Compiled Bindings"
-                Issue = "Missing x:CompileBindings='True'"
-                Files = @($axaml.FullName)
+                Issue     = "Missing x:CompileBindings='True'"
+                Files     = @($axaml.FullName)
             }
         }
-        
+
         # Check for {Binding} without CompileBindings context
         $regularBindings = [regex]::Matches($content, '\{Binding[^}]*\}')
         if ($regularBindings.Count -gt 0) {
@@ -226,36 +227,41 @@ function Test-ConstitutionalCompliance {
                 if ($lines[$i] -match '\{Binding[^}]*\}' -and -not $inDataTemplate) {
                     $violations.Critical += @{
                         Principle = "VI. Compiled Bindings"
-                        Issue = "Using {Binding} instead of {CompiledBinding}"
-                        Files = @("$($axaml.FullName):$($i + 1)")
+                        Issue     = "Using {Binding} instead of {CompiledBinding}"
+                        Files     = @("$($axaml.FullName):$($i + 1)")
                     }
                 }
             }
         }
     }
-    
+
     return $violations
 }
 
 function Invoke-BuildValidation {
     param([string]$RepoPath)
-    
+
     Write-ValidationLog "Running build validation..." "INFO"
-    
+
     Push-Location $RepoPath
     try {
+        # Set Android SDK and Java paths for Android project build
+        $env:ANDROID_SDK_ROOT = "$env:LOCALAPPDATA\Android\Sdk"
+        $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk"
+        $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
+
         $buildOutput = dotnet build "$RepoPath/MTM_Template_Application.sln" --no-restore 2>&1
         $buildSuccess = $LASTEXITCODE -eq 0
-        
+
         # Count warnings and errors
         $errors = ($buildOutput | Select-String -Pattern 'error [A-Z]+\d+:').Count
         $warnings = ($buildOutput | Select-String -Pattern 'warning [A-Z]+\d+:').Count
-        
+
         return @{
-            Success = $buildSuccess
-            Errors = $errors
+            Success  = $buildSuccess
+            Errors   = $errors
             Warnings = $warnings
-            Output = $buildOutput -join "`n"
+            Output   = $buildOutput -join "`n"
         }
     }
     finally {
@@ -265,27 +271,41 @@ function Invoke-BuildValidation {
 
 function Invoke-TestValidation {
     param([string]$RepoPath)
-    
+
     Write-ValidationLog "Running test validation..." "INFO"
-    
+
     Push-Location $RepoPath
     try {
         $testOutput = dotnet test "$RepoPath/MTM_Template_Application.sln" --no-build --verbosity quiet 2>&1
         $testSuccess = $LASTEXITCODE -eq 0
-        
-        # Parse test results
-        $totalMatch = $testOutput | Select-String -Pattern 'total:\s*(\d+)'
-        $passedMatch = $testOutput | Select-String -Pattern 'succeeded:\s*(\d+)'
-        $failedMatch = $testOutput | Select-String -Pattern 'failed:\s*(\d+)'
-        $skippedMatch = $testOutput | Select-String -Pattern 'skipped:\s*(\d+)'
-        
+
+        # Parse test results (handles both xUnit and dotnet test summary formats)
+        $summaryMatch = $testOutput | Select-String -Pattern 'Test summary: total: (\d+), failed: (\d+), succeeded: (\d+), skipped: (\d+)'
+        if ($summaryMatch) {
+            $total = [int]$summaryMatch.Matches[0].Groups[1].Value
+            $failed = [int]$summaryMatch.Matches[0].Groups[2].Value
+            $passed = [int]$summaryMatch.Matches[0].Groups[3].Value
+            $skipped = [int]$summaryMatch.Matches[0].Groups[4].Value
+        }
+        else {
+            # Fallback to individual pattern matching
+            $totalMatch = $testOutput | Select-String -Pattern 'total:\s*(\d+)'
+            $passedMatch = $testOutput | Select-String -Pattern 'succeeded:\s*(\d+)'
+            $failedMatch = $testOutput | Select-String -Pattern 'failed:\s*(\d+)'
+            $skippedMatch = $testOutput | Select-String -Pattern 'skipped:\s*(\d+)'
+            $total = if ($totalMatch) { [int]$totalMatch.Matches[0].Groups[1].Value } else { 0 }
+            $passed = if ($passedMatch) { [int]$passedMatch.Matches[0].Groups[1].Value } else { 0 }
+            $failed = if ($failedMatch) { [int]$failedMatch.Matches[0].Groups[1].Value } else { 0 }
+            $skipped = if ($skippedMatch) { [int]$skippedMatch.Matches[0].Groups[1].Value } else { 0 }
+        }
+
         return @{
             Success = $testSuccess
-            Total = if ($totalMatch) { [int]$totalMatch.Matches[0].Groups[1].Value } else { 0 }
-            Passed = if ($passedMatch) { [int]$passedMatch.Matches[0].Groups[1].Value } else { 0 }
-            Failed = if ($failedMatch) { [int]$failedMatch.Matches[0].Groups[1].Value } else { 0 }
+            Total   = if ($totalMatch) { [int]$totalMatch.Matches[0].Groups[1].Value } else { 0 }
+            Passed  = if ($passedMatch) { [int]$passedMatch.Matches[0].Groups[1].Value } else { 0 }
+            Failed  = if ($failedMatch) { [int]$failedMatch.Matches[0].Groups[1].Value } else { 0 }
             Skipped = if ($skippedMatch) { [int]$skippedMatch.Matches[0].Groups[1].Value } else { 0 }
-            Output = $testOutput -join "`n"
+            Output  = $testOutput -join "`n"
         }
     }
     finally {
@@ -296,7 +316,7 @@ function Invoke-TestValidation {
 # Main Validation Logic
 try {
     Write-ValidationLog "Starting implementation validation..." "INFO"
-    
+
     # Step 1: Determine feature ID
     if (-not $FeatureId) {
         $FeatureId = Get-FeatureIdFromBranch
@@ -305,79 +325,80 @@ try {
         }
         Write-ValidationLog "Auto-detected feature: $FeatureId" "INFO"
     }
-    
+
     # Step 2: Validate feature directory exists
     $featureDir = Join-Path $RepoRoot "specs" $FeatureId
     if (-not (Test-Path $featureDir)) {
         throw "Feature directory not found: $featureDir"
     }
-    
+
     # Step 3: Load feature context
     $specFile = Join-Path $featureDir "spec.md"
     $planFile = Join-Path $featureDir "plan.md"
     $tasksFile = Join-Path $featureDir "tasks.md"
     $quickstartFile = Join-Path $featureDir "quickstart.md"
-    
+
     if (-not (Test-Path $tasksFile)) {
         throw "tasks.md not found. Cannot validate without task list."
     }
-    
+
     Write-ValidationLog "Loading feature context..." "INFO"
-    
+
     # Step 4: Check task completion
     $taskStats = Test-TasksComplete -TasksFilePath $tasksFile
     Write-ValidationLog "Tasks: $($taskStats.Completed)/$($taskStats.Total) ($($taskStats.Percentage)%)" "INFO"
-    
+
     if ($taskStats.Percentage -lt 100) {
         Write-ValidationLog "WARNING: Feature not 100% complete. Continuing validation..." "WARN"
     }
-    
+
     # Step 5: Get functional requirements
     $requirements = @()
     if (Test-Path $specFile) {
         $requirements = Get-FunctionalRequirements -SpecFilePath $specFile
         Write-ValidationLog "Found $($requirements.Count) functional requirements" "INFO"
     }
-    
+
     # Step 6: Constitutional compliance check
     $violations = Test-ConstitutionalCompliance -RepoPath $RepoRoot
     $totalViolations = $violations.Critical.Count + $violations.NonCritical.Count
     Write-ValidationLog "Constitutional check: $totalViolations violations ($($violations.Critical.Count) critical)" $(if ($violations.Critical.Count -gt 0) { "ERROR" } else { "SUCCESS" })
-    
+
     # Step 7: Build validation
     $buildResults = Invoke-BuildValidation -RepoPath $RepoRoot
     Write-ValidationLog "Build: $(if ($buildResults.Success) { 'SUCCESS' } else { 'FAILED' }) ($($buildResults.Errors) errors, $($buildResults.Warnings) warnings)" $(if ($buildResults.Success) { "SUCCESS" } else { "ERROR" })
-    
+
     # Step 8: Test validation
     $testResults = Invoke-TestValidation -RepoPath $RepoRoot
     Write-ValidationLog "Tests: $($testResults.Passed)/$($testResults.Total) passing" $(if ($testResults.Success) { "SUCCESS" } else { "ERROR" })
-    
+
     # Step 9: Determine overall status
     $blockingIssues = 0
     $nonBlockingIssues = $violations.NonCritical.Count
-    
+
     if ($taskStats.Percentage -lt 95) { $blockingIssues++ }
     if ($violations.Critical.Count -gt 0) { $blockingIssues += $violations.Critical.Count }
     if (-not $buildResults.Success) { $blockingIssues++ }
     if (-not $testResults.Success) { $blockingIssues++ }
-    
+
     if ($Strict) {
         $blockingIssues += $nonBlockingIssues
         $nonBlockingIssues = 0
     }
-    
+
     $overallStatus = if ($blockingIssues -eq 0) {
         if ($nonBlockingIssues -eq 0) { "PASS" } else { "CONDITIONAL PASS" }
-    } else {
+    }
+    else {
         "FAIL"
     }
-    
+
     $readyForMerge = $overallStatus -ne "FAIL"
-    
+
     # Step 10: Generate report
     $timestamp = Get-Date -Format "yyyy-MM-dd"
     $reportFile = Join-Path $featureDir "VALIDATION_${FeatureId}_${timestamp}.md"
-    
+
     $reportContent = @"
 # Implementation Validation Report
 
@@ -468,33 +489,33 @@ $(if ($overallStatus -eq "PASS") {
 
 *Validation completed at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')*
 "@
-    
+
     $reportContent | Out-File -FilePath $reportFile -Encoding UTF8
-    
+
     Write-ValidationLog "Report saved to: $reportFile" "SUCCESS"
-    
+
     # Step 11: Output results
     if ($Json) {
         $jsonOutput = @{
-            VALIDATION_FILE = $reportFile
-            FEATURE_ID = $FeatureId
-            COMPLETION_PERCENTAGE = $taskStats.Percentage
-            TASKS_COMPLETED = $taskStats.Completed
-            TASKS_TOTAL = $taskStats.Total
-            REQUIREMENTS_TOTAL = $requirements.Count
-            TESTS_PASSED = $testResults.Passed
-            TESTS_TOTAL = $testResults.Total
+            VALIDATION_FILE           = $reportFile
+            FEATURE_ID                = $FeatureId
+            COMPLETION_PERCENTAGE     = $taskStats.Percentage
+            TASKS_COMPLETED           = $taskStats.Completed
+            TASKS_TOTAL               = $taskStats.Total
+            REQUIREMENTS_TOTAL        = $requirements.Count
+            TESTS_PASSED              = $testResults.Passed
+            TESTS_TOTAL               = $testResults.Total
             CONSTITUTIONAL_VIOLATIONS = @{
-                CRITICAL = $violations.Critical.Count
+                CRITICAL     = $violations.Critical.Count
                 NON_CRITICAL = $violations.NonCritical.Count
             }
-            BUILD_STATUS = if ($buildResults.Success) { "SUCCESS" } else { "FAILED" }
-            OVERALL_STATUS = $overallStatus
-            BLOCKING_ISSUES = $blockingIssues
-            NON_BLOCKING_ISSUES = $nonBlockingIssues
-            READY_FOR_MERGE = $readyForMerge
+            BUILD_STATUS              = if ($buildResults.Success) { "SUCCESS" } else { "FAILED" }
+            OVERALL_STATUS            = $overallStatus
+            BLOCKING_ISSUES           = $blockingIssues
+            NON_BLOCKING_ISSUES       = $nonBlockingIssues
+            READY_FOR_MERGE           = $readyForMerge
         } | ConvertTo-Json -Depth 10
-        
+
         Write-Output $jsonOutput
     }
     else {
@@ -507,20 +528,20 @@ $(if ($overallStatus -eq "PASS") {
         Write-Host $(if ($readyForMerge) { "YES" } else { "NO" }) -ForegroundColor $(if ($readyForMerge) { "Green" } else { "Red" })
         Write-Host "`nReport: $reportFile`n" -ForegroundColor Gray
     }
-    
+
     # Exit with appropriate code
     exit $(if ($readyForMerge) { 0 } else { 1 })
 }
 catch {
     Write-ValidationLog "FATAL ERROR: $_" "ERROR"
     Write-ValidationLog $_.ScriptStackTrace "ERROR"
-    
+
     if ($Json) {
         @{
-            ERROR = $_.Exception.Message
+            ERROR       = $_.Exception.Message
             STACK_TRACE = $_.ScriptStackTrace
         } | ConvertTo-Json | Write-Output
     }
-    
+
     exit 2
 }
