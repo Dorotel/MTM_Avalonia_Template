@@ -32,7 +32,7 @@ _Audience: Step-by-step order, always building foundations first. Each step expl
 - **Done When:** Environment switching works; configs use DI; credentials not hardcoded.
 - **Constitution:** Cross-Platform, DI via AppBuilder.
 
-3. **`docs/BOOT-SEQUENCE.md`**
+3. **`docs/BOOT-SEQUENCE.md`** - COMPLETE
 
 - **Why:** Predictable startup, service initialization order, splash screen.
 - **Dependencies:** Security, environment config
