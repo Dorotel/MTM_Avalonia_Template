@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace MTM_Template_Application.Services.Theme;
 
@@ -11,7 +12,9 @@ namespace MTM_Template_Application.Services.Theme;
 /// </summary>
 public class OSDarkModeMonitor : IDisposable
 {
-    private readonly Timer? _pollingTimer;
+    private readonly Thread? _pollingThread;
+    private readonly CancellationTokenSource _cts;
+    private readonly TimeSpan _pollingInterval;
     private bool _lastKnownDarkMode;
     private bool _disposed;
 
@@ -20,10 +23,33 @@ public class OSDarkModeMonitor : IDisposable
     public OSDarkModeMonitor(TimeSpan? pollingInterval = null)
     {
         _lastKnownDarkMode = IsOSDarkMode();
+        _pollingInterval = pollingInterval ?? TimeSpan.FromSeconds(5);
+        _cts = new CancellationTokenSource();
 
-        // Poll for changes (OS doesn't always provide real-time notifications)
-        var interval = pollingInterval ?? TimeSpan.FromSeconds(5);
-        _pollingTimer = new Timer(CheckForChanges, null, interval, interval);
+        // Create explicit thread for dark mode monitoring
+        _pollingThread = new Thread(MonitorDarkModeLoop)
+        {
+            Name = "OSDarkModeMonitor.MonitorDarkModeLoop",
+            IsBackground = true
+        };
+        _pollingThread.Start();
+    }
+
+    private void MonitorDarkModeLoop()
+    {
+
+        while (!_cts.Token.IsCancellationRequested)
+        {
+            try
+            {
+                CheckForChanges();
+                Task.Delay(_pollingInterval, _cts.Token).Wait();
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+        }
     }
 
     public bool IsOSDarkMode()
@@ -44,7 +70,7 @@ public class OSDarkModeMonitor : IDisposable
         return false;
     }
 
-    private void CheckForChanges(object? state)
+    private void CheckForChanges()
     {
         if (_disposed)
         {
@@ -149,7 +175,17 @@ public class OSDarkModeMonitor : IDisposable
         }
 
         _disposed = true;
-        _pollingTimer?.Dispose();
+        _cts.Cancel();
+
+        if (_pollingThread != null && _pollingThread.IsAlive)
+        {
+            if (!_pollingThread.Join(TimeSpan.FromSeconds(2)))
+            {
+                // Thread didn't stop gracefully
+            }
+        }
+
+        _cts.Dispose();
     }
 }
 

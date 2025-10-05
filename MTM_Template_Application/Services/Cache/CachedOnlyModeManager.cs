@@ -11,7 +11,8 @@ namespace MTM_Template_Application.Services.Cache;
 public class CachedOnlyModeManager : IDisposable
 {
     private readonly IVisualApiClient _visualApiClient;
-    private readonly Timer _reconnectionTimer;
+    private readonly Thread _reconnectionThread;
+    private readonly CancellationTokenSource _cts;
     private readonly TimeSpan _reconnectionCheckInterval;
     private bool _isCachedOnlyMode;
     private bool _disposed;
@@ -27,8 +28,34 @@ public class CachedOnlyModeManager : IDisposable
         _visualApiClient = visualApiClient;
         _reconnectionCheckInterval = reconnectionCheckInterval ?? TimeSpan.FromSeconds(30);
         _isCachedOnlyMode = false;
+        _cts = new CancellationTokenSource();
 
-        _reconnectionTimer = new Timer(OnReconnectionCheck, null, _reconnectionCheckInterval, _reconnectionCheckInterval);
+        _reconnectionThread = new Thread(ReconnectionLoop)
+        {
+            Name = "CachedOnlyModeManager.ReconnectionLoop",
+            IsBackground = true
+        };
+        _reconnectionThread.Start();
+    }
+
+    private void ReconnectionLoop()
+    {
+
+        while (!_cts.Token.IsCancellationRequested)
+        {
+            try
+            {
+                Task.Delay(_reconnectionCheckInterval, _cts.Token).Wait();
+                if (!_disposed)
+                {
+                    CheckServerAvailabilityAsync().GetAwaiter().GetResult();
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+        }
     }
 
     /// <summary>
@@ -72,7 +99,7 @@ public class CachedOnlyModeManager : IDisposable
         try
         {
             var isAvailable = await _visualApiClient.IsServerAvailable();
-            
+
             if (!isAvailable && !_isCachedOnlyMode)
             {
                 EnableCachedOnlyMode("Visual server unavailable");
@@ -109,16 +136,6 @@ public class CachedOnlyModeManager : IDisposable
         };
     }
 
-    private async void OnReconnectionCheck(object? state)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        await CheckServerAvailabilityAsync();
-    }
-
     private void OnModeChanged(bool isCachedOnly, string reason)
     {
         ModeChanged?.Invoke(this, new CachedOnlyModeChangedEventArgs
@@ -137,7 +154,14 @@ public class CachedOnlyModeManager : IDisposable
         }
 
         _disposed = true;
-        _reconnectionTimer?.Dispose();
+        _cts.Cancel();
+
+        if (_reconnectionThread != null && _reconnectionThread.IsAlive)
+        {
+            _reconnectionThread.Join(TimeSpan.FromSeconds(2));
+        }
+
+        _cts.Dispose();
     }
 }
 

@@ -2,23 +2,40 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch MTM Avalonia Template",
+      "name": "Launch MTM Avalonia Template (Desktop)",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "Build Solution",
-      "program": "${workspaceFolder}/src/MTM_Avalonia_Template/bin/Debug/net9.0/MTM_Avalonia_Template.dll",
+      "preLaunchTask": "Build Desktop",
+      "program": "${workspaceFolder}/MTM_Template_Application.Desktop/bin/Debug/net9.0/MTM_Template_Application.Desktop.dll",
       "args": [],
-      "cwd": "${workspaceFolder}/src/MTM_Avalonia_Template",
+      "cwd": "${workspaceFolder}/MTM_Template_Application.Desktop",
       "console": "internalConsole",
       "stopAtEntry": false,
       "env": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "DOTNET_ENVIRONMENT": "Development"
       }
     },
     {
       "name": "Attach to Process",
       "type": "coreclr",
       "request": "attach"
+    },
+    {
+      "name": "Launch Android App",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Deploy Android App",
+      "program": "${workspaceFolder}/MTM_Template_Application.Android/bin/Debug/net9.0-android/MTM_Template_Application.Android.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/MTM_Template_Application.Android",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "env": {
+        "DOTNET_ENVIRONMENT": "Development",
+        "ANDROID_SDK_ROOT": "${env:LOCALAPPDATA}\\Android\\Sdk",
+        "ANDROID_HOME": "${env:LOCALAPPDATA}\\Android\\Sdk",
+        "JAVA_HOME": "C:\\Program Files\\Android\\Android Studio\\jbr"
+      }
     }
   ]
 }

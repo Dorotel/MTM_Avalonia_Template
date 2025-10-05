@@ -5,7 +5,7 @@
       "label": "Build Solution",
       "type": "shell",
       "command": "dotnet",
-      "args": ["build", "${workspaceFolder}/MTM_Avalonia_Template.sln"],
+      "args": ["build", "${workspaceFolder}/MTM_Template_Application.sln"],
       "group": {
         "kind": "build",
         "isDefault": true
@@ -17,10 +17,22 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "Build Desktop",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["build", "${workspaceFolder}/MTM_Template_Application.Desktop/MTM_Template_Application.Desktop.csproj"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
       "label": "Clean Solution",
       "type": "shell",
       "command": "dotnet",
-      "args": ["clean", "${workspaceFolder}/MTM_Avalonia_Template.sln"],
+      "args": ["clean", "${workspaceFolder}/MTM_Template_Application.sln"],
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -31,7 +43,7 @@
       "label": "Restore Solution",
       "type": "shell",
       "command": "dotnet",
-      "args": ["restore", "${workspaceFolder}/MTM_Avalonia_Template.sln"],
+      "args": ["restore", "${workspaceFolder}/MTM_Template_Application.sln"],
       "group": "build",
       "presentation": {
         "reveal": "always",
@@ -42,7 +54,7 @@
       "label": "Run Tests",
       "type": "shell",
       "command": "dotnet",
-      "args": ["test", "${workspaceFolder}/MTM_Avalonia_Template.sln", "--no-build"],
+      "args": ["test", "${workspaceFolder}/MTM_Template_Application.sln", "--no-build"],
       "group": {
         "kind": "test",
         "isDefault": true
@@ -96,13 +108,77 @@
       "label": "Run Main App",
       "type": "shell",
       "command": "dotnet",
-      "args": ["run", "--project", "${workspaceFolder}/src/MTM_Avalonia_Template/MTM_Avalonia_Template.csproj"],
+      "args": ["run", "--project", "${workspaceFolder}/MTM_Template_Application.Desktop/MTM_Template_Application.Desktop.csproj"],
       "group": "none",
       "presentation": {
         "reveal": "always",
         "panel": "dedicated"
       },
       "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Build Android",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["build", "${workspaceFolder}/MTM_Template_Application.Android/MTM_Template_Application.Android.csproj", "-f", "net9.0-android"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "options": {
+        "env": {
+          "ANDROID_SDK_ROOT": "${env:LOCALAPPDATA}\\Android\\Sdk",
+          "ANDROID_HOME": "${env:LOCALAPPDATA}\\Android\\Sdk",
+          "JAVA_HOME": "C:\\Program Files\\Android\\Android Studio\\jbr"
+        }
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Deploy Android App",
+      "type": "shell",
+      "command": "dotnet",
+      "args": ["build", "${workspaceFolder}/MTM_Template_Application.Android/MTM_Template_Application.Android.csproj", "-f", "net9.0-android", "-t:Install"],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "options": {
+        "env": {
+          "ANDROID_SDK_ROOT": "${env:LOCALAPPDATA}\\Android\\Sdk",
+          "ANDROID_HOME": "${env:LOCALAPPDATA}\\Android\\Sdk",
+          "JAVA_HOME": "C:\\Program Files\\Android\\Android Studio\\jbr"
+        }
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Start Android Logcat",
+      "type": "shell",
+      "command": "${env:LOCALAPPDATA}\\Android\\Sdk\\platform-tools\\adb.exe",
+      "args": ["logcat", "-s", "MTM:*", "mono:*", "Avalonia:*"],
+      "group": "none",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "focus": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Check Android Devices",
+      "type": "shell",
+      "command": "${env:LOCALAPPDATA}\\Android\\Sdk\\platform-tools\\adb.exe",
+      "args": ["devices"],
+      "group": "none",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
     }
   ]
 }
