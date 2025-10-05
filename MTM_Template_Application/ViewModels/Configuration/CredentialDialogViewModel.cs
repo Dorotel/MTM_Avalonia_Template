@@ -17,7 +17,6 @@ public partial class CredentialDialogViewModel : ObservableObject
     private readonly ISecretsService _secretsService;
     private readonly ILogger<CredentialDialogViewModel> _logger;
     private bool _dialogResult;
-    private int _retryCount;
 
     [ObservableProperty]
     private string _username = string.Empty;
@@ -26,6 +25,7 @@ public partial class CredentialDialogViewModel : ObservableObject
     private string _password = string.Empty;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasErrorMessage))]
     private string _errorMessage = string.Empty;
 
     [ObservableProperty]
@@ -40,12 +40,29 @@ public partial class CredentialDialogViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RetryCommand))]
+    [NotifyPropertyChangedFor(nameof(ShowRetryButton))]
+    [NotifyPropertyChangedFor(nameof(ShowRetryAttempts))]
     private int _retryAttempts;
 
     /// <summary>
     /// Maximum retry attempts before manual retry required (NFR-017)
     /// </summary>
     private const int MaxAutoRetryAttempts = 3;
+
+    /// <summary>
+    /// Show retry button when retry attempts >= 3
+    /// </summary>
+    public bool ShowRetryButton => RetryAttempts >= MaxAutoRetryAttempts;
+
+    /// <summary>
+    /// Show retry attempts info when retry attempts > 0
+    /// </summary>
+    public bool ShowRetryAttempts => RetryAttempts > 0;
+
+    /// <summary>
+    /// Show error message when not empty
+    /// </summary>
+    public bool HasErrorMessage => !string.IsNullOrWhiteSpace(ErrorMessage);
 
     public CredentialDialogViewModel(
         ISecretsService secretsService,

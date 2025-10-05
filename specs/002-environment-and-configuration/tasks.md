@@ -439,7 +439,7 @@
 
 **Goal**: Build user-facing dialogs and integrate with existing UI
 
-- [ ] **T018** Create CredentialDialogView (AXAML)
+- [x] **T018** Create CredentialDialogView (AXAML) (✅ COMPLETED 2025-10-05)
   - Create `MTM_Template_Application/Views/Configuration/CredentialDialogView.axaml`
   - Add `x:DataType="vm:CredentialDialogViewModel"` and `x:CompileBindings="True"`
   - Add `Design.DataContext` for previewer support
@@ -455,8 +455,9 @@
   - **Dependency**: T012 complete (ViewModel exists)
   - **Source**: `research.md` section 2, Theme V2 guidelines, spec.md NFR-017
   - **Acceptance**: View compiles, previewer shows correct layout, uses CompiledBinding, includes Retry button
+  - **Completed**: Created CredentialDialogView.axaml with Theme V2 tokens, CompiledBinding, proper MVVM patterns, Material Design layout, and Retry button
 
-- [ ] **T019** Create CredentialDialogView code-behind
+- [x] **T019** Create CredentialDialogView code-behind (✅ COMPLETED 2025-10-05)
   - Create `MTM_Template_Application/Views/Configuration/CredentialDialogView.axaml.cs`
   - Set up DataContext binding to CredentialDialogViewModel
   - Add ShowDialog method to display as modal dialog
@@ -464,8 +465,9 @@
   - **File**: `MTM_Template_Application/Views/Configuration/CredentialDialogView.axaml.cs`
   - **Dependency**: T018 complete (AXAML exists)
   - **Acceptance**: Dialog can be shown and dismissed, returns correct result
+  - **Completed**: Created code-behind with ShowDialogAsync method, proper DataContext handling, and result tracking
 
-- [ ] **T020** Integrate ErrorNotificationService with MainWindow status bar
+- [x] **T020** Integrate ErrorNotificationService with MainWindow status bar (✅ COMPLETED 2025-10-05)
   - Modify `MTM_Template_Application/Views/MainWindow.axaml`
   - Add status bar section for error notifications (if not exists)
   - Bind to `ErrorNotificationService.ActiveErrors` collection
@@ -476,8 +478,9 @@
   - **Dependency**: T015 complete (ErrorNotificationService exists)
   - **Source**: `research.md` section 3
   - **Acceptance**: Status bar shows errors, click displays details
+  - **Completed**: Added status bar with warning icon, error count, Theme V2 styling, click handler, and binding to ActiveErrors collection. Enhanced MainViewModel to expose ActiveErrors property and HasActiveErrors computed property.
 
-- [ ] **T021** Create ConfigurationErrorDialog for critical errors
+- [x] **T021** Create ConfigurationErrorDialog for critical errors (✅ COMPLETED 2025-10-05)
   - Create `MTM_Template_Application/Views/Configuration/ConfigurationErrorDialog.axaml`
   - Modal dialog with error message, user action guidance, OK/Retry buttons
   - Use Material Design patterns, Theme V2 tokens
@@ -486,6 +489,7 @@
   - **Dependency**: T015 complete (ErrorNotificationService exists)
   - **Source**: `research.md` section 3
   - **Acceptance**: Dialog blocks UI, displays clear error message with action guidance
+  - **Completed**: Created ConfigurationErrorDialog.axaml with Theme V2 tokens, error severity display, user action guidance, and modal blocking behavior. Code-behind implements ShowDialogAsync method with retry/close result handling.
 
 ---
 

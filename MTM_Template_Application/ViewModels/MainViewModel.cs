@@ -6,12 +6,15 @@ using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
+using MTM_Template_Application.Models.Configuration;
+using MTM_Template_Application.Services.Configuration;
 
 namespace MTM_Template_Application.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
     private readonly ILogger<MainViewModel>? _logger;
+    private readonly IErrorNotificationService? _errorNotificationService;
 
     [ObservableProperty]
     private string _greeting = "Welcome to MTM Developer Hub!";
@@ -46,16 +49,40 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private string _selectedTestCategory = "None";
 
+    /// <summary>
+    /// Active configuration errors from ErrorNotificationService
+    /// </summary>
+    public ReadOnlyObservableCollection<ConfigurationError>? ActiveErrors => _errorNotificationService?.ActiveErrors;
+
+    /// <summary>
+    /// Whether there are any active errors to display
+    /// </summary>
+    public bool HasActiveErrors => _errorNotificationService?.ActiveErrors.Count > 0;
+
     public MainViewModel()
     {
         // Default constructor for design-time
         InitializeCommands();
     }
 
-    public MainViewModel(ILogger<MainViewModel> logger)
+    public MainViewModel(ILogger<MainViewModel> logger, IErrorNotificationService? errorNotificationService = null)
     {
         _logger = logger;
+        _errorNotificationService = errorNotificationService;
+
+        // Subscribe to error events if service is available
+        if (_errorNotificationService != null)
+        {
+            _errorNotificationService.OnErrorOccurred += OnErrorOccurred;
+        }
+
         InitializeCommands();
+    }
+
+    private void OnErrorOccurred(object? sender, ConfigurationError error)
+    {
+        // Error notification handled by service - just log here
+        _logger?.LogWarning("Configuration error occurred: {Key} - {Message}", error.Key, error.Message);
     }
 
     private void InitializeCommands()

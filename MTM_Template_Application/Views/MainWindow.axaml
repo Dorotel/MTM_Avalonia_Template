@@ -20,7 +20,7 @@
     </Design.DataContext>
 
     <!-- Desktop Main Window - Boot Information Placeholder with Custom Title Bar -->
-    <Grid RowDefinitions="40,Auto,*,Auto">
+    <Grid RowDefinitions="40,Auto,*,Auto,Auto">
 
         <!-- Custom Title Bar -->
         <Border Grid.Row="0"
@@ -350,8 +350,65 @@
 
         </Grid>
 
-        <!-- Footer -->
+        <!-- Status Bar for Error Notifications (T020) -->
         <Border Grid.Row="3"
+            Background="{DynamicResource ThemeV2.Warning.Background}"
+            BorderBrush="{DynamicResource ThemeV2.Warning.Border}"
+            BorderThickness="0,1,0,0"
+            Padding="16,8"
+            IsVisible="{CompiledBinding HasActiveErrors}"
+            Cursor="Hand"
+            PointerPressed="StatusBar_PointerPressed">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <!-- Warning Icon -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8"
+                    VerticalAlignment="Center">
+                    <TextBlock Text="⚠"
+                        FontSize="16"
+                        Foreground="{DynamicResource ThemeV2.Warning.Default}"
+                        VerticalAlignment="Center" />
+                    <TextBlock FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="{DynamicResource ThemeV2.Text.Primary}"
+                        VerticalAlignment="Center">
+                        <Run Text="{CompiledBinding ActiveErrors.Count, FallbackValue=0}" />
+                        <Run Text=" configuration warning(s)" />
+                    </TextBlock>
+                </StackPanel>
+
+                <!-- Error Messages (first 3) -->
+                <ItemsControl Grid.Column="1"
+                    ItemsSource="{CompiledBinding ActiveErrors}"
+                    Margin="16,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Message}"
+                                FontSize="12"
+                                Foreground="{DynamicResource ThemeV2.Text.Secondary}"
+                                TextTrimming="CharacterEllipsis"
+                                MaxWidth="500"
+                                VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="12" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+
+                <!-- Click to View Details -->
+                <TextBlock Grid.Column="2"
+                    Text="Click to view details →"
+                    FontSize="12"
+                    FontStyle="Italic"
+                    Foreground="{DynamicResource ThemeV2.Text.Secondary}"
+                    VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+
+        <!-- Footer -->
+        <Border Grid.Row="4"
             Background="{DynamicResource SystemChromeLowColor}"
             BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
             BorderThickness="0,1,0,0"
