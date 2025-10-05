@@ -39,6 +39,7 @@ The application uses a **three-tier theme system**:
 ### Key Services
 
 #### `IThemeService`
+
 ```csharp
 public interface IThemeService
 {
@@ -49,6 +50,7 @@ public interface IThemeService
 ```
 
 #### `IOSDarkModeMonitor`
+
 ```csharp
 public interface IOSDarkModeMonitor : IDisposable
 {
@@ -137,12 +139,14 @@ public class SomeService
 ### CRITICAL: Always Use DynamicResource
 
 ❌ **NEVER** use hardcoded colors in XAML (except splash screens):
+
 ```xml
 <!-- ❌ WRONG -->
 <Border Background="#F5F5F5" Foreground="#212121" />
 ```
 
 ✅ **ALWAYS** use DynamicResource with semantic tokens:
+
 ```xml
 <!-- ✅ CORRECT -->
 <Border Background="{DynamicResource SystemChromeLowColor}"
