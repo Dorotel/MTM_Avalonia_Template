@@ -12,7 +12,6 @@ using NSubstitute;
 using Serilog;
 using Serilog.Events;
 using Serilog.Sinks.InMemory;
-using Serilog.Sinks.InMemory.Assertions;
 using Xunit;
 
 namespace MTM_Template_Tests.Contract;

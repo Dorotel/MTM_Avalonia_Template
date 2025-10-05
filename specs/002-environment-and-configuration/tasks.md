@@ -289,7 +289,7 @@
   - **Source**: `data-model.md` section 3
   - **Acceptance**: Model compiles, tests T007 closer to passing
 
-- [ ] **T012** [P] Create CredentialDialogViewModel
+- [x] **T012** [P] Create CredentialDialogViewModel (✅ COMPLETED 2025-10-05)
   - Create `MTM_Template_Application/ViewModels/Configuration/CredentialDialogViewModel.cs`
   - Add properties: Username, Password, ErrorMessage, IsLoading, DialogTitle, DialogMessage, RetryCount
   - Use `[ObservableProperty]` for all bindable properties
