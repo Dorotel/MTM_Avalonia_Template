@@ -63,6 +63,32 @@ $ARGUMENTS
    - Dependency notes
    - Parallel execution guidance
 
+8. Generate human-friendly task summary:
+   - Load `.specify/templates/tasks-template-human.md` for structure
+   - Create `tasks-summary.md` in the same directory as `tasks.md`
+   - Transform technical task list into project management format:
+     - Group tasks by phase with plain-language goals
+     - Add "What it means" explanations for each task
+     - Include time estimates and "What you'll see when done" outcomes
+     - Show progress tracking with visual indicators (✅ 🔄 ⏳ ⚠️)
+     - Add weekly timeline view for status updates
+     - Include blocked tasks section with unblock dates
+   - Cross-reference technical document: Link to tasks.md for developers
+   - Use [CLARIFICATION NEEDED - HUMAN EXPLANATION] marker if task purpose is unclear
+   - Maintain parallel numbering: Task T001 in tasks.md = Task 1 in tasks-summary.md
+
+   **Translation Patterns** (Technical → Human-Friendly):
+   - "Implement ConfigurationService" → "Create the system that manages settings"
+   - "Write unit tests for OrderValidator" → "Test that order checking works correctly"
+   - "Set up CI/CD pipeline" → "Set up automatic building and testing"
+   - "Integrate with Visual API" → "Connect our system to the Visual software"
+   - "Optimize database queries" → "Make data lookups faster"
+   - "Implement error handling" → "Make system handle problems gracefully"
+   - "Add logging" → "Add diagnostic messages for troubleshooting"
+   - "Configure connection pooling" → "Set up efficient database connections"
+   - "Deploy to staging environment" → "Install on test system"
+   - "Perform load testing" → "Test if system stays fast with many users"
+
 Context for task generation: $ARGUMENTS
 
-The tasks.md should be immediately executable - each task must be specific enough that an LLM can complete it without additional context.
+The tasks.md should be immediately executable - each task must be specific enough that an LLM can complete it without additional context. The tasks-summary.md should be readable by non-technical stakeholders tracking project progress.
