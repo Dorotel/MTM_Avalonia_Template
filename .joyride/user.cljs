@@ -42,5 +42,3 @@
   (set! (.-text status-item) "$(rocket) MTM")
   (set! (.-tooltip status-item) "MTM Avalonia Template")
   (.show status-item))
-
-(println "Joyride user.cljs loaded for MTM_Avalonia_Template")
