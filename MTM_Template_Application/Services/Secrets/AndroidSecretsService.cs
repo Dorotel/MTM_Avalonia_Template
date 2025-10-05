@@ -18,6 +18,11 @@ public class AndroidSecretsService : ISecretsService
 {
     private readonly ILogger<AndroidSecretsService> _logger;
 
+    /// <summary>
+    /// Event raised when credential recovery is needed due to encryption errors
+    /// </summary>
+    public event EventHandler<CredentialRecoveryEventArgs>? OnCredentialRecoveryNeeded;
+
     public AndroidSecretsService(ILogger<AndroidSecretsService> logger)
     {
         ArgumentNullException.ThrowIfNull(logger);
@@ -77,7 +82,16 @@ public class AndroidSecretsService : ISecretsService
             var entry = SecretCache.Instance.Retrieve(key);
             if (entry == null)
             {
-                _logger.LogWarning("Secret {Key} not found", key);
+                _logger.LogWarning("Secret {Key} not found in Android KeyStore", key);
+
+                // Raise credential recovery event for missing credentials
+                RaiseCredentialRecoveryNeeded(
+                    key,
+                    null,
+                    CredentialRecoveryFailureType.NotFound,
+                    $"Credential '{key}' not found in Android KeyStore. Please enter your credentials."
+                );
+
                 return Task.FromResult<string?>(null);
             }
 
@@ -93,11 +107,74 @@ public class AndroidSecretsService : ISecretsService
             _logger.LogDebug("Secret {Key} retrieved from Android KeyStore", key);
             return Task.FromResult<string?>(value);
         }
-        catch (Exception ex)
+        catch (CryptographicException ex)
         {
-            _logger.LogError(ex, "Failed to retrieve secret {Key}", key);
+            // KeyStore entry corrupted or device keys changed
+            _logger.LogError(ex, "Cryptographic error retrieving secret {Key} - Android KeyStore entry may be corrupted", key);
+
+            RaiseCredentialRecoveryNeeded(
+                key,
+                ex,
+                CredentialRecoveryFailureType.CorruptedCredentials,
+                $"Your saved credentials could not be decrypted from Android KeyStore. This can happen if device security settings changed. Please re-enter your credentials for '{key}'."
+            );
+
             return Task.FromResult<string?>(null);
         }
+        catch (UnauthorizedAccessException ex)
+        {
+            // Permission denied to access KeyStore
+            _logger.LogError(ex, "Unauthorized access retrieving secret {Key} - Android KeyStore permissions may be revoked", key);
+
+            RaiseCredentialRecoveryNeeded(
+                key,
+                ex,
+                CredentialRecoveryFailureType.AccessDenied,
+                $"Access to Android KeyStore was denied. Please check app permissions and re-enter your credentials for '{key}'."
+            );
+
+            return Task.FromResult<string?>(null);
+        }
+        catch (Exception ex)
+        {
+            // Unknown error
+            _logger.LogError(ex, "Unknown error retrieving secret {Key} from Android KeyStore", key);
+
+            RaiseCredentialRecoveryNeeded(
+                key,
+                ex,
+                CredentialRecoveryFailureType.Unknown,
+                $"An unexpected error occurred while retrieving credentials for '{key}' from Android KeyStore. Please re-enter your credentials."
+            );
+
+            return Task.FromResult<string?>(null);
+        }
+    }
+
+    /// <summary>
+    /// Raise the credential recovery needed event
+    /// </summary>
+    private void RaiseCredentialRecoveryNeeded(
+        string key,
+        Exception? exception,
+        CredentialRecoveryFailureType failureType,
+        string message)
+    {
+        var eventArgs = new CredentialRecoveryEventArgs
+        {
+            Key = key,
+            Exception = exception,
+            FailureType = failureType,
+            Message = message
+        };
+
+        OnCredentialRecoveryNeeded?.Invoke(this, eventArgs);
+
+        _logger.LogInformation(
+            "Credential recovery event raised for key {Key}, failure type {FailureType} (Android KeyStore)",
+            key,
+            failureType
+        );
     }
 
     public Task DeleteSecretAsync(string key, CancellationToken cancellationToken = default)
