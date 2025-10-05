@@ -2,6 +2,9 @@
   // ============================================================================
   // GitHub Copilot Configuration
   // ============================================================================
+  // Copilot will automatically discover instruction files in:
+  // - .github/copilot-instructions.md (root level)
+  // - .github/instructions/*.instructions.md (instruction files)
   "github.copilot.chat.codeGeneration.useInstructionFiles": true,
   // ============================================================================
   // C# / .NET Configuration
@@ -93,6 +96,10 @@
   "xml.format.joinCommentLines": false,
   "xml.format.joinContentLines": false,
   "xml.completion.autoCloseTags": true,
+  "xml.catalogs": [
+    ".vscode/xml.catalog.xml"
+  ],
+  "xml.validation.enabled": true,
   // ============================================================================
   // Terminal Configuration
   // ============================================================================

@@ -1,0 +1,37 @@
+# ShellCheck Configuration
+# See: https://www.shellcheck.net/wiki/
+
+# Disable specific checks globally
+# Format: disable=SC1234,SC5678
+
+# SC2148: Tips depend on target shell and yours is unknown
+# (We specify shell with shebang in each script)
+disable=SC2148
+
+# SC1091: Not following: file not included
+# (Allow sourcing files that may not exist in all environments)
+disable=SC1091
+
+# SC2034: Variable appears unused
+# (Some variables are used by sourced scripts)
+# disable=SC2034
+
+# SC2154: Variable is referenced but not assigned
+# (Variables may come from parent scope or environment)
+# disable=SC2154
+
+# SC2155: Declare and assign separately to avoid masking return values
+# (Sometimes convenience is preferred)
+# disable=SC2155
+
+# Enable optional checks
+# Format: enable=...
+
+# External sources
+# Specify directories to search for sourced files
+# source-path=SCRIPTDIR
+
+# Shell dialect
+# Specify the shell dialect to use (sh, bash, dash, ksh)
+# Default: auto-detect from shebang
+# shell=bash
