@@ -8,8 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using MySql.Data.MySqlClient;
 using MTM_Template_Application.Models.Configuration;
+using MySql.Data.MySqlClient;
 
 namespace MTM_Template_Application.Services.Configuration;
 
