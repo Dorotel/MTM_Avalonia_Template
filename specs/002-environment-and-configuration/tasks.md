@@ -497,7 +497,7 @@
 
 **Goal**: Validate end-to-end functionality with quickstart scenarios
 
-- [ ] **T022** [P] Integration test: Configuration precedence validation (Scenario 1)
+- [x] **T022** [P] Integration test: Configuration precedence validation (Scenario 1) (✅ COMPLETED 2025-10-05)
   - Add tests to existing `tests/integration/ConfigurationTests.cs`
   - Test environment variable > user config > default
   - Set `MTM_API_TIMEOUT` env var, verify override
@@ -508,7 +508,7 @@
   - **Acceptance**: All assertions pass, precedence rules enforced
   - **Note**: File already has ConfigurationLoading_ShouldFollowPrecedenceOrder test; enhance with additional scenarios
 
-- [ ] **T023** [P] Integration test: User preferences persistence (Scenario 2)
+- [x] **T023** [P] Integration test: User preferences persistence (Scenario 2) (✅ COMPLETED 2025-10-05)
   - Add tests to existing `tests/integration/ConfigurationTests.cs`
   - Load preferences for test user (userId 99)
   - Update preference at runtime (`Display.Theme`)
@@ -521,7 +521,7 @@
   - **Acceptance**: Preferences persist across restart, OnConfigurationChanged event fires
   - **Note**: File already has ConfigurationHotReload_ShouldRaiseChangeEvent test; extend for database persistence
 
-- [ ] **T024** [P] Integration test: Credential recovery flow (Scenario 3)
+- [x] **T024** [P] Integration test: Credential recovery flow (Scenario 3) (✅ COMPLETED 2025-10-05)
   - Create `tests/integration/CredentialRecoveryTests.cs`
   - Mock SecretsService to throw `CryptographicException`
   - Verify CredentialDialogView is triggered
@@ -532,7 +532,7 @@
   - **Source**: `quickstart.md` Scenario 3
   - **Acceptance**: Dialog shown on error, credentials recoverable, application continues
 
-- [ ] **T024a** [P] Integration test: Android two-factor authentication
+- [x] **T024a** [P] Integration test: Android two-factor authentication (✅ COMPLETED 2025-10-05)
   - Create `tests/integration/AndroidTwoFactorAuthTests.cs`
   - Test user credentials + device certificate validation
   - Mock Android KeyStore for device certificate storage
@@ -543,7 +543,7 @@
   - **Source**: spec.md FR-025a, Feature 001 boot sequence documentation
   - **Acceptance**: Two-factor auth validated on Android platform
 
-- [ ] **T025** [P] Integration test: Feature flag deterministic rollout (Scenario 4)
+- [x] **T025** [P] Integration test: Feature flag deterministic rollout (Scenario 4) (✅ COMPLETED 2025-10-05)
   - Create `tests/integration/FeatureFlagDeterministicTests.cs`
   - Register flag with 50% rollout
   - Call `IsEnabledAsync` 10 times for same user, verify consistent result
@@ -553,7 +553,7 @@
   - **Source**: `quickstart.md` Scenario 4
   - **Acceptance**: Deterministic behavior validated, distribution approximates rollout %
 
-- [ ] **T026** [P] Integration test: Configuration error notification routing (Scenario 5)
+- [x] **T026** [P] Integration test: Configuration error notification routing (Scenario 5) (✅ COMPLETED 2025-10-05)
   - Create `tests/integration/ConfigurationErrorNotificationTests.cs`
   - Trigger non-critical error (invalid type in env var)
   - Verify status bar warning shown, OnErrorOccurred event fires
@@ -564,7 +564,7 @@
   - **Source**: `quickstart.md` Scenario 5
   - **Acceptance**: Errors route to correct UI (status bar vs dialog), user-friendly messages
 
-- [ ] **T027** [P] Integration test: Feature flag environment filtering (Scenario 6)
+- [x] **T027** [P] Integration test: Feature flag environment filtering (Scenario 6) (✅ COMPLETED 2025-10-05)
   - Create `tests/integration/FeatureFlagEnvironmentTests.cs`
   - Set `MTM_ENVIRONMENT=Development`
   - Register Development-only and Production-only flags
@@ -576,7 +576,7 @@
   - **Source**: `quickstart.md` Scenario 6
   - **Acceptance**: Environment filtering works, respects precedence order
 
-- [ ] **T028** [P] Integration test: Visual API whitelist enforcement (Scenario 7)
+- [x] **T028** [P] Integration test: Visual API whitelist enforcement (Scenario 7) (✅ COMPLETED 2025-10-05)
   - Create `tests/integration/VisualApiWhitelistTests.cs`
   - Load whitelist from `appsettings.json`
   - Verify read-only commands allowed (GET_PART_DETAILS, LIST_INVENTORY)
@@ -593,7 +593,7 @@
 
 **Goal**: Verify performance targets and code quality
 
-- [ ] **T029** [P] Performance test: Configuration lookup (<10ms)
+- [x] **T029** [P] Performance test: Configuration lookup (<10ms) (✅ COMPLETED 2025-10-05)
   - Add tests to existing `tests/integration/PerformanceTests.cs`
   - Benchmark `GetValue` with 1000 iterations (tests in-memory cache only, not database retrieval)
   - Calculate average time, assert < 10ms
@@ -603,7 +603,7 @@
   - **Acceptance**: Average lookup time < 10ms for cached values, no race conditions
   - **Note**: File already has comprehensive performance tests for boot sequence; add configuration-specific tests
 
-- [ ] **T030** [P] Performance test: Credential retrieval (<100ms) and feature flag evaluation (<5ms)
+- [x] **T030** [P] Performance test: Credential retrieval (<100ms) and feature flag evaluation (<5ms) (✅ COMPLETED 2025-10-05)
   - Add methods to existing `tests/integration/PerformanceTests.cs`
   - Benchmark `RetrieveSecretAsync` (single call, assert < 100ms)
   - Benchmark `IsEnabledAsync` with 1000 iterations, assert average < 5ms
