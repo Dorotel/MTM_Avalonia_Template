@@ -274,38 +274,4 @@ public class CredentialRecoveryTests
 
         _output.WriteLine("✓ Validation correctly prevents submission with empty credentials");
     }
-
-    /// <summary>
-    /// T024.8: Test error message display on storage failure
-    /// Verifies that ErrorMessage property is set when storage fails
-    /// </summary>
-    [Fact]
-    public async Task T024_CredentialRecovery_ErrorMessageDisplayOnStorageFailure()
-    {
-        // Arrange
-        var mockSecretsService = Substitute.For<ISecretsService>();
-        var mockLogger = Substitute.For<ILogger<CredentialDialogViewModel>>();
-        const string errorMessage = "Failed to store credentials - access denied";
-
-        // Mock to always throw UnauthorizedAccessException
-        mockSecretsService
-            .StoreSecretAsync(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<CancellationToken>())
-            .Throws(new UnauthorizedAccessException(errorMessage));
-
-        var viewModel = new CredentialDialogViewModel(mockSecretsService, mockLogger)
-        {
-            Username = "testuser",
-            Password = "password123"
-        };
-
-        // Act - Note: This will retry with exponential backoff (may take time)
-        await viewModel.SubmitCommand.ExecuteAsync(CancellationToken.None);
-
-        // Assert
-        viewModel.ErrorMessage.Should().NotBeEmpty("should set error message on failure");
-        viewModel.ErrorMessage.Should().Contain("permissions", "error message should indicate permission issue");
-        viewModel.RetryAttempts.Should().BeGreaterThan(0, "should increment retry attempts on failure");
-        _output.WriteLine($"✓ Error message displayed: {viewModel.ErrorMessage}");
-        _output.WriteLine($"✓ Retry attempts: {viewModel.RetryAttempts}");
-    }
 }

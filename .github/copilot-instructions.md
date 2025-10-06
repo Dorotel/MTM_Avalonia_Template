@@ -2,6 +2,79 @@
 
 Auto-generated from all feature plans. Last updated: 2025-10-05
 
+## Radio Silence Mode (Agent Protocol)
+
+Purpose: Execute large or critical tasks with zero chatter and maximal focus. Only produce concrete deliverables.
+
+When to enter
+- Running any Prompt from the [Specify] workflow, Large refactors, complex features, critical bug fixes, perf/security work, infra/architectural changes, major dependency updates, documentation/testing/quality/i18n/l10n/UX/accessibility/cross-platform/CI-CD improvements.
+
+Entry handshake (required)
+1) Clarify unknowns first (single, concise question set).
+2) Post a short plan and expected outputs, including a timebox.
+3) Await user approval to proceed. If explicitly told to “enter radio silence”, proceed immediately.
+4) If using any of the .specify prompts, enter Radio Silence.
+
+Operating rules (during silence)
+- No commentary, no status updates, no thoughts.
+- Output only deliverables in the following formats:
+  - PATCH (existing file edit)
+    - Path (repo-relative)
+    - Unified diff in a fenced code block
+  - NEW FILE
+    - Path + full file contents in a fenced code block
+  - DELETE FILE
+    - Path only
+  - TEST
+    - Commands to run and minimal pass/fail summary
+  - COMMIT
+    - Concise, conventional commit message (single subject + optional body)
+- Enforce repository standards at all times:
+  - Version compatibility (net9.0, Avalonia 11.3.6, MVVM Toolkit 8.4.0, etc.)
+  - Nullability, async + CancellationToken, DI patterns
+  - Avalonia CompiledBinding with x:DataType (no Binding/ReflectionBinding)
+  - MySQL parameterized queries only; use schema from .github/mamp-database/schema-tables.json
+  - Follow existing code patterns; do not introduce new patterns
+
+Allowed interrupts (break silence with one concise question)
+- Spec ambiguity or missing business decision
+- Missing secrets/config/paths or unresolved schema uncertainty
+- Version/API conflicts or cross-platform constraints
+- Failing tests that require product choice (not purely technical)
+
+Exit protocol
+- On completion or timebox end, post:
+  - SUMMARY: one short paragraph
+  - CHANGES: bullet list of files touched/added/removed
+  - TESTS: minimal results summary
+  - NEXT: requested review points or next steps
+- Then await feedback.
+
+Plan template (pre-silence)
+- Objective: <single sentence>
+- Steps: <3–7 bullets>
+- Outputs: PATCH/NEW FILE/DELETE FILE/TEST/COMMIT
+- Timebox: <e.g., 45m>
+
+Deliverable templates (during silence)
+- PATCH path/to/file.ext
+
+```diff
+<unified diff>
+```
+
+- NEW FILE path/to/file.ext
+
+```<lang>
+<full contents>
+```
+
+- DELETE FILE path/to/file.ext
+- TEST
+- COMMIT
+<subject line>
+<optional body>
+
 ## Priority Guidelines for GitHub Copilot
 
 When generating code for this repository, **ALWAYS** follow this priority order:
@@ -87,9 +160,13 @@ When working with specifications, always reference:
 - Example: `create-new-feature.sh --json "{ARGS}"` returns `{"BRANCH_NAME": "...", "SPEC_FILE": "..."}`
 
 ## Active Technologies
-- [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION] (002-environment-and-configuration)
-- [if applicable, e.g., PostgreSQL, CoreData, files or N/A] (002-environment-and-configuration)
-- MAMP MySQL 5.7 (UserPreferences, FeatureFlags tables) + OS-native secure storage (DPAPI/KeyStore for credentials) (002-environment-and-configuration)
+- Language/Runtime: C# (LangVersion latest) on .NET 9.0 with Nullable enabled (002-environment-and-configuration)
+- UI/MVVM: Avalonia UI 11.3.6 with CompiledBindings by default; CommunityToolkit.Mvvm 8.4.0 (source generators) (002-environment-and-configuration)
+- DI/Logging/Observability: Microsoft.Extensions.DependencyInjection 9.0.0; Serilog.Extensions.Logging 8.0.0; OpenTelemetry (Jaeger optional) (002-environment-and-configuration)
+- Resilience/Mapping/Validation: Polly 8.4.2; AutoMapper 13.0.1; FluentValidation 11.10.0 (002-environment-and-configuration)
+- Database/Security: MySql.Data 9.0.0 against MAMP MySQL 5.7 (UserPreferences, FeatureFlags); OS-native secure storage (DPAPI/KeyStore) (002-environment-and-configuration)
+- Caching/Compression: K4os.Compression.LZ4 1.3.8 for local cache (002-environment-and-configuration)
+- Testing: xUnit 2.9.2; NSubstitute 5.1.0; FluentAssertions 6.12.1 (002-environment-and-configuration)
 
 ### Core Stack (001-boot-sequence-splash)
 - **Framework**: C# .NET 9.0 with nullable reference types enabled
@@ -720,5 +797,39 @@ Before generating ANY code:
 - OpenTelemetry exports to local Jaeger instance (optional)
 - Avalonia version: 11.3+ (ensure latest stable)
 - Use FluentTheme or Material.Avalonia for theming
+
+### MAMP MySQL 5.7 CLI Access
+
+**Successful Connection Method**:
+
+```powershell
+# Full path to MAMP MySQL client (mysql.exe not in PATH by default)
+& "C:\MAMP\bin\mysql\bin\mysql.exe" -u root -p"root" -h 127.0.0.1 -P 3306
+
+# Connect to specific database
+& "C:\MAMP\bin\mysql\bin\mysql.exe" -u root -p"root" -h 127.0.0.1 -P 3306 -D mtm_template_dev
+
+# Execute query directly (useful for scripts)
+& "C:\MAMP\bin\mysql\bin\mysql.exe" -u root -p"root" -h 127.0.0.1 -P 3306 -D mtm_template_dev -e "SHOW TABLES;"
+```
+
+**Connection Details**:
+- **Host**: 127.0.0.1 (localhost)
+- **Port**: 3306 (default)
+- **Username**: root (MAMP default)
+- **Password**: root (MAMP default - change in production!)
+- **Database**: mtm_template_dev (development database)
+- **Version**: MySQL 5.7.24
+
+**Existing Tables** (Feature 002 already implemented):
+- `users` - User accounts (UserId, Username, DisplayName, IsActive, CreatedAt, LastLoginAt)
+- `userpreferences` - User-specific settings
+- `featureflags` - Feature flag configurations
+
+**Important Notes**:
+- Password on command line shows security warning (use .my.cnf file or environment variable in production)
+- Table names are lowercase (MySQL on Windows is case-insensitive, but Linux/production may be case-sensitive)
+- Always use parameterized queries in C# code (never string concatenation)
+- Reference `.github/mamp-database/schema-tables.json` for exact schema before coding
 
 <!-- MANUAL ADDITIONS END -->

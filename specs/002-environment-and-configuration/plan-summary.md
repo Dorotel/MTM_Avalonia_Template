@@ -2,27 +2,24 @@
 
 **Document Type**: Non-Technical Project Overview
 **Created**: 2025-10-05
-**Status**: Planning Phase Complete
+**Status**: Planning Complete - Ready for Implementation
 **For**: Business stakeholders, project managers, and anyone tracking progress
 
 ---
 
 ## 📋 What This Document Is
 
-This is a plain-language summary of **how** we plan to build the configuration system enhancements. It translates the technical implementation plan into terms anyone can understand, focusing on the approach, timeline, and what's involved.
+This is a plain-language summary of **how** we plan to build the environment and configuration management system. It translates the technical implementation plan into terms anyone can understand, focusing on the approach, timeline, and what's involved.
 
 **Who should read this?**
-
 - Managers tracking project progress
 - Stakeholders wanting to understand the work involved
 - Team members who need to coordinate with the development team
 - Anyone curious about what's happening "behind the scenes"
 
 **Related Documents:**
-
 - 🔧 **Technical Plan**: [plan.md](./plan.md) - Detailed technical approach for developers
-- 📘 **Feature Overview**: [overview.md](./overview.md) - What the feature does and why
-- 📊 **Feature Specification**: [spec.md](./spec.md) - Complete requirements
+- 📘 **Feature Specification**: [spec.md](./spec.md) - What the feature does and why
 
 ---
 
@@ -30,76 +27,73 @@ This is a plain-language summary of **how** we plan to build the configuration s
 
 ### What We're Building On
 
-We're enhancing an existing system that already handles basic configuration. Think of it like upgrading a filing cabinet system to include:
+**Settings System with Smart Memory**: We're creating a system that remembers application settings (like database connections, file locations) and can be overridden by environment variables - think of it like having default preferences that you can customize per computer.
 
-- **Database Storage**: We'll save your personal settings (like display preferences and filters) in a database - similar to how your web browser remembers your preferences
-- **Security System**: We'll protect sensitive information (like passwords) using your computer's built-in secure storage - like a locked vault that only you can open
-- **Feature Toggle System**: We'll enable/disable features in a smart way that's consistent for each user - like having switches that stay in the same position for you
-- **Error Alert System**: We'll show you helpful messages when something needs attention - from gentle reminders to important warnings
+**Secure Credential Vault**: We're using your computer's built-in security (Windows Credential Manager on Windows, KeyStore on Android) to safely store passwords and API keys - like using your operating system's password manager instead of writing passwords on sticky notes.
+
+**Feature Control Center**: We're building a system that checks which features are turned on/off from a central database at startup - like a settings dashboard that controls which buttons appear in the app.
 
 ### Why These Choices?
 
-**Database for Preferences**: We chose MySQL database because it can handle many users at once and we already use it for other data. It's fast, reliable, and our team knows it well.
+**Industry-Standard Patterns**: We're using Microsoft's recommended approach for configuration (appsettings.json + environment variables) because it's proven, well-documented, and our team knows it well. This means faster development and fewer surprises.
 
-**Built-in Security**: Instead of creating our own password storage (risky!), we use your operating system's secure storage. Windows has one, Android has one - they're tested, proven, and much safer than anything we could build from scratch.
+**Operating System Security**: By using Windows/Android's built-in credential storage, we're not reinventing the wheel. The OS has already solved this problem securely, so we're leveraging what's already there.
 
-**Smart Feature Toggles**: Features turn on/off consistently per user (not randomly). This prevents the confusion of seeing a feature one minute and not seeing it the next.
-
-**Helpful Error Messages**: Not every error is critical. Minor issues get a small warning icon you can click for details. Critical issues (like "can't connect to database") show a dialog box that explains what to do in plain English.
+**Simplicity Over Complexity**: We decided feature flags only update at app startup (not while running) because it's simpler and more predictable. If you change a flag, restart the app - just like changing system settings.
 
 ---
 
 ## 🏗️ Major Building Blocks
 
-### Block 1: Configuration Storage System
+This section breaks down the work into major pieces, like building a house room by room.
 
-**What it does**: Saves your preferences so the app "remembers" how you like things (theme, filters, sort order)
+### Block 1: Configuration System
 
-**Why it's needed**: Nobody wants to reset their preferences every time they restart the app
+**What it does**: Reads application settings from files and environment variables, automatically preferring environment variables when both exist.
 
-**How long it will take**: About 1 week (database setup + testing)
+**Why it's needed**: So developers can override database connections or file paths without editing code, and so the app works in different environments (development, staging, production).
 
-**Who works on this**: Database developer + backend developer
+**How long it will take**: About 1 week (6 tasks)
 
-### Block 2: Credential Recovery Dialog
+**Who works on this**: Configuration developer
 
-**What it does**: If the app can't retrieve your saved password (corrupted storage, permissions changed), it shows a friendly dialog asking you to enter it again
+**Business value**: Faster deployments, fewer configuration mistakes, easier troubleshooting
 
-**Why it's needed**: Without this, users would be stuck if passwords couldn't be retrieved - the app would just crash or fail silently
+### Block 2: Credential Storage
 
-**How long it will take**: About 3-4 days (design + build + test)
+**What it does**: Securely stores and retrieves passwords, API keys, and other secrets using the operating system's secure storage.
 
-**Who works on this**: UI developer + UX designer
+**Why it's needed**: So credentials aren't stored in plain text files where hackers could find them. The OS protects them with hardware encryption.
 
-### Block 3: Smart Error Notifications
+**How long it will take**: About 1.5 weeks (7 tasks)
 
-**What it does**: Shows you different types of messages based on how serious the problem is - from "FYI" status bar icons to "Please fix this now" dialog boxes
+**Who works on this**: Security developer
 
-**Why it's needed**: Not all errors need to interrupt your work. Minor issues can wait; critical ones need immediate attention.
+**Business value**: Meets security compliance requirements, protects sensitive data, reduces breach risk
 
-**How long it will take**: About 1 week (notification system + integration)
+### Block 3: Feature Flag System
 
-**Who works on this**: Backend developer + UI developer
+**What it does**: Checks a database at app startup to see which features are enabled, caches them in memory, and provides a simple "is this feature on?" check.
 
-### Block 4: Consistent Feature Flags
+**Why it's needed**: So we can turn features on/off without deploying new code, test features with small user groups, or quickly disable problematic features.
 
-**What it does**: Makes sure that when you see a new feature enabled, it stays enabled for you (not randomly appearing/disappearing)
-
-**Why it's needed**: Random feature behavior confuses users and makes troubleshooting impossible
-
-**How long it will take**: About 3-4 days (algorithm change + testing)
+**How long it will take**: About 1 week (6 tasks)
 
 **Who works on this**: Backend developer
 
-### Block 5: Visual API Safety System
+**Business value**: Faster incident response, safer feature rollouts, easier A/B testing
 
-**What it does**: Enforces that only "read" commands can be sent to the Visual ERP system (no "write" or "delete" commands)
+### Block 4: Database Foundation
 
-**Why it's needed**: Safety - we only want to read data from Visual, never change it accidentally
+**What it does**: Creates three database tables (Users, UserPreferences, FeatureFlags) to store user settings and feature flags.
 
-**How long it will take**: About 2 days (whitelist setup + validation)
+**Why it's needed**: So settings and flags persist across app restarts and are shared across devices.
 
-**Who works on this**: Backend developer
+**How long it will take**: About 0.5 weeks (5 tasks)
+
+**Who works on this**: Database developer
+
+**Business value**: Centralized settings management, consistent user experience across devices
 
 ---
 
@@ -107,56 +101,41 @@ We're enhancing an existing system that already handles basic configuration. Thi
 
 ### Phase 1: Foundation (Week 1)
 
-**Goal**: Set up database tables and configuration files
+**Goal**: Set up database, models, and contracts
 
 **What happens**:
+- Create database tables (Users, UserPreferences, FeatureFlags)
+- Define data models in code (what a "UserPreference" looks like)
+- Write contract tests (verify interfaces are correct before implementing)
+- Update database documentation
 
-- Create database tables for user preferences and feature flags
-- Set up configuration files with placeholder values
-- Write tests that define expected behavior (they'll fail at first - that's normal!)
+**What you'll see**: Not much visible yet - this is like laying the foundation of a house
 
-**What you'll see**: Nothing visible yet - this is like laying the foundation of a house
+### Phase 2: Core Implementation (Weeks 2-3)
 
-### Phase 2: Core Features (Weeks 2-3)
-
-**Goal**: Build the main functionality
+**Goal**: Build the three main systems (Configuration, Credentials, Feature Flags)
 
 **What happens**:
+- Implement configuration service with precedence rules (environment variables beat file settings)
+- Implement Windows credential storage using DPAPI (Data Protection API)
+- Implement Android credential storage using KeyStore
+- Implement feature flag evaluator with database sync
+- Wire up dependency injection (so services can talk to each other)
 
-- Enhance configuration system to save/load from database
-- Create credential recovery dialog with clear instructions
-- Implement smart error notification routing
-- Upgrade feature flags to be consistent per user
-- Set up Visual API command whitelist
-
-**What you'll see**: Working features you can interact with, though not fully polished
+**What you'll see**: Services work but aren't connected to UI yet - you can test them with automated tests
 
 ### Phase 3: Integration & Testing (Week 4)
 
-**Goal**: Make everything work together smoothly
+**Goal**: Make sure everything works together reliably
 
 **What happens**:
+- Test credential recovery flow (what happens when Windows Credential Manager is corrupted?)
+- Test offline scenarios (what happens when database is unreachable?)
+- Test configuration precedence (does environment variable really override file?)
+- Test feature flag sync (does database change reflect in app after restart?)
+- Performance testing (<3 seconds startup, <100ms configuration retrieval)
 
-- Test configuration saving and loading across restarts
-- Test credential recovery when storage fails
-- Test error notifications with different scenarios
-- Test feature flags with many users to verify consistency
-- Test that only allowed API commands work
-
-**What you'll see**: Fully working system ready for real use
-
-### Phase 4: Polish & Documentation (Week 5)
-
-**Goal**: Make it reliable and easy to understand
-
-**What happens**:
-
-- Performance testing (ensure everything is fast enough)
-- Write user documentation
-- Create setup guide for administrators
-- Fix any remaining issues found in testing
-
-**What you'll see**: Production-ready feature with documentation
+**What you'll see**: Fully functional feature ready for real use, with evidence it handles problems gracefully
 
 ---
 
@@ -164,21 +143,25 @@ We're enhancing an existing system that already handles basic configuration. Thi
 
 ### What It Talks To
 
-**MySQL Database**: Stores your preferences so they persist when you close the app. Like saving a document - your changes are kept for next time.
+**MySQL Database**: Reads user preferences and feature flags from MAMP MySQL 5.7 database running locally (127.0.0.1:3306)
 
-**Windows/Android Security Storage**: Protects passwords using your operating system's built-in vault. Windows has Credential Manager, Android has KeyStore - both are encrypted and secure.
+**Windows Credential Manager** (Windows only): Stores and retrieves credentials using built-in OS security
 
-**MTM Application Launcher**: When new features are released, the launcher checks if there's an update and downloads new configuration. This keeps feature flags synchronized with the app version.
+**Android KeyStore** (Android only): Stores and retrieves credentials using Android's secure storage
 
-**Visual ERP System**: Reads data from the ERP system (part numbers, inventory, orders) but never writes back. The whitelist ensures only "read" commands are allowed.
+**Configuration Files**: Reads appsettings.json file for default settings
+
+**Environment Variables**: Reads system environment variables for deployment-specific overrides
 
 ### What Could Break
 
-**Database Offline**: If MySQL stops running, you can't save new preferences. The app shows a clear dialog: "Database is not available. Please start MySQL and try again." You can still use the app with defaults.
+**Database Offline**: If MySQL database is unreachable, the app uses cached feature flags (from last successful sync) and shows a warning. Configuration and credentials still work normally.
 
-**Password Storage Corrupted**: If Windows/Android secure storage has issues, the app shows a dialog asking you to re-enter your Visual ERP credentials. They'll be saved again once storage is working.
+**Credential Storage Corrupted**: If Windows Credential Manager has problems, the app prompts the user to re-enter credentials and attempts to re-save them. The user isn't blocked from using the app.
 
-**Network Issues**: If you can't reach the Visual ERP system, the app uses cached data (if available) or shows a friendly message. The app doesn't crash - it degrades gracefully.
+**Invalid Configuration Values**: If an environment variable has the wrong format (e.g., "ABC" instead of a number), the app logs a warning and uses the default value from appsettings.json.
+
+**Network Partition**: Android devices without network access can't sync feature flags, so they use whatever flags were cached last time they had connectivity. The app detects "offline mode" and adjusts behavior accordingly.
 
 ---
 
@@ -186,22 +169,20 @@ We're enhancing an existing system that already handles basic configuration. Thi
 
 ### How Will It Look?
 
-We're using Material Design patterns - clean, modern, and familiar. Think Google-style interfaces: clear buttons, readable text, consistent colors.
+**Mostly Invisible**: This is a behind-the-scenes feature - users won't see much UI except:
+- Credential recovery dialog if Windows Credential Manager fails
+- Subtle status indicators showing "online" vs "offline" mode
+- Settings screen showing active feature flags (for troubleshooting)
 
-The credential recovery dialog will have:
-
-- Clear title: "Credentials Required"
-- Plain English message: "We couldn't access your saved login information. Please enter your Visual ERP username and password to continue."
-- Two text boxes (username, password) with large, easy-to-click buttons
-- Helpful error messages if something's wrong
+**Error Messages**: When something goes wrong, users see helpful messages like "We couldn't connect to the database. Using your last saved settings..." instead of cryptic error codes.
 
 ### How Will It Feel to Use?
 
-**For minor issues**: A small warning icon appears in the status bar. Click it to see details. Doesn't interrupt your work.
+**Fast and Seamless**: Configuration retrieval takes less than 100 milliseconds - so fast you won't notice. Feature flags are cached in memory, so checking "is this feature enabled?" is instant.
 
-**For critical issues**: A dialog box appears with clear explanation and action button. You must address it to continue (like "Start MySQL" or "Enter Password").
+**Reliable Offline**: The app works offline by using cached settings and credentials. Users don't get stuck with "network error" messages that block them from working.
 
-**Overall philosophy**: Never surprise the user. Always explain what happened and what to do about it in everyday language.
+**Self-Healing**: If credentials are corrupted, the app prompts for re-entry instead of crashing. If the database is down, the app uses cached flags instead of showing blank screens.
 
 ---
 
@@ -209,150 +190,81 @@ The credential recovery dialog will have:
 
 ### Things That Could Slow Us Down
 
-**Learning Curve**: This is the first feature using the new Material Design dialog system - might take a day to get familiar.
+**Platform-Specific Testing**: We need to test credential storage on both Windows (DPAPI) and Android (KeyStore) - requires setting up both environments and devices for testing. **Mitigation**: Use factory pattern to abstract platform differences, write extensive contract tests to catch issues early.
 
-**Database Schema Changes**: If existing database structure conflicts with our new tables, we'll need to coordinate schema changes carefully.
+**Database Connection Edge Cases**: Many scenarios to test (database down, network partition, slow queries, corrupted data). **Mitigation**: Use established patterns from Feature 001 (boot sequence) which already handles similar scenarios.
 
-**Testing Coverage**: With 7 different integration scenarios, testing will take time. We'll need the MAMP MySQL server running reliably for tests.
+**Environment Variable Syntax**: Different operating systems handle environment variables differently (Windows uses `%VAR%`, Linux uses `$VAR`). **Mitigation**: .NET's configuration system abstracts these differences - we test on all platforms.
 
-### Our Backup Plans
-
-**Material Design Issues**: If the new dialog system is problematic, we fall back to standard Avalonia dialogs (simpler, but less polished). Adds 1-2 days.
-
-**Schema Conflicts**: We have a rollback script ready. If new tables cause issues, we can revert and redesign. Adds 3-5 days.
-
-**MySQL Stability**: If MAMP is unreliable for testing, we switch to Docker MySQL container (more consistent). Adds 1 day for setup.
+**Credential Recovery UX**: Prompting users for credentials is disruptive - need to make dialog clear and non-threatening. **Mitigation**: Use friendly language ("Let's reconnect to your secure storage"), provide context about what happened, make "cancel" option work gracefully.
 
 ---
 
-## 📊 Quality Measures
+## 📊 Success Metrics
 
-### How We'll Know It's Ready
+### How We'll Know It Works
 
-**Speed Tests**:
+**Performance Targets**:
+- ✅ Configuration retrieval: <100ms (tested with 50+ configuration keys)
+- ✅ Credential retrieval: <200ms (tested with Windows Credential Manager and Android KeyStore)
+- ✅ Service initialization: <3 seconds (part of boot sequence, Feature 001 target)
+- ✅ Feature flag evaluation: <1ms (in-memory cache, no database calls)
 
-- Configuration lookup: Under 10 milliseconds (instant - you won't notice any delay)
-- Password retrieval: Under 100 milliseconds (faster than you can blink)
-- Feature flag check: Under 5 milliseconds (instant)
+**Reliability Targets**:
+- ✅ Works offline: Cached flags available for 30 days without database connectivity
+- ✅ Handles corrupted credentials: Recovery dialog succeeds in 95%+ of cases
+- ✅ Graceful degradation: No crashes when dependencies unavailable
+- ✅ Test coverage: >80% on critical paths (configuration precedence, credential storage, flag evaluation)
 
-**Accuracy Tests**:
-
-- 100 users with feature flag at 50% rollout = approximately 50 see it enabled (consistent for each user)
-- Save 100 preferences to database, restart app, all 100 load correctly
-- Corrupt password storage, credential dialog appears with clear message
-
-**User Experience Tests**:
-
-- 5 actual users try credential recovery dialog without instructions - all succeed
-- Minor configuration error shows status bar warning (non-intrusive)
-- Critical database error shows modal dialog with clear action steps
-
-### What "Done" Looks Like
-
-- ✅ All planned features work as described in specification
-- ✅ All 7 test scenarios pass without errors
-- ✅ Performance targets met (<10ms, <100ms, <5ms)
-- ✅ No crashes when database offline or passwords missing
-- ✅ Error messages use plain English (no technical jargon like "CryptographicException")
-- ✅ Feature flags are deterministic (same user always sees same result)
-- ✅ Documentation written for developers and administrators
-- ✅ Team trained on how configuration system works
+**User Experience Targets**:
+- ✅ No user action required for normal operation (everything "just works")
+- ✅ Clear error messages when problems occur (no technical jargon)
+- ✅ Self-healing where possible (automatic retry, prompt for re-entry vs crash)
 
 ---
 
-## 💰 Cost Considerations
+## 🎓 What We Learned (Research Phase)
 
-### What's Included in the Work
+During the planning phase, we researched 10 areas and made these key decisions:
 
-- Developer time to write the code (4-5 weeks total)
-- Testing time to verify everything works (included in timeline)
-- Design time for credential dialog UI (1-2 days)
-- Documentation writing (quickstart guides, setup instructions)
-- Code review and quality checks
+1. **Configuration Storage**: Use Microsoft.Extensions.Configuration (industry standard) instead of custom JSON parser
+2. **Credential Storage**: Use OS-native security (DPAPI/KeyStore) instead of encrypted files (less secure)
+3. **Feature Flags**: Launch-time-only sync (simplicity) instead of real-time hot-reload (complexity)
+4. **Error Handling**: Result<T> pattern (functional approach) instead of exception-only (loses context)
+5. **Database**: Normalized schema with foreign keys (data integrity) instead of NoSQL (overkill)
+6. **Platform Detection**: RuntimeInformation.IsOSPlatform() (built-in) instead of #if directives (hard to test)
+7. **Precedence**: Environment variables override files (12-factor app) instead of merge logic (complex)
+8. **Recovery**: User prompt on failure (self-healing) instead of crash (poor UX)
+9. **Testing**: Contract-first TDD (design-by-contract) instead of implementation-first (violates principles)
+10. **Logging**: Serilog structured logs (debuggability) instead of Console.WriteLine (unstructured)
 
-### What's NOT Included
-
-- MySQL server setup (IT department handles MAMP installation)
-- Network infrastructure (VPN, firewall rules for database access)
-- Visual ERP credentials (system administrator provides)
-- User training on how to use features (separate training program)
-
----
-
-## 🗓️ Timeline
-
-### Key Dates
-
-| Milestone          | Target Date | What Happens                          |
-| ------------------ | ----------- | ------------------------------------- |
-| Planning Complete  | 2025-10-05  | We know exactly what we're building ✅ |
-| Database Setup     | 2025-10-12  | Tables created and tested             |
-| Core Features Done | 2025-10-26  | All functionality working             |
-| Testing Complete   | 2025-11-02  | All scenarios validated               |
-| Ready for Use      | 2025-11-09  | Feature is live and available         |
-
-**Note**: These dates assume:
-
-- MAMP MySQL server available for development
-- No major clarification questions arise during implementation
-- No conflicts with other features being developed simultaneously
-
-We'll provide weekly updates on Fridays covering progress, blockers, and next steps.
-
-### Weekly Updates
-
-We'll provide updates every Friday covering:
-
-- ✅ What was completed this week
-- 🔄 What's currently in progress
-- ⏳ What's planned for next week
-- ⚠️ Any issues that came up and how we're addressing them
-- 📊 Whether we're on track for target dates
+Each decision prioritized **simplicity**, **reliability**, and **following established patterns** over custom solutions.
 
 ---
 
-## 📞 Who to Contact
+## 🚀 Next Steps
 
-**Questions about progress**: Development Team Lead
-**Questions about timeline**: Project Manager
-**Questions about user experience**: UX Designer
-**Questions about database setup**: Database Administrator
-**Questions about technical details**: See [plan.md](./plan.md) and contact Backend Developer
+**For Management**:
+- ✅ Planning complete - ready to execute /tasks command to generate detailed task list
+- ⏳ Implementation phase starts after task generation (estimated 4 weeks)
+- ⏳ Weekly status updates on progress (using tasks.md checklist)
 
----
+**For Developers**:
+- ✅ Technical plan documented in plan.md
+- ✅ Research complete (10 areas with decisions and rationale)
+- ✅ Design complete (6 entities, 3 contracts, database schema)
+- ⏳ Execute /tasks command to generate 28-task implementation checklist
+- ⏳ Follow TDD approach (tests before implementation)
 
-## 📝 Change History
-
-| Date       | Change                                                     | Who               |
-| ---------- | ---------------------------------------------------------- | ----------------- |
-| 2025-10-05 | Planning completed, all clarifications resolved            | Development Team  |
-| 2025-10-05 | Research phase complete (technology decisions documented)  | Backend Developer |
-| 2025-10-05 | Design phase complete (data models, contracts, quickstart) | Full Team         |
-
----
-
-## 🎓 Key Terms Explained
-
-**Configuration System**: The part of the app that remembers your preferences (like theme, default filters, sort order)
-
-**Credential Storage**: Secure place where passwords are kept (using your operating system's built-in encryption)
-
-**Feature Flag**: A switch that turns features on or off without changing code (lets us release features gradually)
-
-**Database Persistence**: Saving data to a database so it survives when you close the app
-
-**Contract Test**: A test that validates data structure and behavior (like a checklist ensuring everything matches specifications)
-
-**Integration Test**: A test that validates complete workflows end-to-end (like following a real user's journey through the app)
-
-**Deterministic Rollout**: Ensuring the same user always sees the same features enabled (not random)
-
-**Modal Dialog**: A dialog box that requires your attention before you can continue (blocks other interactions until addressed)
-
-**Status Bar Indicator**: A small icon or message in the bottom bar that doesn't interrupt your work
+**For Stakeholders**:
+- ✅ Constitutional compliance verified (all 9 principles satisfied)
+- ✅ Security approach documented (OS-native credential storage)
+- ✅ Performance targets defined (<3s initialization, <100ms config retrieval)
+- ⏳ Implementation will follow spec-driven development process
+- ⏳ Regular updates as features are completed
 
 ---
 
-*This document is designed to keep non-technical stakeholders informed without overwhelming them with implementation details. For the complete technical specification, developers should refer to plan.md in this same folder.*
-
+**Status**: 🟢 Plan Complete - Ready for Implementation
 **Last Updated**: 2025-10-05
+**Next Milestone**: Execute /tasks command to generate implementation checklist

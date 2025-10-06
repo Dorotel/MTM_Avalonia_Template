@@ -203,8 +203,10 @@ public class DatabaseSchemaContractTests : IDisposable
             ));
         }
 
-        // Assert
-        foreignKeys.Should().Contain(fk => fk.RefTable == "Users" && fk.RefColumn == "UserId");
+        // Assert - Use case-insensitive comparison (MySQL returns lowercase)
+        foreignKeys.Should().Contain(fk =>
+            string.Equals(fk.RefTable, "Users", StringComparison.OrdinalIgnoreCase) &&
+            fk.RefColumn == "UserId");
     }
 
     [Fact]
@@ -343,6 +345,25 @@ public class DatabaseSchemaContractTests : IDisposable
         );
         await cleanupCommand.ExecuteNonQueryAsync();
 
+        // Ensure User record exists for FK constraint
+        var userCleanupCommand = new MySqlCommand(
+            "DELETE FROM Users WHERE UserId = 998",
+            connection
+        );
+        await userCleanupCommand.ExecuteNonQueryAsync();
+
+        var createUserCommand = new MySqlCommand(
+            @"INSERT INTO Users (UserId, Username, DisplayName, IsActive, CreatedAt)
+              VALUES (@userId, @username, @displayName, @isActive, @createdAt)",
+            connection
+        );
+        createUserCommand.Parameters.AddWithValue("@userId", 998);
+        createUserCommand.Parameters.AddWithValue("@username", "test_user_998");
+        createUserCommand.Parameters.AddWithValue("@displayName", "Test User 998");
+        createUserCommand.Parameters.AddWithValue("@isActive", true);
+        createUserCommand.Parameters.AddWithValue("@createdAt", DateTime.UtcNow);
+        await createUserCommand.ExecuteNonQueryAsync();
+
         // Insert first record
         var insertCommand1 = new MySqlCommand(
             @"INSERT INTO UserPreferences (UserId, PreferenceKey, PreferenceValue, Category)
@@ -374,6 +395,7 @@ public class DatabaseSchemaContractTests : IDisposable
 
         // Cleanup
         await cleanupCommand.ExecuteNonQueryAsync();
+        await userCleanupCommand.ExecuteNonQueryAsync();
     }
 
     [Fact]

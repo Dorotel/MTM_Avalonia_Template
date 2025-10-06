@@ -605,7 +605,235 @@ dotnet test
 
 Theme selection persists in user configuration.
 
-## 📚 Additional Resources
+## � Configuration & Secrets Management Patterns (Feature 002)
+
+### Configuration Service Pattern
+
+The application uses **layered configuration precedence** for flexible deployment:
+
+```csharp
+// Configuration precedence (highest to lowest):
+// 1. Environment Variables (MTM_*, ASPNETCORE_*, DOTNET_*)
+// 2. User Configuration (runtime SetValue, persisted to MySQL)
+// 3. Application Defaults (hard-coded fallbacks)
+
+// Get configuration value with type safety
+var timeout = _configurationService.GetValue<int>("API:Timeout", defaultValue: 30);
+
+// Set user preference (triggers OnConfigurationChanged event)
+_configurationService.SetValue("UI:Theme", "Dark");
+
+// Listen for configuration changes
+_configurationService.OnConfigurationChanged += (sender, args) =>
+{
+    _logger.LogInformation("Config changed: {Key} = {NewValue}", args.Key, args.NewValue);
+};
+```
+
+**Key Principles**:
+- Use `IConfigurationService` interface (DI-friendly)
+- Type-safe access via `GetValue<T>()`
+- Change detection prevents unnecessary UI re-renders
+- Database persistence for user preferences
+- Environment variables read once at startup (not runtime polling)
+
+### Secrets Management Pattern
+
+OS-native credential storage with platform-specific implementations:
+
+```csharp
+// Factory pattern for platform detection
+var secretsService = SecretsServiceFactory.Create(loggerFactory);
+
+// Store credential (encrypted in OS-native storage)
+await secretsService.StoreSecretAsync("Visual.Username", username, cancellationToken);
+await secretsService.StoreSecretAsync("Visual.Password", password, cancellationToken);
+
+// Retrieve credential (decrypted from OS storage)
+var username = await secretsService.RetrieveSecretAsync("Visual.Username", cancellationToken);
+
+// Delete credential
+await secretsService.DeleteSecretAsync("Visual.Username", cancellationToken);
+```
+
+**Platform Implementations**:
+- **Windows**: `WindowsSecretsService` (DPAPI via Credential Manager)
+- **Android**: `AndroidSecretsService` (KeyStore with hardware-backed encryption)
+- **Unsupported platforms**: Throws `PlatformNotSupportedException`
+
+**Error Handling**:
+- Storage unavailable → User-friendly dialog prompting credential re-entry
+- Dialog cancellation → Application closes with clear warning (FR-013)
+- Corrupted credentials → Automatic recovery flow (see `docs/CREDENTIAL-RECOVERY-FLOW.md`)
+
+### Feature Flag Evaluation Pattern
+
+Deterministic feature flag evaluation with environment-specific configurations:
+
+```csharp
+// Register feature flag with environment and rollout percentage
+evaluator.RegisterFlag(new FeatureFlag
+{
+    FlagName = "Visual.UseForItems",
+    IsEnabled = true,
+    Environment = "Production",
+    RolloutPercentage = 50 // 50% of users see this feature
+});
+
+// Check if enabled (deterministic per userId)
+bool enabled = await evaluator.IsEnabledAsync("Visual.UseForItems", userId, cancellationToken);
+
+// Update flag state
+await evaluator.SetEnabledAsync("Visual.UseForItems", true, cancellationToken);
+
+// Refresh flags from database
+await evaluator.RefreshFlagsAsync(cancellationToken);
+```
+
+**Key Behaviors**:
+- **Unregistered flags return false** (disabled) + log warning
+- **Rollout percentage uses hash-based determinism** (same userId always sees same result)
+- **Environment filtering**: Only flags for current environment are active
+- **Launch-time sync**: Flags loaded from MySQL at startup, no hot-reload
+- **Validation**: Flag names must match `^[a-zA-Z0-9._-]+$` regex
+
+### Database Schema Management
+
+Always reference `.github/mamp-database/schema-tables.json` before database operations:
+
+```csharp
+// ✅ CORRECT - Parameterized queries with exact table/column names
+await using var command = new MySqlCommand(
+    "SELECT PreferenceKey, PreferenceValue FROM UserPreferences WHERE UserId = @userId",
+    connection
+);
+command.Parameters.AddWithValue("@userId", userId);
+
+// ❌ INCORRECT - String concatenation (SQL injection risk)
+var command = new MySqlCommand($"SELECT * FROM UserPreferences WHERE UserId = {userId}", connection);
+```
+
+**Tables from Feature 002**:
+- `Users` (UserId PK, Username, DisplayName, IsActive, CreatedAt, LastLoginAt)
+- `UserPreferences` (PreferenceId PK, UserId FK, PreferenceKey, PreferenceValue, LastUpdated)
+- `FeatureFlags` (FlagId PK, FlagName UNIQUE, IsEnabled, Environment, RolloutPercentage, UpdatedAt)
+
+**Critical Rules**:
+- Table names are case-sensitive: `Users`, `UserPreferences`, `FeatureFlags`
+- Column names are case-sensitive: `UserId`, `PreferenceKey`, `FlagName`
+- Always use parameterized queries (never string concatenation)
+- Update `schema-tables.json` immediately after schema changes
+- Track migrations in `migrations-history.json`
+
+### Environment Variable Handling
+
+Environment variables follow strict precedence and naming conventions:
+
+```csharp
+// Precedence order (startup-only detection):
+// 1. MTM_ENVIRONMENT (app-specific)
+// 2. ASPNETCORE_ENVIRONMENT (ASP.NET default)
+// 3. DOTNET_ENVIRONMENT (generic .NET)
+// 4. Build configuration (DEBUG → Development, RELEASE → Production)
+// 5. Defaults (Development)
+
+// Naming convention: MTM_ prefix for app-specific variables
+Environment.GetEnvironmentVariable("MTM_DATABASE_SERVER");
+Environment.GetEnvironmentVariable("MTM_VISUAL_API_BASE_URL");
+Environment.GetEnvironmentVariable("MTM_FEATURE_FLAG_OFFLINE_MODE");
+```
+
+**Key Principles**:
+- Read **once at startup** (not runtime polling)
+- App-specific variables (`MTM_*`) override framework defaults
+- Underscore format (not colon): `MTM_DATABASE_SERVER` (not `MTM:Database:Server`)
+
+### Error Categorization Pattern
+
+Severity-based error handling with user-friendly recovery:
+
+```csharp
+public enum ErrorSeverity
+{
+    Info,       // Status bar notification
+    Warning,    // Status bar with click-for-details
+    Critical    // Modal dialog blocking interaction
+}
+
+// Usage
+try
+{
+    await _secretsService.RetrieveSecretAsync(key, cancellationToken);
+}
+catch (InvalidOperationException ex) when (ex.Message.Contains("Storage unavailable"))
+{
+    // Critical error - show modal recovery dialog
+    _logger.LogError(ex, "OS-native credential storage unavailable");
+    await ShowCredentialRecoveryDialogAsync();
+}
+catch (Exception ex)
+{
+    // Warning - show status bar notification
+    _logger.LogWarning(ex, "Non-critical error retrieving credential");
+    ShowStatusBarWarning("Credential retrieval failed. Using cached data.");
+}
+```
+
+**Recovery Strategies**:
+- **Configuration errors**: Fall back to defaults + log warning
+- **Credential errors**: Prompt user for re-entry (see `docs/CREDENTIAL-RECOVERY-FLOW.md`)
+- **Database unavailable**: Use cached values + graceful degradation
+- **Feature flag errors**: Treat as disabled + log warning
+
+### Graceful Degradation Pattern
+
+Application continues operating when dependencies are unavailable:
+
+```csharp
+// Database unavailable
+try
+{
+    await _configurationService.LoadUserPreferencesAsync(userId, cancellationToken);
+}
+catch (MySqlException ex)
+{
+    _logger.LogWarning(ex, "Database unavailable - using cached preferences");
+    // Continue with in-memory defaults
+}
+
+// Feature flags unavailable
+try
+{
+    await _featureFlagEvaluator.RefreshFlagsAsync(cancellationToken);
+}
+catch (Exception ex)
+{
+    _logger.LogWarning(ex, "Feature flag sync failed - using cached flags");
+    // Continue with last-known flag state from local JSON
+}
+```
+
+**Offline Capabilities**:
+- Configuration: Environment variables → User config (cached) → Defaults
+- User Preferences: Last-known cached values (persisted to local JSON)
+- Feature Flags: Last-known cached values (persisted to local JSON)
+- Credentials: Must be available (cannot proceed without)
+
+### Performance Targets (Feature 002)
+
+Configuration and secrets operations have strict performance budgets:
+
+| Operation                   | Target | Measured In                          |
+| --------------------------- | ------ | ------------------------------------ |
+| Configuration retrieval     | <100ms | `GetValue<T>()` with 50+ keys        |
+| Credential retrieval        | <200ms | `RetrieveSecretAsync()` (OS storage) |
+| Feature flag evaluation     | <5ms   | `IsEnabledAsync()` (in-memory cache) |
+| Configuration change events | <50ms  | Event dispatch to subscribers        |
+| User preference persistence | <500ms | MySQL insert/update query            |
+
+**Performance Tests**: `tests/integration/PerformanceTests.cs`
+
+## �📚 Additional Resources
 
 ### Key Documentation Files
 

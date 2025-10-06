@@ -26,7 +26,7 @@ public class ConfigurationTests
     public async Task ConfigurationLoading_ShouldFollowPrecedenceOrder()
     {
         // Arrange - Set environment variable (highest precedence)
-        System.Environment.SetEnvironmentVariable("TEST_SETTING", "env_value");
+        System.Environment.SetEnvironmentVariable("MTM_TEST_SETTING", "env_value");
 
         try
         {
@@ -44,7 +44,7 @@ public class ConfigurationTests
         finally
         {
             // Cleanup
-            System.Environment.SetEnvironmentVariable("TEST_SETTING", null);
+            System.Environment.SetEnvironmentVariable("MTM_TEST_SETTING", null);
         }
     }
 
@@ -440,6 +440,8 @@ public class ConfigurationTests
 
         try
         {
+            // Ensure User record exists for FK constraint
+            await EnsureUserExistsAsync(testUserId, $"test_user_{testUserId}");
             // Act 1 - Save initial value
             await configService.SaveUserPreferenceAsync(testUserId, prefKey, initialValue, CancellationToken.None);
             var value1 = configService.GetValue<string>(prefKey, "default");
@@ -477,6 +479,10 @@ public class ConfigurationTests
 
         try
         {
+            // Ensure User records exist for FK constraints
+            await EnsureUserExistsAsync(user1Id, $"test_user_{user1Id}");
+            await EnsureUserExistsAsync(user2Id, $"test_user_{user2Id}");
+
             // Act - Save preferences for two different users with same key
             await configService.SaveUserPreferenceAsync(user1Id, prefKey, user1Value, CancellationToken.None);
             await configService.SaveUserPreferenceAsync(user2Id, prefKey, user2Value, CancellationToken.None);
@@ -501,4 +507,42 @@ public class ConfigurationTests
     }
 
     #endregion T023: User Preferences Persistence Tests
+
+    #region Helper Methods
+
+    /// <summary>
+    /// Ensures a User record exists in the database for foreign key constraints
+    /// </summary>
+    private static async Task EnsureUserExistsAsync(int userId, string username)
+    {
+        var connectionString = "Server=127.0.0.1;Port=3306;Database=mtm_template_dev;User ID=root;Password=root;";
+        using var connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString);
+        await connection.OpenAsync();
+
+        // Check if user exists
+        var checkCommand = new MySql.Data.MySqlClient.MySqlCommand(
+            "SELECT COUNT(*) FROM Users WHERE UserId = @userId",
+            connection
+        );
+        checkCommand.Parameters.AddWithValue("@userId", userId);
+        var count = Convert.ToInt32(await checkCommand.ExecuteScalarAsync());
+
+        // Create user if doesn't exist
+        if (count == 0)
+        {
+            var insertCommand = new MySql.Data.MySqlClient.MySqlCommand(
+                @"INSERT INTO Users (UserId, Username, DisplayName, IsActive, CreatedAt)
+                  VALUES (@userId, @username, @displayName, @isActive, @createdAt)",
+                connection
+            );
+            insertCommand.Parameters.AddWithValue("@userId", userId);
+            insertCommand.Parameters.AddWithValue("@username", username);
+            insertCommand.Parameters.AddWithValue("@displayName", $"Test User {userId}");
+            insertCommand.Parameters.AddWithValue("@isActive", true);
+            insertCommand.Parameters.AddWithValue("@createdAt", DateTime.UtcNow);
+            await insertCommand.ExecuteNonQueryAsync();
+        }
+    }
+
+    #endregion Helper Methods
 }

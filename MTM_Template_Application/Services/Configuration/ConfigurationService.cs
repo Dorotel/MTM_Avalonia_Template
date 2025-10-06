@@ -289,17 +289,78 @@ public class ConfigurationService : IConfigurationService
     {
         ArgumentNullException.ThrowIfNull(key);
 
+        // FR-009: Validate environment variable key format
+        // Environment variables (MTM_*, DOTNET_*, ASPNETCORE_*) must use underscores only
+        // Hierarchical config keys (Display.Theme, API:Timeout) can use dots/colons
+        if (key.Contains(' '))
+        {
+            throw new ArgumentException(
+                $"Invalid configuration key format: '{key}'. Keys cannot contain spaces.",
+                nameof(key));
+        }
+
+        // Check if this looks like an environment variable key (all uppercase with underscores or dots)
+        var isEnvVarStyle = key.All(c => char.IsUpper(c) || c == '_' || c == '.');
+        if (isEnvVarStyle && (key.Contains('.') || key.Contains('-')))
+        {
+            throw new ArgumentException(
+                $"Invalid configuration key format: '{key}'. Environment variable keys must use underscores only (e.g., MTM_ENVIRONMENT, not MTM.ENVIRONMENT or MTM-ENVIRONMENT).",
+                nameof(key));
+        }
+
+        // Reject hyphens in any key
+        if (key.Contains('-'))
+        {
+            throw new ArgumentException(
+                $"Invalid configuration key format: '{key}'. Keys cannot contain hyphens. Use underscores for environment variables (MTM_ENVIRONMENT) or dots/colons for hierarchical keys (Display.Theme, API:Timeout).",
+                nameof(key));
+        }
+
         _lock.EnterReadLock();
         try
         {
-            // Check environment variables first (highest precedence)
-            var envKey = ConvertToEnvironmentVariableKey(key);
-            if (IsValidEnvironmentVariableKey(envKey))
+            // Special handling for ENVIRONMENT key with precedence chain
+            if (key.Equals("ENVIRONMENT", StringComparison.OrdinalIgnoreCase))
             {
-                var envValue = Environment.GetEnvironmentVariable(envKey);
+                var mtmEnv = Environment.GetEnvironmentVariable("MTM_ENVIRONMENT");
+                if (!string.IsNullOrWhiteSpace(mtmEnv))
+                {
+                    _logger.LogDebug("Configuration key {Key} resolved from MTM_ENVIRONMENT", key);
+                    return ConvertValue<T>(mtmEnv);
+                }
+
+                var aspnetEnv = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+                if (!string.IsNullOrWhiteSpace(aspnetEnv))
+                {
+                    _logger.LogDebug("Configuration key {Key} resolved from ASPNETCORE_ENVIRONMENT", key);
+                    return ConvertValue<T>(aspnetEnv);
+                }
+
+                var dotnetEnv = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+                if (!string.IsNullOrWhiteSpace(dotnetEnv))
+                {
+                    _logger.LogDebug("Configuration key {Key} resolved from DOTNET_ENVIRONMENT", key);
+                    return ConvertValue<T>(dotnetEnv);
+                }
+            }
+
+            // Check environment variables first (highest precedence)
+            // Try with MTM_ prefix
+            var mtmKey = $"MTM_{ConvertToEnvironmentVariableKey(key)}";
+            var envValue = Environment.GetEnvironmentVariable(mtmKey);
+            if (!string.IsNullOrEmpty(envValue))
+            {
+                _logger.LogDebug("Configuration key {Key} resolved from environment variable {EnvKey}", key, mtmKey);
+                return ConvertValue<T>(envValue);
+            }
+
+            // Try exact key if it's already a valid env var key
+            if (IsValidEnvironmentVariableKey(key))
+            {
+                envValue = Environment.GetEnvironmentVariable(key);
                 if (!string.IsNullOrEmpty(envValue))
                 {
-                    _logger.LogDebug("Configuration key {Key} resolved from environment variable {EnvKey}", key, envKey);
+                    _logger.LogDebug("Configuration key {Key} resolved from environment variable {EnvKey}", key, key);
                     return ConvertValue<T>(envValue);
                 }
             }
@@ -349,17 +410,23 @@ public class ConfigurationService : IConfigurationService
             _logger.LogInformation("Configuration setting {Key} updated", key);
 
             // Only fire event if value actually changed (clarification 2025-10-05)
-            if (oldValue != newValueString)
+            if (oldValue?.ToString() != newValueString)
             {
-                // Raise change event (outside lock to avoid deadlock)
-                Task.Run(() => OnConfigurationChanged?.Invoke(this, new ConfigurationChangedEventArgs
+                var eventArgs = new ConfigurationChangedEventArgs
                 {
                     Key = key,
                     OldValue = oldValue,
                     NewValue = value
-                }), cancellationToken);
+                };
 
-                _logger.LogDebug("Configuration change event fired for {Key} (old: {OldValue}, new: {NewValue})", key, oldValue, newValueString);
+                // Redact sensitive values in logs
+                var oldValueForLog = IsSensitiveKey(key) ? "[REDACTED]" : oldValue?.ToString() ?? "null";
+                var newValueForLog = IsSensitiveKey(key) ? "[REDACTED]" : newValueString;
+
+                _logger.LogDebug("Configuration change event fired for {Key} (old: {OldValue}, new: {NewValue})", key, oldValueForLog, newValueForLog);
+
+                // Raise event immediately after releasing lock
+                OnConfigurationChanged?.Invoke(this, eventArgs);
             }
             else
             {
