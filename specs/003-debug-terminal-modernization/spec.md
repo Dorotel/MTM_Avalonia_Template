@@ -2,7 +2,7 @@
 
 **Feature Branch**: `003-debug-terminal-modernization`
 **Created**: 2025-10-06
-**Status**: Ready for Planning - 5 of 8 Clarifications Resolved
+**Status**: Ready for Implementation - All 8 Clarifications Resolved
 **Input**: User description: "Debug Terminal Modernization - Real-time performance monitoring, boot timeline visualization, quick actions panel, error history, connection pool stats, environment variables display, assembly info, auto-refresh toggle, network diagnostics, historical trends, live log viewer, export functionality"
 
 **Related Documents**:
@@ -25,9 +25,9 @@ This feature modernizes the Debug Terminal with 20 enhancements across 3 phases,
 
 ### Index
 
-**Resolved (Session 2025-10-06)**: CL-001, CL-002, CL-005, CL-007, CL-008
+**Resolved (Session 2025-10-06)**: CL-001, CL-002, CL-003, CL-004, CL-005, CL-006, CL-007, CL-008
 
-**Open**: CL-003, CL-004, CL-006
+**Open**: None - All clarifications resolved
 
 ### Session 2025-10-06
 
@@ -49,11 +49,32 @@ This feature modernizes the Debug Terminal with 20 enhancements across 3 phases,
 - **Answer/Decision**: User-configurable (1-30s) with 5s default
 - **Spec Changes**: Updated FR-037, FR-038, FR-039
 
+### CL-003: Export File Formats
+- **Status**: Answered (2025-10-06)
+- **Question**: Should export support both JSON and Markdown formats?
+- **Answer/Decision**: JSON mandatory (Phase 1), Markdown optional stretch goal (Phase 2)
+- **Rationale**: JSON provides machine-readable diagnostics, Markdown for human readability (lower priority)
+- **Spec Changes**: FR-040 updated to prioritize JSON, Markdown noted as "if time permits"
+
+### CL-004: Android Platform Differences
+- **Status**: Answered (2025-10-06)
+- **Question**: How should connection pool stats behave on Android?
+- **Answer/Decision**: Desktop-first implementation, Android shows "Not Available" for unavailable metrics
+- **Rationale**: Android uses MTM Server API (no direct MySQL pool access), graceful degradation maintains UI consistency
+- **Spec Changes**: NFR-014 enforces graceful degradation, T040 includes Android handling
+
 ### CL-005: Network Diagnostics Timeouts
 - **Status**: Answered (2025-10-06)
 - **Question**: Network test timeout duration?
 - **Answer/Decision**: 5 seconds (industry standard)
 - **Spec Changes**: Updated FR-014, added FR-017
+
+### CL-006: Metrics Update Mechanism
+- **Status**: Answered (2025-10-06)
+- **Question**: Should metrics update via timer polling or event-driven notifications?
+- **Answer/Decision**: Timer polling with configurable interval (1-30s, default 5s per CL-002)
+- **Rationale**: Simpler implementation, adequate for Phase 1 requirements, lower complexity than event-driven
+- **Spec Changes**: Implementation approach documented in T016
 
 ### CL-007: Error History Retention
 - **Status**: Answered (2025-10-06)
@@ -87,10 +108,17 @@ This feature modernizes the Debug Terminal with 20 enhancements across 3 phases,
 
 ### Additional Scenarios
 
-**Scenario 2**: Developer monitors real-time CPU/memory during heavy operation
-**Scenario 3**: Support staff exports diagnostics for bug report
-**Scenario 4**: DevOps reviews error history to diagnose intermittent failures
-**Scenario 5**: Engineer checks environment variables to verify configuration precedence
+**Scenario 2: Real-Time Performance Monitoring During Heavy Operation**
+Bob (Developer) runs a batch import operation and monitors CPU/memory in Debug Terminal. He notices memory climbing from 60MB to 85MB (yellow zone) and preemptively cancels the operation before hitting the 90MB red zone.
+
+**Scenario 3: Diagnostic Export for Bug Report**
+Carol (Support Staff) receives a user complaint about "slow app startup." She opens Debug Terminal, clicks "Export Diagnostic Report," saves JSON file, and attaches it to the bug ticket. Developer identifies database connection pooling issue from exported data.
+
+**Scenario 4: Error History Review for Intermittent Failures**
+Dave (DevOps) investigates intermittent "Connection Refused" errors. He checks Error History panel, sees 3 network errors in the last hour with stack traces pointing to Visual API timeouts during peak hours. He adjusts retry policy.
+
+**Scenario 5: Environment Variable Configuration Verification**
+Eve (Engineer) deploys to production and verifies configuration precedence in Debug Terminal. She confirms `MTM_DATABASE_SERVER` overrides `ASPNETCORE_` defaults, ensuring correct database connection.
 
 ---
 
@@ -104,7 +132,7 @@ This feature modernizes the Debug Terminal with 20 enhancements across 3 phases,
 - **FR-003**: Display GC collection counts (Gen 0, 1, 2)
 - **FR-004**: Display current thread count
 - **FR-005**: Display current handle count
-- **FR-006**: Real-time metrics MUST NOT cause UI blocking or frame drops
+- **FR-006**: Real-time metrics MUST update at configurable interval (see NFR-003 for UI blocking requirements)
 
 #### Boot Timeline Visualization (Feature #3)
 - **FR-007**: Render horizontal bar chart for Stage 0, 1, 2 durations
@@ -112,19 +140,19 @@ This feature modernizes the Debug Terminal with 20 enhancements across 3 phases,
 - **FR-009**: Display proportional bar widths relative to total boot time
 
 #### Quick Actions Panel (Feature #10)
-- **FR-026**: Provide Quick Actions panel with buttons:
+- **FR-026**: Provide Quick Actions Panel with buttons:
   - "Clear Cache" (clears all entries, **requires confirmation**)
   - "Reload Configuration" (reloads from disk)
   - "Test Database Connection" (attempts MySQL connection)
   - "Force GC Collection" (triggers `GC.Collect()`)
   - "Refresh All Metrics" (manual update)
   - "Export Diagnostic Report" (opens export dialog)
-- **FR-027**: All Quick Actions execute asynchronously without UI blocking
-- **FR-028**: Show loading state (spinner) while executing
+- **FR-027**: All Quick Actions Panel buttons execute asynchronously without UI blocking
+- **FR-028**: Show loading state (spinner) while executing Quick Actions
 - **FR-029**: "Clear Cache" displays confirmation: "This will delete all cached data. Continue?"
 
 #### Error History (Feature #9)
-- **FR-024**: Display last 10 errors/warnings from current session (in-memory only)
+- **FR-024**: Display last 10 errors/warnings from circular buffer (max 100 retained, session-only, in-memory only)
 - **FR-025**: Each error shows:
   - Timestamp (HH:mm:ss.fff)
   - Category (Database, Network, Cache, Configuration)
@@ -207,7 +235,10 @@ This feature modernizes the Debug Terminal with 20 enhancements across 3 phases,
   - Cache statistics
   - Database connection status
   - Environment variables
-- **FR-042**: Sanitize sensitive data (passwords, API keys, tokens)
+- **FR-042**: Sanitize sensitive data (passwords, API keys, tokens, emails) using regex patterns:
+  - Password pattern: `password[:\s]*[^\s]+` → `password: [REDACTED]`
+  - Token pattern: `(token|key|secret)[:\s]*[^\s]+` → `$1: [REDACTED]`
+  - Email pattern: `[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}` → `[EMAIL_REDACTED]`
 - **FR-043**: Include metadata: export timestamp, app version, platform
 - **FR-044**: Provide "Copy to Clipboard" option
 - **FR-045**: Show user-friendly error messages with retry option
@@ -321,8 +352,8 @@ This feature will NOT include:
 - [x] All mandatory sections completed
 
 ### Requirement Completeness
-- [x] 5 of 8 clarifications resolved (CL-001, CL-002, CL-005, CL-007, CL-008)
-- [ ] 3 clarifications remain open (CL-003, CL-004, CL-006) - low/medium priority, can proceed to planning
+- [x] All 8 clarifications resolved (CL-001 through CL-008)
+- [x] Implementation approach documented for all deferred decisions
 - [x] Requirements are testable and unambiguous (clarified requirements updated)
 - [x] Success criteria are measurable
 - [x] Scope clearly bounded (3 phases)
