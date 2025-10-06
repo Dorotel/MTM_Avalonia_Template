@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "description": "Stored procedures for MAMP MySQL 5.7 database",
+  "version": "1.0.0",
+  "lastUpdated": "2025-10-05",
+  "database": "mtm_template_dev",
+  "procedures": {},
+  "procedureCount": 0,
+  "notes": [
+    "No stored procedures currently defined for Feature 002",
+    "Future procedures should be documented here with full parameter signatures",
+    "Example format: { name, description, parameters[], returnType, logic, createdBy, createdDate }"
+  ],
+  "plannedProcedures": [
+    {
+      "name": "sp_GetUserPreferencesByCategory",
+      "description": "Retrieve all user preferences filtered by category",
+      "parameters": [
+        {"name": "p_UserId", "type": "INT", "direction": "IN"},
+        {"name": "p_Category", "type": "VARCHAR(100)", "direction": "IN"}
+      ],
+      "returnType": "RESULT SET",
+      "status": "PLANNED",
+      "notes": "May be implemented in future feature for bulk preference loading"
+    },
+    {
+      "name": "sp_UpdateFeatureFlagRollout",
+      "description": "Update rollout percentage for a feature flag with audit logging",
+      "parameters": [
+        {"name": "p_FlagName", "type": "VARCHAR(255)", "direction": "IN"},
+        {"name": "p_NewPercentage", "type": "INT", "direction": "IN"},
+        {"name": "p_ModifiedBy", "type": "VARCHAR(100)", "direction": "IN"}
+      ],
+      "returnType": "INT (rows affected)",
+      "status": "PLANNED",
+      "notes": "Would include validation and audit trail functionality"
+    }
+  ]
+}

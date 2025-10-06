@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "description": "MAMP MySQL 5.7 connection information and environment-specific settings",
+  "version": "1.0.0",
+  "lastUpdated": "2025-10-05",
+  "mampVersion": "5.7",
+  "environments": {
+    "development": {
+      "host": "localhost",
+      "port": 3306,
+      "database": "mtm_template_dev",
+      "description": "MAMP MySQL 5.7 local development database",
+      "connectionString": {
+        "server": "localhost",
+        "port": 3306,
+        "database": "mtm_template_dev",
+        "useCompression": false,
+        "allowUserVariables": true,
+        "connectionTimeout": 5,
+        "pooling": true,
+        "maxPoolSize": 100,
+        "minPoolSize": 5
+      },
+      "notes": [
+        "UseCompression=false to avoid EndOfStreamException with MAMP MySQL 5.7",
+        "Credentials stored in OS-native credential manager (DPAPI on Windows)",
+        "Connection pooling enabled for performance"
+      ]
+    },
+    "production": {
+      "host": "mtmanu-sql01",
+      "port": 3306,
+      "database": "mtm_template_prod",
+      "description": "Production MySQL server",
+      "connectionString": {
+        "server": "mtmanu-sql01",
+        "port": 3306,
+        "database": "mtm_template_prod",
+        "useCompression": false,
+        "allowUserVariables": true,
+        "connectionTimeout": 10,
+        "pooling": true,
+        "maxPoolSize": 200,
+        "minPoolSize": 10
+      },
+      "notes": [
+        "Production server uses different connection pool sizing",
+        "Longer connection timeout for network latency",
+        "Credentials managed through production credential vault"
+      ]
+    }
+  },
+  "characterSet": "utf8mb4",
+  "collation": "utf8mb4_general_ci",
+  "engine": "InnoDB",
+  "limitations": [
+    "No CHECK constraints support in MySQL 5.7",
+    "Case-insensitive table names on Windows, case-sensitive on Linux",
+    "Compression protocol causes stream reading errors with MAMP",
+    "No JSON data type validation (use application-level validation)"
+  ],
+  "credentialStorage": {
+    "windows": "DPAPI via CredentialManager",
+    "android": "KeyStore API",
+    "macos": "Keychain Services (planned)",
+    "linux": "Secret Service API (planned)"
+  },
+  "references": {
+    "configService": "MTM_Template_Application/Services/Configuration/ConfigurationService.cs",
+    "migration": "config/migrations/001_initial_schema.sql",
+    "tests": "tests/contract/DatabaseSchemaContractTests.cs"
+  }
+}

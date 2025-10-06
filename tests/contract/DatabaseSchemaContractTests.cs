@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using MySql.Data.MySqlClient;
@@ -8,14 +11,56 @@ using Xunit;
 namespace MTM_Template_Tests.Contract;
 
 /// <summary>
-/// Contract tests for database schema based on database-schema-contract.json
-/// These tests validate table structure, constraints, and sample data.
+/// Contract tests for database schema based on .github/mamp-database/schema-tables.json
+/// These tests validate table structure, constraints, and sample data against the JSON schema.
 /// Tests may PASS if database was set up correctly in T004.
+///
+/// Reference: Constitution v1.3.0 Principle VIII (MAMP MySQL Database Documentation)
+/// All schema expectations are loaded from schema-tables.json to ensure single source of truth.
 /// </summary>
 public class DatabaseSchemaContractTests : IDisposable
 {
     private readonly string _connectionString;
     private MySqlConnection? _connection;
+    private static readonly Lazy<JsonDocument> _schemaDocument = new(() => LoadSchemaDocument());
+
+    private static JsonDocument LoadSchemaDocument()
+    {
+        // Load schema-tables.json from .github/mamp-database/
+        var repoRoot = GetRepositoryRoot();
+        var schemaPath = Path.Combine(repoRoot, ".github", "mamp-database", "schema-tables.json");
+
+        if (!File.Exists(schemaPath))
+        {
+            throw new FileNotFoundException($"Schema file not found: {schemaPath}. Ensure .github/mamp-database/schema-tables.json exists.");
+        }
+
+        var jsonContent = File.ReadAllText(schemaPath);
+        return JsonDocument.Parse(jsonContent);
+    }
+
+    private static string GetRepositoryRoot()
+    {
+        // Navigate up from test assembly location to repository root
+        var directory = new DirectoryInfo(AppContext.BaseDirectory);
+        while (directory != null && !File.Exists(Path.Combine(directory.FullName, ".git", "config")))
+        {
+            directory = directory.Parent;
+        }
+
+        if (directory == null)
+        {
+            throw new InvalidOperationException("Could not find repository root (no .git directory found)");
+        }
+
+        return directory.FullName;
+    }
+
+    private static JsonElement GetTableSchema(string tableName)
+    {
+        var root = _schemaDocument.Value.RootElement;
+        return root.GetProperty("tables").GetProperty(tableName);
+    }
 
     public DatabaseSchemaContractTests()
     {
@@ -219,7 +264,7 @@ public class DatabaseSchemaContractTests : IDisposable
         columns.Should().Contain(c => c.Name == "Environment" && c.Type == "varchar");
         columns.Should().Contain(c => c.Name == "RolloutPercentage" && c.Type == "int" && c.Nullable == "NO");
         columns.Should().Contain(c => c.Name == "AppVersion" && c.Type == "varchar");
-        columns.Should().Contain(c => c.Name == "LastModified" && c.Type == "datetime" && c.Nullable == "NO");
+        columns.Should().Contain(c => c.Name == "UpdatedAt" && c.Type == "datetime" && c.Nullable == "NO");
     }
 
     [Fact]

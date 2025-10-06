@@ -1,0 +1,354 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "description": "Complete table schemas for MAMP MySQL 5.7 database",
+  "version": "1.0.0",
+  "lastUpdated": "2025-10-05",
+  "database": "mtm_template_dev",
+  "tables": {
+    "Users": {
+      "description": "User accounts for MTM Template Application",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_general_ci",
+      "columns": [
+        {
+          "name": "UserId",
+          "type": "INT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "description": "Unique user identifier"
+        },
+        {
+          "name": "Username",
+          "type": "VARCHAR(100)",
+          "nullable": false,
+          "description": "Unique username for login"
+        },
+        {
+          "name": "DisplayName",
+          "type": "VARCHAR(255)",
+          "nullable": true,
+          "default": null,
+          "description": "User's display name in UI"
+        },
+        {
+          "name": "IsActive",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "default": true,
+          "description": "Whether user account is active"
+        },
+        {
+          "name": "CreatedAt",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "description": "Account creation timestamp"
+        },
+        {
+          "name": "LastLoginAt",
+          "type": "DATETIME",
+          "nullable": true,
+          "default": null,
+          "description": "Most recent login timestamp"
+        }
+      ],
+      "primaryKey": {
+        "name": "PRIMARY",
+        "columns": ["UserId"]
+      },
+      "uniqueKeys": [
+        {
+          "name": "UK_Users_Username",
+          "columns": ["Username"]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "IDX_Users_IsActive",
+          "columns": ["IsActive"],
+          "type": "INDEX"
+        }
+      ],
+      "foreignKeys": [],
+      "sampleData": [
+        {
+          "UserId": 42,
+          "Username": "testuser",
+          "DisplayName": "Test User",
+          "IsActive": true,
+          "CreatedAt": "2025-10-05 14:00:00",
+          "LastLoginAt": null
+        },
+        {
+          "UserId": 99,
+          "Username": "integrationtest",
+          "DisplayName": "Integration Test User",
+          "IsActive": true,
+          "CreatedAt": "2025-10-05 14:00:00",
+          "LastLoginAt": null
+        }
+      ]
+    },
+    "UserPreferences": {
+      "description": "User-specific configuration preferences with hierarchical keys",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_general_ci",
+      "columns": [
+        {
+          "name": "PreferenceId",
+          "type": "INT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "description": "Unique preference record identifier"
+        },
+        {
+          "name": "UserId",
+          "type": "INT",
+          "nullable": false,
+          "description": "Foreign key to Users table"
+        },
+        {
+          "name": "PreferenceKey",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "description": "Hierarchical key (e.g., Display.Theme, Filter.DefaultLocation)"
+        },
+        {
+          "name": "PreferenceValue",
+          "type": "TEXT",
+          "nullable": true,
+          "default": null,
+          "description": "Value stored as text (parse as needed)"
+        },
+        {
+          "name": "Category",
+          "type": "VARCHAR(100)",
+          "nullable": true,
+          "default": null,
+          "description": "Category for grouping (Display, Filters, Sort, UI)"
+        },
+        {
+          "name": "LastUpdated",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "onUpdate": "CURRENT_TIMESTAMP",
+          "description": "Last modification timestamp (auto-updated)"
+        }
+      ],
+      "primaryKey": {
+        "name": "PRIMARY",
+        "columns": ["PreferenceId"]
+      },
+      "uniqueKeys": [
+        {
+          "name": "UK_UserPreferences",
+          "columns": ["UserId", "PreferenceKey"]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "IDX_UserPreferences_UserId",
+          "columns": ["UserId"],
+          "type": "INDEX"
+        },
+        {
+          "name": "IDX_UserPreferences_Category",
+          "columns": ["Category"],
+          "type": "INDEX"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "name": "FK_UserPreferences_Users",
+          "columns": ["UserId"],
+          "referencedTable": "Users",
+          "referencedColumns": ["UserId"],
+          "onDelete": "CASCADE",
+          "onUpdate": "RESTRICT"
+        }
+      ],
+      "sampleData": [
+        {
+          "PreferenceId": 1,
+          "UserId": 42,
+          "PreferenceKey": "Display.Theme",
+          "PreferenceValue": "Dark",
+          "Category": "Display",
+          "LastUpdated": "2025-10-05 14:30:00"
+        },
+        {
+          "PreferenceId": 2,
+          "UserId": 42,
+          "PreferenceKey": "Filter.DefaultLocation",
+          "PreferenceValue": "WH-01",
+          "Category": "Filters",
+          "LastUpdated": "2025-10-05 14:35:00"
+        },
+        {
+          "PreferenceId": 3,
+          "UserId": 42,
+          "PreferenceKey": "Sort.OrderBy",
+          "PreferenceValue": "DateDescending",
+          "Category": "Sort",
+          "LastUpdated": "2025-10-05 14:40:00"
+        }
+      ]
+    },
+    "FeatureFlags": {
+      "description": "Feature flags for phased rollouts and environment-specific features",
+      "engine": "InnoDB",
+      "charset": "utf8mb4",
+      "collation": "utf8mb4_general_ci",
+      "columns": [
+        {
+          "name": "FlagId",
+          "type": "INT",
+          "nullable": false,
+          "autoIncrement": true,
+          "primaryKey": true,
+          "description": "Unique feature flag identifier"
+        },
+        {
+          "name": "FlagName",
+          "type": "VARCHAR(255)",
+          "nullable": false,
+          "description": "Unique feature flag name (kebab-case convention)"
+        },
+        {
+          "name": "IsEnabled",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "default": false,
+          "description": "Whether feature is enabled globally"
+        },
+        {
+          "name": "Environment",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "default": null,
+          "description": "Target environment (Development, Staging, Production) or NULL for all"
+        },
+        {
+          "name": "RolloutPercentage",
+          "type": "INT",
+          "nullable": false,
+          "default": 0,
+          "description": "Percentage of users to receive feature (0-100)",
+          "validation": "Must be between 0 and 100 (enforced by CHECK constraint or app logic)"
+        },
+        {
+          "name": "AppVersion",
+          "type": "VARCHAR(50)",
+          "nullable": true,
+          "default": null,
+          "description": "Semantic version (e.g., 1.0.0) - feature applies to this version and above"
+        },
+        {
+          "name": "UpdatedAt",
+          "type": "DATETIME",
+          "nullable": false,
+          "default": "CURRENT_TIMESTAMP",
+          "onUpdate": "CURRENT_TIMESTAMP",
+          "description": "Last modification timestamp (auto-updated)"
+        }
+      ],
+      "primaryKey": {
+        "name": "PRIMARY",
+        "columns": ["FlagId"]
+      },
+      "uniqueKeys": [
+        {
+          "name": "UK_FeatureFlags_FlagName",
+          "columns": ["FlagName"]
+        }
+      ],
+      "indexes": [
+        {
+          "name": "IDX_FeatureFlags_FlagName",
+          "columns": ["FlagName"],
+          "type": "INDEX"
+        },
+        {
+          "name": "IDX_FeatureFlags_Environment",
+          "columns": ["Environment"],
+          "type": "INDEX"
+        },
+        {
+          "name": "IDX_FeatureFlags_AppVersion",
+          "columns": ["AppVersion"],
+          "type": "INDEX"
+        }
+      ],
+      "foreignKeys": [],
+      "constraints": [
+        {
+          "name": "CHK_FeatureFlags_RolloutPercentage",
+          "type": "CHECK",
+          "expression": "`RolloutPercentage` BETWEEN 0 AND 100",
+          "note": "Not enforced in MySQL 5.7 - use application-level validation"
+        }
+      ],
+      "sampleData": [
+        {
+          "FlagId": 1,
+          "FlagName": "Visual.UseForItems",
+          "IsEnabled": true,
+          "Environment": "Development",
+          "RolloutPercentage": 100,
+          "AppVersion": "1.0.0",
+          "UpdatedAt": "2025-10-05 14:30:00"
+        },
+        {
+          "FlagId": 2,
+          "FlagName": "OfflineModeAllowed",
+          "IsEnabled": true,
+          "Environment": null,
+          "RolloutPercentage": 50,
+          "AppVersion": "1.0.0",
+          "UpdatedAt": "2025-10-05 14:30:00"
+        },
+        {
+          "FlagId": 3,
+          "FlagName": "Debug.ShowSqlQueries",
+          "IsEnabled": true,
+          "Environment": "Development",
+          "RolloutPercentage": 100,
+          "AppVersion": "1.0.0",
+          "UpdatedAt": "2025-10-05 14:30:00"
+        },
+        {
+          "FlagId": 4,
+          "FlagName": "Production.AdvancedFeature",
+          "IsEnabled": false,
+          "Environment": "Production",
+          "RolloutPercentage": 0,
+          "AppVersion": "1.0.0",
+          "UpdatedAt": "2025-10-05 14:30:00"
+        },
+        {
+          "FlagId": 5,
+          "FlagName": "TestFeature.Rollout50",
+          "IsEnabled": true,
+          "Environment": null,
+          "RolloutPercentage": 50,
+          "AppVersion": "1.0.0",
+          "UpdatedAt": "2025-10-05 14:30:00"
+        }
+      ]
+    }
+  },
+  "tableCount": 3,
+  "totalColumns": 20,
+  "notes": [
+    "All tables use InnoDB engine for transaction support and foreign key constraints",
+    "utf8mb4 charset supports full Unicode including emojis",
+    "PascalCase naming convention for tables and columns (Users, UserId, PreferenceKey)",
+    "Timestamp columns use DATETIME with CURRENT_TIMESTAMP defaults",
+    "Boolean columns use BOOLEAN type (stored as TINYINT(1) in MySQL)"
+  ]
+}

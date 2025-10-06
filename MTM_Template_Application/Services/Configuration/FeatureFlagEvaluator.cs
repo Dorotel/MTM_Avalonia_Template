@@ -32,6 +32,12 @@ public class FeatureFlagEvaluator
     {
         ArgumentNullException.ThrowIfNull(flag);
 
+        // Validate flag name format (clarification 2025-10-05: letters, numbers, dots, underscores, hyphens only)
+        if (!System.Text.RegularExpressions.Regex.IsMatch(flag.Name, @"^[a-zA-Z0-9._-]+$"))
+        {
+            throw new ArgumentException($"Feature flag name '{flag.Name}' is invalid. Only letters, numbers, dots, underscores, and hyphens are allowed (regex: ^[a-zA-Z0-9._-]+$)", nameof(flag));
+        }
+
         // Validate RolloutPercentage
         if (flag.RolloutPercentage < 0 || flag.RolloutPercentage > 100)
         {

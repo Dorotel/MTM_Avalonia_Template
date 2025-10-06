@@ -49,6 +49,9 @@ public class ConfigurationService : IConfigurationService
         var assemblyLocation = AppContext.BaseDirectory;
         _repositoryRoot = GetRepositoryRoot(assemblyLocation);
         _configDirectory = Path.Combine(_repositoryRoot, "config");
+
+        // Load environment variables at startup (clarification 2025-10-05: read once at startup)
+        LoadEnvironmentVariables();
         _userFoldersConfigPath = Path.Combine(_configDirectory, "user-folders.json");
         _databaseSchemaConfigPath = Path.Combine(_configDirectory, "database-schema.json");
 
@@ -181,6 +184,64 @@ public class ConfigurationService : IConfigurationService
         return Directory.GetCurrentDirectory();
     }
 
+    /// <summary>
+    /// Load environment variables at startup (clarification 2025-10-05: read once)
+    /// Precedence: MTM_ENVIRONMENT > ASPNETCORE_ENVIRONMENT > DOTNET_ENVIRONMENT > build config
+    /// </summary>
+    private void LoadEnvironmentVariables()
+    {
+        // Check environment variables in precedence order
+        var mtmEnv = Environment.GetEnvironmentVariable("MTM_ENVIRONMENT");
+        var aspnetEnv = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        var dotnetEnv = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT");
+
+        // Determine effective environment (highest precedence wins)
+        string? effectiveEnvironment = null;
+        string source = "Default";
+
+        if (!string.IsNullOrWhiteSpace(mtmEnv))
+        {
+            effectiveEnvironment = mtmEnv;
+            source = "MTM_ENVIRONMENT";
+        }
+        else if (!string.IsNullOrWhiteSpace(aspnetEnv))
+        {
+            effectiveEnvironment = aspnetEnv;
+            source = "ASPNETCORE_ENVIRONMENT";
+        }
+        else if (!string.IsNullOrWhiteSpace(dotnetEnv))
+        {
+            effectiveEnvironment = dotnetEnv;
+            source = "DOTNET_ENVIRONMENT";
+        }
+
+        if (effectiveEnvironment != null)
+        {
+            _lock.EnterWriteLock();
+            try
+            {
+                _settings["Environment"] = new ConfigurationSetting
+                {
+                    Key = "Environment",
+                    Value = effectiveEnvironment,
+                    Source = source,
+                    Precedence = 10, // Highest precedence (environment variables)
+                    IsEncrypted = false
+                };
+
+                _logger.LogInformation("Environment set to {Environment} from {Source}", effectiveEnvironment, source);
+            }
+            finally
+            {
+                _lock.ExitWriteLock();
+            }
+        }
+        else
+        {
+            _logger.LogDebug("No environment variables found (MTM_ENVIRONMENT, ASPNETCORE_ENVIRONMENT, DOTNET_ENVIRONMENT), using build configuration");
+        }
+    }
+
     private static string GetDefaultUserFoldersConfig()
     {
         return JsonSerializer.Serialize(new
@@ -272,11 +333,12 @@ public class ConfigurationService : IConfigurationService
         try
         {
             var oldValue = _settings.TryGetValue(key, out var existing) ? existing.Value : null;
+            var newValueString = value.ToString() ?? string.Empty;
 
             var setting = new ConfigurationSetting
             {
                 Key = key,
-                Value = value.ToString() ?? string.Empty,
+                Value = newValueString,
                 Source = "UserConfig",
                 Precedence = 50, // UserConfig precedence
                 IsEncrypted = IsSensitiveKey(key)
@@ -286,13 +348,23 @@ public class ConfigurationService : IConfigurationService
 
             _logger.LogInformation("Configuration setting {Key} updated", key);
 
-            // Raise change event (outside lock to avoid deadlock)
-            Task.Run(() => OnConfigurationChanged?.Invoke(this, new ConfigurationChangedEventArgs
+            // Only fire event if value actually changed (clarification 2025-10-05)
+            if (oldValue != newValueString)
             {
-                Key = key,
-                OldValue = oldValue,
-                NewValue = value
-            }), cancellationToken);
+                // Raise change event (outside lock to avoid deadlock)
+                Task.Run(() => OnConfigurationChanged?.Invoke(this, new ConfigurationChangedEventArgs
+                {
+                    Key = key,
+                    OldValue = oldValue,
+                    NewValue = value
+                }), cancellationToken);
+
+                _logger.LogDebug("Configuration change event fired for {Key} (old: {OldValue}, new: {NewValue})", key, oldValue, newValueString);
+            }
+            else
+            {
+                _logger.LogDebug("Configuration value unchanged for {Key}, event not fired", key);
+            }
         }
         finally
         {
@@ -349,7 +421,7 @@ public class ConfigurationService : IConfigurationService
             await using var connection = new MySqlConnection(connectionString);
             await connection.OpenAsync(cancellationToken);
 
-            var query = "SELECT ConfigKey, ConfigValue FROM UserPreferences WHERE UserId = @UserId";
+            var query = "SELECT PreferenceKey, PreferenceValue FROM UserPreferences WHERE UserId = @UserId";
             await using var command = new MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@UserId", userId);
 
@@ -361,10 +433,10 @@ public class ConfigurationService : IConfigurationService
             {
                 while (await reader.ReadAsync(cancellationToken))
                 {
-                    var key = reader.GetString(reader.GetOrdinal("ConfigKey"));
-                    var value = reader.IsDBNull(reader.GetOrdinal("ConfigValue"))
+                    var key = reader.GetString(reader.GetOrdinal("PreferenceKey"));
+                    var value = reader.IsDBNull(reader.GetOrdinal("PreferenceValue"))
                         ? string.Empty
-                        : reader.GetString(reader.GetOrdinal("ConfigValue"));
+                        : reader.GetString(reader.GetOrdinal("PreferenceValue"));
 
                     var setting = new ConfigurationSetting
                     {
@@ -413,15 +485,15 @@ public class ConfigurationService : IConfigurationService
             await connection.OpenAsync(cancellationToken);
 
             var query = @"
-                INSERT INTO UserPreferences (UserId, ConfigKey, ConfigValue, LastModified)
-                VALUES (@UserId, @Key, @Value, @LastModified)
-                ON DUPLICATE KEY UPDATE ConfigValue = @Value, LastModified = @LastModified";
+                INSERT INTO UserPreferences (UserId, PreferenceKey, PreferenceValue, LastUpdated)
+                VALUES (@UserId, @Key, @Value, @LastUpdated)
+                ON DUPLICATE KEY UPDATE PreferenceValue = @Value, LastUpdated = @LastUpdated";
 
             await using var command = new MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@UserId", userId);
             command.Parameters.AddWithValue("@Key", key);
             command.Parameters.AddWithValue("@Value", value.ToString());
-            command.Parameters.AddWithValue("@LastModified", DateTime.UtcNow);
+            command.Parameters.AddWithValue("@LastUpdated", DateTime.UtcNow);
 
             await command.ExecuteNonQueryAsync(cancellationToken);
 
@@ -598,7 +670,7 @@ public class ConfigurationService : IConfigurationService
                 MaximumPoolSize = (uint)(_databaseSchemaConfig?.ConnectionSettings?.MaxPoolSize ?? 100),
                 MinimumPoolSize = (uint)(_databaseSchemaConfig?.ConnectionSettings?.MinPoolSize ?? 5),
                 AllowUserVariables = true,
-                UseCompression = true
+                UseCompression = false // Disabled for MAMP MySQL 5.7 compatibility (clarification 2025-10-05)
             };
 
             // Credentials should be retrieved from SecretsService (not implemented here - would require ISecretsService injection)

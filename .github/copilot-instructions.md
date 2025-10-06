@@ -105,8 +105,18 @@ When working with specifications, always reference:
 
 ### Data Sources
 - MySQL 5.7 (MAMP) - Local database
+  - **Schema Documentation**: `.github/mamp-database/schema-tables.json` (single source of truth)
+  - **Connection Info**: `.github/mamp-database/connection-info.json`
+  - **Stored Procedures**: `.github/mamp-database/stored-procedures.json`
+  - **Functions**: `.github/mamp-database/functions.json`
+  - **Views**: `.github/mamp-database/views.json`
+  - **Indexes**: `.github/mamp-database/indexes.json`
+  - **Sample Data**: `.github/mamp-database/sample-data.json`
+  - **Migration History**: `.github/mamp-database/migrations-history.json`
 - Visual ERP - Read-only via API Toolkit
 - Local cache with LZ4 compression
+
+**CRITICAL**: Always reference `.github/mamp-database/schema-tables.json` before writing database-related code. Use exact table/column names (case-sensitive: `Users`, `UserId`, `PreferenceKey`).
 
 ## Context Files Priority
 

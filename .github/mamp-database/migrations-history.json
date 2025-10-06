@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "description": "Database migration history and schema versioning for MAMP MySQL 5.7",
+  "version": "1.0.0",
+  "lastUpdated": "2025-10-05",
+  "database": "mtm_template_dev",
+  "currentSchemaVersion": "1.0.0",
+  "migrations": [
+    {
+      "version": "1.0.0",
+      "name": "001_initial_schema",
+      "description": "Initial database schema for Feature 002 (Environment and Configuration)",
+      "featureId": "002-environment-and-configuration",
+      "appliedDate": "2025-10-05",
+      "appliedBy": "GitHub Copilot Agent",
+      "scriptLocation": "config/migrations/001_initial_schema.sql",
+      "changes": {
+        "tablesAdded": [
+          {
+            "name": "Users",
+            "description": "User accounts (may already exist from Feature 001)"
+          },
+          {
+            "name": "UserPreferences",
+            "description": "User-specific configuration preferences"
+          },
+          {
+            "name": "FeatureFlags",
+            "description": "Feature flags for phased rollouts"
+          }
+        ],
+        "tablesModified": [],
+        "tablesDeleted": [],
+        "columnsAdded": [],
+        "columnsModified": [],
+        "columnsDeleted": [],
+        "indexesAdded": [
+          "UK_Users_Username",
+          "IDX_Users_IsActive",
+          "UK_UserPreferences",
+          "IDX_UserPreferences_UserId",
+          "IDX_UserPreferences_Category",
+          "UK_FeatureFlags_FlagName",
+          "IDX_FeatureFlags_FlagName",
+          "IDX_FeatureFlags_Environment",
+          "IDX_FeatureFlags_AppVersion"
+        ],
+        "indexesDeleted": [],
+        "foreignKeysAdded": [
+          "FK_UserPreferences_Users"
+        ],
+        "foreignKeysDeleted": [],
+        "proceduresAdded": [],
+        "proceduresModified": [],
+        "proceduresDeleted": [],
+        "functionsAdded": [],
+        "functionsModified": [],
+        "functionsDeleted": [],
+        "viewsAdded": [],
+        "viewsModified": [],
+        "viewsDeleted": []
+      },
+      "rollbackScript": null,
+      "testResults": {
+        "contractTests": "12 of 65 failed initially (fixed after clarifications)",
+        "integrationTests": "Pending",
+        "dataIntegrity": "Verified with sample data insertion"
+      },
+      "notes": [
+        "Uses CREATE IF NOT EXISTS to avoid conflicts with Feature 001",
+        "Foreign key cascade deletion for UserPreferences when user is deleted",
+        "CHECK constraint on RolloutPercentage not enforced in MySQL 5.7 (app-level validation required)",
+        "Sample data inserted for testing (UserIds 42 and 99)"
+      ]
+    }
+  ],
+  "pendingMigrations": [],
+  "versioningStrategy": {
+    "format": "Semantic Versioning (MAJOR.MINOR.PATCH)",
+    "majorIncrement": "Breaking changes (column removal, table drop, type change breaking compatibility)",
+    "minorIncrement": "New tables, columns, procedures, or indexes (backward compatible)",
+    "patchIncrement": "Bug fixes, documentation updates, constraint modifications, performance optimizations"
+  },
+  "migrationProcess": {
+    "steps": [
+      "1. Create migration script in config/migrations/",
+      "2. Document changes in this file (migrations-history.json)",
+      "3. Update schema-tables.json with new/modified structures",
+      "4. Update sample-data.json if test data changes",
+      "5. Update stored-procedures.json / functions.json / views.json if applicable",
+      "6. Run migration script on MAMP MySQL 5.7",
+      "7. Verify with contract tests",
+      "8. Update schema version in this file",
+      "9. Commit all changes with message: 'db: migration vX.Y.Z - description'"
+    ],
+    "rollbackStrategy": "Manual rollback scripts for breaking changes, auto-rollback for non-breaking changes",
+    "testingRequirements": [
+      "All contract tests must pass after migration",
+      "Integration tests must validate new functionality",
+      "Performance tests if indexes or structure significantly changed"
+    ]
+  },
+  "schemaVersionTracking": {
+    "location": "This file (migrations-history.json) is the single source of truth",
+    "alternateLocations": [
+      ".github/mamp-database/schema-tables.json (version field)",
+      "Each migration script header (version comment)"
+    ]
+  },
+  "notes": [
+    "This file must be updated immediately after any database schema change",
+    "Migration history is append-only - never delete historical migrations",
+    "Rollback scripts are optional but recommended for major version changes",
+    "Schema version format: MAJOR.MINOR.PATCH matching semantic versioning"
+  ]
+}

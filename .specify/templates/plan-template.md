@@ -5,6 +5,7 @@
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
 ## Execution Flow (/plan command scope)
+
 ```
 1. Load feature spec from Input path
    → If not found: ERROR "No feature spec at {path}"
@@ -46,7 +47,7 @@
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
-*Based on Constitution v1.2.0*
+*Based on Constitution v1.3.0*
 
 ### I. Cross-Platform First
 - [ ] Phase 1 platforms supported (Windows Desktop + Android)
@@ -96,7 +97,14 @@
 - [ ] Services as `Singleton`/`Scoped` based on lifecycle
 - [ ] NO service locator pattern
 
-### VIII. Visual ERP Integration Standards (if applicable)
+### VIII. MAMP MySQL Database Documentation (if applicable)
+- [ ] Reference JSON files in `.github/mamp-database/` before code generation
+- [ ] Update JSON files immediately after database changes
+- [ ] Complete metadata (tables, columns, indexes, foreign keys, procedures, functions, views)
+- [ ] Schema accuracy maintained (single source of truth)
+- [ ] Version tracking in `migrations-history.json`
+
+### IX. Visual ERP Integration Standards (if applicable)
 - [ ] Read-only access only (no write operations)
 - [ ] Infor Visual API Toolkit commands exclusively (NO direct SQL)
 - [ ] Command whitelist in `docs/VISUAL-WHITELIST.md`
@@ -120,6 +128,7 @@
 ## Project Structure
 
 ### Documentation (this feature)
+
 ```
 specs/[###-feature]/
 ├── plan.md              # This file (/plan command output)
@@ -183,6 +192,7 @@ directories captured above]
    - For each integration → patterns task
 
 2. **Generate and dispatch research agents**:
+
    ```
    For each unknown in Technical Context:
      Task: "Research {unknown} for {feature context}"
@@ -264,7 +274,6 @@ directories captured above]
 | -------------------------- | ------------------ | ------------------------------------ |
 | [e.g., 4th project]        | [current need]     | [why 3 projects insufficient]        |
 | [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient]  |
-
 
 ## Progress Tracking
 *This checklist is updated during execution flow*

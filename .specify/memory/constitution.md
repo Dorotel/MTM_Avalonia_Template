@@ -1,52 +1,57 @@
 <!--
 SYNC IMPACT REPORT - Constitution Update
-Version Change: 1.1.0 → 1.2.0 (Platform Scope Clarification + Visual ERP Integration Standards)
+Version Change: 1.2.0 → 1.3.0 (MAMP MySQL Database Documentation Standards)
 Date: 2025-10-05
 Status: ✅ COMPLETE
 
 Modified Principles:
-  ✅ Enhanced: I. Cross-Platform First → Clarified Phase 1 scope (Windows + Android only)
-  ✅ Enhanced: Manufacturing Domain Requirements → Expanded Visual ERP integration details
-  ✅ Added: VIII. Visual ERP Integration Standards (NEW - elevated from feature requirements)
+  ✅ Added: VIII. MAMP MySQL Database Documentation (NEW - NON-NEGOTIABLE)
+  ✅ Renumbered: Previous VIII (Visual ERP Integration) → IX
 
 Added Sections:
-  ✅ Technology Stack (C# .NET 9.0, Avalonia 11.3+, MySQL 5.7, Visual ERP)
-  ✅ Platform Architecture (Desktop vs Android data access patterns)
-  ✅ Visual ERP Command Whitelist requirements
+  ✅ .github/mamp-database/ directory structure and file descriptions
+  ✅ Mandatory workflow for database documentation
+  ✅ JSON file update requirements and versioning
+
+Files Created:
+  ✅ .github/mamp-database/README.md: Overview and usage guidelines
+  ✅ .github/mamp-database/connection-info.json: Connection settings
+  ✅ .github/mamp-database/schema-tables.json: Complete table structures
+  ✅ .github/mamp-database/stored-procedures.json: Procedure documentation
+  ✅ .github/mamp-database/functions.json: User-defined functions
+  ✅ .github/mamp-database/views.json: Database views
+  ✅ .github/mamp-database/indexes.json: Index performance notes
+  ✅ .github/mamp-database/sample-data.json: Test data
+  ✅ .github/mamp-database/migrations-history.json: Migration history
+  ✅ .github/prompts/mamp-database-sync.prompt.md: Comprehensive audit prompt
 
 Templates Requiring Updates:
-  ✅ plan-template.md: Constitution Check gates updated for Principle VIII (includes all 8 principles + Async patterns)
-  ✅ spec-template.md: Added Visual ERP integration to AI guidance (feature-specific sections added per feature)
-  ✅ Feature 002 spec.md: Android architecture aligned with Feature 001 (MTM Server API)
-  ✅ Feature 002 plan.md: Android data access pattern updated
+  ✅ plan-template.md: Constitution Check gates (add Principle VIII validation) - COMPLETE
+  ✅ spec-template.md: Database change sections (reference JSON files) - COMPLETE
+  ✅ tasks-template.md: Add database documentation tasks - COMPLETE
 
-Implementation Updates Completed:
-  ✅ Feature 002 spec.md: Updated FR-025, FR-025a, FR-028-031b (Android MTM Server API)
-  ✅ Feature 002 spec.md: Updated clarification Q&A (Android architecture, Visual whitelist location)
-  ✅ Feature 002 plan.md: Updated Constraints section (Android MTM Server API)
-  ✅ Feature 002 plan.md: Updated Constitution Check (Principle I v1.2.0, added Principle VIII)
-  ✅ Feature 002 plan.md: Updated Key Decisions and Clarification Resolution Summary
+Implementation Updates Needed:
+  ✅ Update DatabaseSchemaContractTests: Reference schema-tables.json for expected structure
+  ✅ Add database audit task to validation checklist
+  ✅ Update copilot-instructions.md: Reference .github/mamp-database/ directory
+  ✅ Create GitHub Action/CI check for lastUpdated timestamp validation
 
-Follow-up TODOs (Implementation Phase):
-  🔲 Verify Visual command whitelist exists at docs/VISUAL-WHITELIST.md (create if missing)
-  🔲 Implement whitelist validation in Visual API client wrapper
-  🔲 Ensure Android two-factor auth implementation (credentials + device certificate)
-  🔲 Update Feature 001 documentation to reference Constitution v1.2.0 Principle VIII
-  🔲 Create Visual API client service with whitelist enforcement
-  🔲 Add placeholder for PLACEHOLDER_ANDROID_MIN_SDK in Technology Stack
+Follow-up TODOs:
+  🔲 Run mamp-database-sync audit after Feature 002 completion
+  ✅ Update README.md: Document .github/mamp-database/ directory purpose
 
 Constitution Changes Summary:
-  - Version: 1.1.0 → 1.2.0 (MINOR - new principle added)
-  - New Principle: VIII. Visual ERP Integration Standards (NON-NEGOTIABLE)
-  - Clarified: Phase 1 platform scope (Windows Desktop + Android only)
-  - Added: Technology Stack section with complete framework/dependency listing
-  - Added: Platform Architecture section with data access patterns
-  - Enhanced: Manufacturing Domain Requirements with Visual/MySQL specifics
+  - Version: 1.2.0 → 1.3.0 (MINOR - new principle added)
+  - New Principle: VIII. MAMP MySQL Database Documentation (NON-NEGOTIABLE)
+  - Renumbered: Previous Principle VIII → IX (Visual ERP Integration)
+  - Added: Complete workflow for database documentation maintenance
+  - Added: JSON file structure and responsibilities
+  - Enhanced: Rationale for database accuracy requirements
   - Updated: Version History table
-  - Updated: Last Review date and Next Review Due date
+  - Updated: Last Review date remains 2025-10-05 (same-day amendment)
 
 Suggested Commit Message:
-docs: amend constitution to v1.2.0 - platform scope + Visual ERP integration standards
+docs: amend constitution to v1.3.0 - MAMP MySQL database documentation standards
 -->
 
 # MTM Avalonia Template Constitution
@@ -54,7 +59,7 @@ docs: amend constitution to v1.2.0 - platform scope + Visual ERP integration sta
 **Project Type**: Manufacturing/Warehouse Desktop + Android Application
 **Framework**: Avalonia UI 11.3+ with .NET 9.0
 **Methodology**: Spec-Driven Development (GitHub Spec Kit)
-**Version**: 1.2.0 | **Ratified**: 2025-10-02 | **Last Amended**: 2025-10-05
+**Version**: 1.3.0 | **Ratified**: 2025-10-02 | **Last Amended**: 2025-10-05
 
 ---
 
@@ -359,7 +364,69 @@ public static AppBuilder BuildAvaloniaApp()
 
 ---
 
-### VIII. Visual ERP Integration Standards (NON-NEGOTIABLE) 🆕
+### VIII. MAMP MySQL Database Documentation (NON-NEGOTIABLE) 🆕
+
+**All MAMP MySQL 5.7 database objects MUST be documented in `.github/mamp-database/` JSON files.**
+
+**Requirements**:
+- **Reference First**: ALWAYS read JSON files in `.github/mamp-database/` before generating database-related code
+- **Immediate Updates**: ANY database object creation/modification MUST update corresponding JSON file(s) immediately
+- **Complete Metadata**: Document full structure (tables, columns, indexes, foreign keys, procedures, functions, views)
+- **Schema Accuracy**: JSON files are single source of truth for database schema
+- **Regular Audits**: Run `mamp-database-sync.prompt.md` audit after significant database changes
+- **Version Tracking**: Update `migrations-history.json` for all schema changes with semantic versioning
+
+**JSON File Structure**:
+- `connection-info.json`: Connection settings, environment-specific configurations
+- `schema-tables.json`: Complete table structures with columns, types, constraints
+- `stored-procedures.json`: All stored procedures with parameters and logic
+- `functions.json`: User-defined functions with signatures
+- `views.json`: Database views with SQL definitions
+- `indexes.json`: All indexes with performance notes
+- `sample-data.json`: Test data used in development
+- `migrations-history.json`: Migration history and versioning
+
+**Mandatory Workflow**:
+1. **Before writing code**: Read relevant JSON files to verify table/column names and types
+2. **During development**: Reference JSON for exact schema (case-sensitive: `Users`, `UserId`, `PreferenceKey`)
+3. **After database changes**: Update JSON file(s) with new/modified objects
+4. **After feature completion**: Run audit prompt to verify accuracy
+5. **Before PR**: Ensure `lastUpdated` timestamp is current and `version` incremented
+
+**Rationale**: MAMP MySQL 5.7 database is critical infrastructure. Accurate documentation prevents:
+- Runtime errors from incorrect table/column names
+- Type mismatches causing data loss
+- Missing indexes causing performance degradation
+- Undocumented procedures creating maintenance confusion
+- Schema drift between environments
+
+**Example**:
+
+```csharp
+// ✅ Good - Reference JSON before writing code
+// Read .github/mamp-database/schema-tables.json to verify:
+// Table: Users (PascalCase)
+// Columns: UserId (INT), Username (VARCHAR(100)), IsActive (BOOLEAN)
+
+var query = @"
+    SELECT UserId, Username, IsActive
+    FROM Users
+    WHERE IsActive = TRUE";
+
+// After adding new column, update schema-tables.json:
+// Add to Users.columns array:
+// {
+//   "name": "Email",
+//   "type": "VARCHAR(255)",
+//   "nullable": true,
+//   "default": null,
+//   "description": "User email for notifications"
+// }
+```
+
+---
+
+### IX. Visual ERP Integration Standards (NON-NEGOTIABLE) 🆕
 
 **All Visual ERP access MUST be read-only via Infor Visual API Toolkit commands with whitelist enforcement.**
 
@@ -643,6 +710,7 @@ Android Tablet App
 | 1.0.0   | 2025-10-02 | Initial ratification - Manufacturing template setup                                                                                                                                  |
 | 1.1.0   | 2025-10-03 | Added Avalonia best practices, CompiledBinding, DI patterns, Spec-Kit integration                                                                                                    |
 | 1.2.0   | 2025-10-05 | Clarified Phase 1 platform scope (Windows + Android), Added Principle VIII (Visual ERP Integration), Technology Stack section, Platform Architecture, Android MTM Server API pattern |
+| 1.3.0   | 2025-10-05 | Added Principle VIII (MAMP MySQL Database Documentation), created .github/mamp-database/ structure, renumbered Visual ERP principle to IX, added database audit workflow             |
 
 ---
 

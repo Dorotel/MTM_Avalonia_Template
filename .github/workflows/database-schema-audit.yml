@@ -1,0 +1,190 @@
+name: Database Schema Audit
+
+on:
+    pull_request:
+        paths:
+            - ".github/mamp-database/**"
+            - "MTM_Template_Application/Services/DataLayer/**"
+            - "tests/contract/DatabaseSchemaContractTests.cs"
+    push:
+        branches:
+            - main
+            - "feature/**"
+            - "0[0-9][0-9]-*"
+        paths:
+            - ".github/mamp-database/**"
+    schedule:
+        # Run weekly audit on Mondays at 9 AM UTC
+        - cron: "0 9 * * 1"
+    workflow_dispatch:
+
+jobs:
+    validate-schema-documentation:
+        name: Validate Schema Documentation
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Validate schema-tables.json structure
+              shell: pwsh
+              run: |
+                  Write-Host "Validating schema-tables.json..." -ForegroundColor Cyan
+
+                  $schemaPath = ".github/mamp-database/schema-tables.json"
+
+                  if (-not (Test-Path $schemaPath)) {
+                    Write-Error "❌ schema-tables.json not found at $schemaPath"
+                    exit 1
+                  }
+
+                  $schema = Get-Content $schemaPath -Raw | ConvertFrom-Json
+
+                  # Required fields validation
+                  $requiredFields = @('version', 'lastUpdated', 'database', 'tables', 'tableCount')
+                  $missingFields = @()
+
+                  foreach ($field in $requiredFields) {
+                    if (-not $schema.PSObject.Properties.Name.Contains($field)) {
+                      $missingFields += $field
+                    }
+                  }
+
+                  if ($missingFields.Count -gt 0) {
+                    Write-Error "❌ Missing required fields: $($missingFields -join ', ')"
+                    exit 1
+                  }
+
+                  Write-Host "✅ All required fields present" -ForegroundColor Green
+
+                  # Validate version format (semantic versioning)
+                  if ($schema.version -notmatch '^\d+\.\d+\.\d+$') {
+                    Write-Error "❌ Invalid version format: $($schema.version). Expected semantic version (e.g., 1.0.0)"
+                    exit 1
+                  }
+
+                  Write-Host "✅ Version format valid: $($schema.version)" -ForegroundColor Green
+
+                  # Validate lastUpdated timestamp
+                  try {
+                    $lastUpdated = [DateTime]::Parse($schema.lastUpdated)
+                    $daysSinceUpdate = (Get-Date) - $lastUpdated
+
+                    Write-Host "📅 Last updated: $($schema.lastUpdated) ($([math]::Round($daysSinceUpdate.TotalDays)) days ago)" -ForegroundColor Cyan
+
+                    # Warn if older than 30 days
+                    if ($daysSinceUpdate.TotalDays -gt 30) {
+                      Write-Warning "⚠️ schema-tables.json is $([math]::Round($daysSinceUpdate.TotalDays)) days old (>30 days). Consider running database audit."
+                      # Don't fail - just warn
+                    } else {
+                      Write-Host "✅ Timestamp is current (<30 days)" -ForegroundColor Green
+                    }
+
+                    # Fail if lastUpdated is in the future
+                    if ($lastUpdated -gt (Get-Date)) {
+                      Write-Error "❌ lastUpdated timestamp is in the future: $($schema.lastUpdated)"
+                      exit 1
+                    }
+                  }
+                  catch {
+                    Write-Error "❌ Invalid lastUpdated timestamp format: $($schema.lastUpdated). Expected YYYY-MM-DD format."
+                    exit 1
+                  }
+
+                  # Validate table count matches actual tables
+                  $actualTableCount = ($schema.tables.PSObject.Properties).Count
+                  if ($schema.tableCount -ne $actualTableCount) {
+                    Write-Error "❌ tableCount mismatch: declared $($schema.tableCount), actual $actualTableCount"
+                    exit 1
+                  }
+
+                  Write-Host "✅ Table count valid: $($schema.tableCount)" -ForegroundColor Green
+
+                  # Validate each table has required structure
+                  foreach ($tableName in $schema.tables.PSObject.Properties.Name) {
+                    $table = $schema.tables.$tableName
+
+                    $requiredTableFields = @('description', 'columns', 'primaryKey')
+                    $missingTableFields = @()
+
+                    foreach ($field in $requiredTableFields) {
+                      if (-not $table.PSObject.Properties.Name.Contains($field)) {
+                        $missingTableFields += $field
+                      }
+                    }
+
+                    if ($missingTableFields.Count -gt 0) {
+                      Write-Error "❌ Table '$tableName' missing fields: $($missingTableFields -join ', ')"
+                      exit 1
+                    }
+
+                    # Validate columns structure
+                    if ($table.columns.Count -eq 0) {
+                      Write-Error "❌ Table '$tableName' has no columns defined"
+                      exit 1
+                    }
+
+                    foreach ($column in $table.columns) {
+                      $requiredColumnFields = @('name', 'type', 'nullable')
+                      $missingColumnFields = @()
+
+                      foreach ($field in $requiredColumnFields) {
+                        if (-not $column.PSObject.Properties.Name.Contains($field)) {
+                          $missingColumnFields += $field
+                        }
+                      }
+
+                      if ($missingColumnFields.Count -gt 0) {
+                        Write-Error "❌ Table '$tableName', column '$($column.name)' missing fields: $($missingColumnFields -join ', ')"
+                        exit 1
+                      }
+                    }
+
+                    Write-Host "  ✅ Table '$tableName' structure valid ($($table.columns.Count) columns)" -ForegroundColor Green
+                  }
+
+                  Write-Host "`n✅ All validation checks passed!" -ForegroundColor Green
+
+            - name: Validate migrations-history.json
+              shell: pwsh
+              run: |
+                  Write-Host "Validating migrations-history.json..." -ForegroundColor Cyan
+
+                  $migrationsPath = ".github/mamp-database/migrations-history.json"
+
+                  if (-not (Test-Path $migrationsPath)) {
+                    Write-Warning "⚠️ migrations-history.json not found. This is acceptable for new projects."
+                    exit 0
+                  }
+
+                  $migrations = Get-Content $migrationsPath -Raw | ConvertFrom-Json
+
+                  # Validate version matches schema-tables.json
+                  $schemaPath = ".github/mamp-database/schema-tables.json"
+                  $schema = Get-Content $schemaPath -Raw | ConvertFrom-Json
+
+                  if ($migrations.currentVersion -ne $schema.version) {
+                    Write-Error "❌ Version mismatch: migrations-history.json currentVersion ($($migrations.currentVersion)) != schema-tables.json version ($($schema.version))"
+                    exit 1
+                  }
+
+                  Write-Host "✅ Migration history version matches schema version: $($schema.version)" -ForegroundColor Green
+
+            - name: Generate audit summary
+              shell: pwsh
+              run: |
+                  Write-Host "`n========================================" -ForegroundColor Cyan
+                  Write-Host "  DATABASE SCHEMA AUDIT COMPLETE" -ForegroundColor Cyan
+                  Write-Host "========================================`n" -ForegroundColor Cyan
+
+                  $schemaPath = ".github/mamp-database/schema-tables.json"
+                  $schema = Get-Content $schemaPath -Raw | ConvertFrom-Json
+
+                  Write-Host "Database: $($schema.database)" -ForegroundColor White
+                  Write-Host "Version: $($schema.version)" -ForegroundColor White
+                  Write-Host "Last Updated: $($schema.lastUpdated)" -ForegroundColor White
+                  Write-Host "Tables: $($schema.tableCount)" -ForegroundColor White
+                  Write-Host "Total Columns: $($schema.totalColumns)" -ForegroundColor White
+
+                  Write-Host "`n✅ All database documentation is valid and up-to-date!" -ForegroundColor Green
