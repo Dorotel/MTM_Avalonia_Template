@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "description": "User-defined functions for MAMP MySQL 5.7 database",
+  "version": "1.0.0",
+  "lastUpdated": "2025-10-05",
+  "database": "mtm_template_dev",
+  "functions": {},
+  "functionCount": 0,
+  "notes": [
+    "No user-defined functions currently implemented for Feature 002",
+    "Future functions should be documented here with signatures and logic",
+    "Example format: { name, description, parameters[], returnType, deterministic, logic, createdBy, createdDate }"
+  ],
+  "plannedFunctions": [
+    {
+      "name": "fn_IsFeatureEnabledForUser",
+      "description": "Determines if a feature flag is enabled for a specific user based on rollout percentage",
+      "parameters": [
+        {"name": "p_FlagName", "type": "VARCHAR(255)"},
+        {"name": "p_UserId", "type": "INT"}
+      ],
+      "returnType": "BOOLEAN",
+      "deterministic": false,
+      "status": "PLANNED",
+      "notes": "Would use hash-based consistent rollout algorithm"
+    }
+  ]
+}

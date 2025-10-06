@@ -47,44 +47,60 @@
 - [ ] T002 Initialize [language] project with [framework] dependencies
 - [ ] T003 [P] Configure linting and formatting tools
 
+## Phase 3.1a: Database Schema Documentation *(if feature modifies database)*
+**CRITICAL: Complete BEFORE writing any database code**
+- [ ] T004 Read `.github/mamp-database/schema-tables.json` to verify existing schema
+- [ ] T005 Document new/modified tables in spec (exact names, columns, types, constraints)
+- [ ] T006 Update `.github/mamp-database/schema-tables.json` with new table definitions
+- [ ] T007 Update `.github/mamp-database/indexes.json` with performance indexes
+- [ ] T008 Increment version in `.github/mamp-database/migrations-history.json`
+- [ ] T009 Verify schema accuracy (case-sensitive table/column names match JSON)
+
 ## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
 **CRITICAL: These tests MUST be written and MUST FAIL before ANY implementation**
-- [ ] T004 [P] Contract test POST /api/users in tests/contract/test_users_post.py
-- [ ] T005 [P] Contract test GET /api/users/{id} in tests/contract/test_users_get.py
-- [ ] T006 [P] Integration test user registration in tests/integration/test_registration.py
-- [ ] T007 [P] Integration test auth flow in tests/integration/test_auth.py
+- [ ] T010 [P] Contract test POST /api/users in tests/contract/test_users_post.py
+- [ ] T011 [P] Contract test GET /api/users/{id} in tests/contract/test_users_get.py
+- [ ] T012 [P] Integration test user registration in tests/integration/test_registration.py
+- [ ] T013 [P] Integration test auth flow in tests/integration/test_auth.py
 
 ## Phase 3.3: Core Implementation (ONLY after tests are failing)
-- [ ] T008 [P] User model in src/models/user.py
-- [ ] T009 [P] UserService CRUD in src/services/user_service.py
-- [ ] T010 [P] CLI --create-user in src/cli/user_commands.py
-- [ ] T011 POST /api/users endpoint
-- [ ] T012 GET /api/users/{id} endpoint
-- [ ] T013 Input validation
-- [ ] T014 Error handling and logging
+- [ ] T014 [P] User model in src/models/user.py
+- [ ] T015 [P] UserService CRUD in src/services/user_service.py
+- [ ] T016 [P] CLI --create-user in src/cli/user_commands.py
+- [ ] T017 POST /api/users endpoint
+- [ ] T018 GET /api/users/{id} endpoint
+- [ ] T019 Input validation
+- [ ] T020 Error handling and logging
 
 ## Phase 3.4: Integration
-- [ ] T015 Connect UserService to DB
-- [ ] T016 Auth middleware
-- [ ] T017 Request/response logging
-- [ ] T018 CORS and security headers
+- [ ] T021 Connect UserService to DB
+- [ ] T022 Auth middleware
+- [ ] T023 Request/response logging
+- [ ] T024 CORS and security headers
 
 ## Phase 3.5: Polish
-- [ ] T019 [P] Unit tests for validation in tests/unit/test_validation.py
-- [ ] T020 Performance tests (<200ms)
-- [ ] T021 [P] Update docs/api.md
-- [ ] T022 Remove duplication
-- [ ] T023 Run manual-testing.md
+- [ ] T025 [P] Unit tests for validation in tests/unit/test_validation.py
+- [ ] T026 Performance tests (<200ms)
+- [ ] T027 [P] Update docs/api.md
+- [ ] T028 Remove duplication
+- [ ] T029 Run manual-testing.md
+
+## Phase 3.6: Database Documentation Audit *(if database modified)*
+- [ ] T030 Run `mamp-database-sync.prompt.md` audit to verify accuracy
+- [ ] T031 Verify `lastUpdated` timestamps are current in all modified JSON files
+- [ ] T032 Confirm schema changes match actual database structure
 
 ## Dependencies
-- Tests (T004-T007) before implementation (T008-T014)
-- T008 blocks T009, T015
-- T016 blocks T018
-- Implementation before polish (T019-T023)
+- Database schema docs (T004-T009) before tests (T010-T013)
+- Tests (T010-T013) before implementation (T014-T020)
+- T014 blocks T015, T021
+- T022 blocks T024
+- Implementation before polish (T025-T029)
+- Database audit (T030-T032) after all database code complete
 
 ## Parallel Example
 ```
-# Launch T004-T007 together:
+# Launch T010-T013 together (contract tests):
 Task: "Contract test POST /api/users in tests/contract/test_users_post.py"
 Task: "Contract test GET /api/users/{id} in tests/contract/test_users_get.py"
 Task: "Integration test registration in tests/integration/test_registration.py"
@@ -103,17 +119,24 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 1. **From Contracts**:
    - Each contract file → contract test task [P]
    - Each endpoint → implementation task
-   
+
 2. **From Data Model**:
    - Each entity → model creation task [P]
    - Relationships → service layer tasks
-   
-3. **From User Stories**:
+
+3. **From Database Schema Changes** (if applicable):
+   - Read `.github/mamp-database/schema-tables.json` → reference task
+   - Each table created/modified → schema update task
+   - After database changes → JSON file update task
+   - Increment version in `migrations-history.json` → versioning task
+
+4. **From User Stories**:
    - Each story → integration test [P]
    - Quickstart scenarios → validation tasks
 
-4. **Ordering**:
+5. **Ordering**:
    - Setup → Tests → Models → Services → Endpoints → Polish
+   - Database documentation BEFORE implementation
    - Dependencies block parallel execution
 
 ## Validation Checklist
@@ -125,3 +148,5 @@ Task: "Integration test auth in tests/integration/test_auth.py"
 - [ ] Parallel tasks truly independent
 - [ ] Each task specifies exact file path
 - [ ] No task modifies same file as another [P] task
+- [ ] Database schema changes documented in `.github/mamp-database/` (if applicable)
+- [ ] Database audit tasks included (if database modified)

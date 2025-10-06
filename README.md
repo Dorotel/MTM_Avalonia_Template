@@ -157,9 +157,82 @@ MTM_Avalonia_Template/
 ├── MTM_Template_Application.Android/  # Android entry point
 ├── tests/                             # Unit + integration tests
 ├── specs/                             # Feature specifications
-└── docs/                              # Documentation
+├── docs/                              # Documentation
+└── .github/
+    ├── mamp-database/                 # Database schema documentation
+    │   ├── schema-tables.json         # Complete table structures
+    │   ├── stored-procedures.json     # Stored procedure definitions
+    │   ├── functions.json             # User-defined functions
+    │   ├── views.json                 # Database views
+    │   ├── indexes.json               # Index documentation
+    │   ├── sample-data.json           # Test data
+    │   ├── connection-info.json       # Connection settings
+    │   └── migrations-history.json    # Migration versioning
+    └── workflows/                     # GitHub Actions CI/CD
 
 ```
+
+### Database Documentation (`.github/mamp-database/`)
+
+**Critical Infrastructure**: All MAMP MySQL 5.7 database objects are documented in `.github/mamp-database/` JSON files as the **single source of truth** for schema structure.
+
+#### Purpose
+
+- **Schema Accuracy**: Prevents runtime errors from incorrect table/column names (case-sensitive)
+- **Type Safety**: Documents exact data types to prevent type mismatches
+- **Performance**: Tracks indexes to avoid performance degradation
+- **Maintenance**: Documents stored procedures, functions, and views
+- **Migration Tracking**: Maintains version history for schema changes
+
+#### Mandatory Workflow
+
+1. **Before writing code**: ALWAYS read `schema-tables.json` to verify table/column names and types
+2. **During development**: Reference JSON files for exact schema (case-sensitive: `Users`, `UserId`, `PreferenceKey`)
+3. **After database changes**: IMMEDIATELY update corresponding JSON file(s) with new/modified objects
+4. **Before PR**: Ensure `lastUpdated` timestamp is current and `version` field incremented
+5. **After feature completion**: Run database audit to verify accuracy
+
+#### JSON File Structure
+
+| File                      | Purpose                                                                           | Updated When                       |
+| ------------------------- | --------------------------------------------------------------------------------- | ---------------------------------- |
+| `schema-tables.json`      | Complete table structures with columns, types, constraints, indexes, foreign keys | Any table/column/constraint change |
+| `stored-procedures.json`  | Stored procedure signatures, parameters, and logic                                | Procedure created/modified         |
+| `functions.json`          | User-defined function definitions and return types                                | Function created/modified          |
+| `views.json`              | Database view SQL definitions                                                     | View created/modified              |
+| `indexes.json`            | Index documentation with performance notes                                        | Index added/removed/modified       |
+| `sample-data.json`        | Test data used in development and testing                                         | Sample data changes                |
+| `connection-info.json`    | Connection settings and environment configs                                       | Connection parameters change       |
+| `migrations-history.json` | Version history with semantic versioning                                          | Any schema change                  |
+
+#### Example: Reading Schema Before Code
+
+```csharp
+// ✅ CORRECT - Reference schema-tables.json first
+// Verified from .github/mamp-database/schema-tables.json:
+//   Table: Users (PascalCase)
+//   Columns: UserId (INT, PK), Username (VARCHAR(100)), IsActive (BOOLEAN)
+
+var query = @"
+    SELECT UserId, Username, IsActive
+    FROM Users
+    WHERE IsActive = TRUE";
+
+// ❌ INCORRECT - Guessing schema (may cause runtime errors)
+var query = "SELECT user_id, user_name FROM users"; // Wrong case!
+```
+
+#### Automated Validation
+
+The GitHub Action workflow `.github/workflows/database-schema-audit.yml` runs automatically to:
+- ✅ Validate JSON structure and required fields
+- ✅ Check version format (semantic versioning)
+- ✅ Verify `lastUpdated` timestamp is current (<30 days)
+- ✅ Validate table count matches actual tables
+- ✅ Ensure each table has required metadata
+- ⚠️ Warn if schema documentation is outdated
+
+See [Constitution Principle VIII](.specify/memory/constitution.md#viii-mamp-mysql-database-documentation-non-negotiable-) for complete requirements.
 
 ## Configuration
 
@@ -202,21 +275,21 @@ $env:MTM_DATABASE_PORT = "3306"
 
 ### Boot Performance Targets
 
-| Metric | Target | Measured |
-|--------|--------|----------|
-| Stage 0 (Splash) | <1s | ✅ Verified |
-| Stage 1 (Services) | <3s | ✅ Verified |
-| Stage 2 (Application) | <1s | ✅ Verified |
-| **Total Boot Time** | **<10s** | **✅ Verified** |
+| Metric                | Target   | Measured       |
+| --------------------- | -------- | -------------- |
+| Stage 0 (Splash)      | <1s      | ✅ Verified     |
+| Stage 1 (Services)    | <3s      | ✅ Verified     |
+| Stage 2 (Application) | <1s      | ✅ Verified     |
+| **Total Boot Time**   | **<10s** | **✅ Verified** |
 
 ### Memory Budget
 
-| Component | Target | Notes |
-|-----------|--------|-------|
-| Cache (compressed) | ~40MB | LZ4 compression (~3:1 ratio) |
-| Core Services | ~30MB | DI container, logging, pools |
-| Framework | ~30MB | Avalonia UI, .NET runtime |
-| **Total** | **<100MB** | **During startup** |
+| Component          | Target     | Notes                        |
+| ------------------ | ---------- | ---------------------------- |
+| Cache (compressed) | ~40MB      | LZ4 compression (~3:1 ratio) |
+| Core Services      | ~30MB      | DI container, logging, pools |
+| Framework          | ~30MB      | Avalonia UI, .NET runtime    |
+| **Total**          | **<100MB** | **During startup**           |
 
 ## Offline Mode
 

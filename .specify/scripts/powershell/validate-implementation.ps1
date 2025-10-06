@@ -195,6 +195,51 @@ function Test-ConstitutionalCompliance {
         }
     }
 
+    # Principle VIII: MAMP MySQL Database Documentation (CRITICAL CHECK)
+    Write-ValidationLog "Checking database documentation..." "INFO"
+    $schemaTablesPath = Join-Path $RepoPath ".github/mamp-database/schema-tables.json"
+
+    if (Test-Path $schemaTablesPath) {
+        $schemaContent = Get-Content $schemaTablesPath -Raw | ConvertFrom-Json
+
+        # Check lastUpdated timestamp (warn if older than 30 days)
+        if ($schemaContent.lastUpdated) {
+            $lastUpdated = [DateTime]::Parse($schemaContent.lastUpdated)
+            $daysSinceUpdate = (Get-Date) - $lastUpdated
+
+            if ($daysSinceUpdate.TotalDays -gt 30) {
+                $violations.NonCritical += @{
+                    Principle = "VIII. MAMP MySQL Database Documentation"
+                    Issue     = "schema-tables.json lastUpdated is $([math]::Round($daysSinceUpdate.TotalDays)) days old (>30 days)"
+                    Files     = @($schemaTablesPath)
+                }
+            }
+        }
+        else {
+            $violations.Critical += @{
+                Principle = "VIII. MAMP MySQL Database Documentation"
+                Issue     = "schema-tables.json missing 'lastUpdated' field"
+                Files     = @($schemaTablesPath)
+            }
+        }
+
+        # Check version field exists
+        if (-not $schemaContent.version) {
+            $violations.Critical += @{
+                Principle = "VIII. MAMP MySQL Database Documentation"
+                Issue     = "schema-tables.json missing 'version' field"
+                Files     = @($schemaTablesPath)
+            }
+        }
+    }
+    else {
+        $violations.Critical += @{
+            Principle = "VIII. MAMP MySQL Database Documentation"
+            Issue     = "schema-tables.json file not found in .github/mamp-database/"
+            Files     = @(".github/mamp-database/schema-tables.json")
+        }
+    }
+
     # Principle VI: Compiled Bindings (CRITICAL CHECK)
     Write-ValidationLog "Checking XAML bindings (CRITICAL)..." "INFO"
     $axamlFiles = Get-ChildItem -Path "$RepoPath/MTM_Template_Application" -Filter "*.axaml" -Recurse

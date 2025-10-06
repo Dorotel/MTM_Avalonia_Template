@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "description": "Database views for MAMP MySQL 5.7 database",
+  "version": "1.0.0",
+  "lastUpdated": "2025-10-05",
+  "database": "mtm_template_dev",
+  "views": {},
+  "viewCount": 0,
+  "notes": [
+    "No views currently defined for Feature 002",
+    "Future views should be documented here with full SQL definitions",
+    "Example format: { name, description, sql, dependencies[], createdBy, createdDate }"
+  ],
+  "plannedViews": [
+    {
+      "name": "vw_ActiveUserPreferences",
+      "description": "Shows preferences for active users only with denormalized user information",
+      "sql": "SELECT u.UserId, u.Username, u.DisplayName, up.PreferenceKey, up.PreferenceValue, up.Category, up.LastUpdated FROM Users u INNER JOIN UserPreferences up ON u.UserId = up.UserId WHERE u.IsActive = TRUE",
+      "dependencies": ["Users", "UserPreferences"],
+      "status": "PLANNED",
+      "notes": "Could improve performance for common queries joining users and preferences"
+    },
+    {
+      "name": "vw_EnabledFeatureFlags",
+      "description": "Shows only enabled feature flags with current environment filter",
+      "sql": "SELECT FlagId, FlagName, Environment, RolloutPercentage, AppVersion, UpdatedAt FROM FeatureFlags WHERE IsEnabled = TRUE",
+      "dependencies": ["FeatureFlags"],
+      "status": "PLANNED",
+      "notes": "Simplifies queries that only need enabled flags"
+    }
+  ]
+}

@@ -25,9 +25,44 @@ public interface IConfigurationService
     Task ReloadAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Load user preferences from database
+    /// </summary>
+    Task LoadUserPreferencesAsync(int userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Save a user preference to database
+    /// </summary>
+    Task SaveUserPreferenceAsync(int userId, string key, object value, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get user folder path with dynamic location detection
+    /// </summary>
+    Task<string> GetUserFolderPathAsync(int userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get user folder locations (primary, backup, network availability)
+    /// </summary>
+    Task<UserFolderLocations> GetUserFolderLocationsAsync(int userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Get database connection string with dynamic selection
+    /// </summary>
+    Task<string> GetDatabaseConnectionStringAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Event raised when configuration changes
     /// </summary>
     event EventHandler<ConfigurationChangedEventArgs>? OnConfigurationChanged;
+}
+
+/// <summary>
+/// User folder locations result
+/// </summary>
+public record UserFolderLocations
+{
+    public string Primary { get; init; } = string.Empty;
+    public string? Backup { get; init; }
+    public bool IsNetworkAvailable { get; init; }
 }
 
 /// <summary>

@@ -1,0 +1,8 @@
+{
+  "HomeDevelopmentIPAddress": "73.94.78.172",
+  "NetworkDrivePath": "\\\\mtmanu-fs01\\Expo Drive\\MH_RESOURCE\\MTM_Apps\\Users",
+  "LocalFallbackPath": "{MyDocuments}\\MTM_Apps\\users",
+  "NetworkAccessTimeoutSeconds": 2,
+  "LocationCacheDurationMinutes": 5,
+  "EnableDualWrite": true
+}

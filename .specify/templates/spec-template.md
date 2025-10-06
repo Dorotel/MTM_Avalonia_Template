@@ -1,11 +1,12 @@
 # Feature Specification: [FEATURE NAME]
 
-**Feature Branch**: `[###-feature-name]`  
-**Created**: [DATE]  
-**Status**: Draft  
+**Feature Branch**: `[###-feature-name]`
+**Created**: [DATE]
+**Status**: Draft
 **Input**: User description: "$ARGUMENTS"
 
 ## Execution Flow (main)
+
 ```
 1. Parse user description from Input
    → If empty: ERROR "No feature description provided"
@@ -25,12 +26,71 @@
 8. Return: SUCCESS (spec ready for planning)
 ```
 
+## Clarifications Q&A Template
+
+Use this section whenever any [NEEDS CLARIFICATION: …] markers exist in the spec. Keep each question atomic and traceable.
+
+### How to use
+- Create one entry per ambiguity with a unique ID: CL-001, CL-002, …
+- Quote the exact marker text in “Question”.
+- Add a proposed interim assumption (to unblock planning) and note its risk.
+- After an answer is agreed, update “Answer/Decision” and list all “Spec Changes”.
+- Remove the corresponding [NEEDS CLARIFICATION: …] tag(s) from the body once resolved.
+
+### Index
+- Open: list CL IDs with a short label
+- Resolved: list CL IDs with a short outcome
+
+### Entry Template (copy per question)
+- ID: CL-###
+- Tag location(s): section and line or bullet where the marker appears
+- Question (exact): the full text from the marker
+- Context: why this matters for scope, users, or testing
+- Options considered:
+  - Option A: brief
+  - Option B: brief
+- Proposed interim assumption: the assumption to proceed if not answered now
+- Impact if unresolved: risks to scope, timeline, testing, or dependencies
+- Priority: High | Medium | Low
+- Owner: decision-maker
+- Due date: yyyy-mm-dd
+- Status: Open | Answered | Deferred
+- Answer/Decision: the agreed resolution (concise)
+- Spec changes:
+  - Update section “…”
+  - Add/modify requirements “…”
+  - Remove marker(s) at “…”
+- Notes: any follow-ups or dependencies
+
+### Minimal Example (illustrative)
+- ID: CL-001
+- Tag location(s): Requirements > FR-006
+- Question (exact): authenticate users via which method?
+- Context: affects user flows and acceptance tests
+- Options considered: A) Email/Password B) SSO
+- Proposed interim assumption: Email/Password
+- Impact if unresolved: blocks acceptance scenarios
+- Priority: High
+- Owner: Product
+- Due date: 2025-10-10
+- Status: Answered
+- Answer/Decision: Use Email/Password
+- Spec changes:
+  - Updated Requirements (FR-006) to specify Email/Password
+  - Removed marker from FR-006
+- Notes: Revisit SSO in a separate feature
+
 ---
 
 ## ⚡ Quick Guidelines
 - ✅ Focus on WHAT users need and WHY
 - ❌ Avoid HOW to implement (no tech stack, APIs, code structure)
 - 👥 Written for business stakeholders, not developers
+- 📅 Keep it concise and focused on key points
+- 🔄 Include examples and use cases to illustrate concept
+- ✍️ Use clear and simple language, avoiding jargon, but make it easy for a copilot agent to understand
+
+---
 
 ### Section Requirements
 - **Mandatory sections**: Must be completed for every feature
@@ -44,11 +104,21 @@ When creating this spec from a user prompt:
 3. **Think like a tester**: Every vague requirement should fail the "testable and unambiguous" checklist item
 4. **Common underspecified areas**:
    - User types and permissions
-   - Data retention/deletion policies  
+   - Data retention/deletion policies
    - Performance targets and scale
    - Error handling behaviors
    - Integration requirements
    - Security/compliance needs
+   - **MAMP MySQL database changes** (if feature modifies database):
+     - Which tables are created/modified?
+     - What columns, types, and constraints?
+     - Are JSON files in `.github/mamp-database/` referenced?
+     - Is `migrations-history.json` updated with version increment?
+   - **Visual ERP integration** (if feature accesses Visual):
+     - Which Visual tables/data are accessed?
+     - Are API Toolkit commands read-only?
+     - Are commands in whitelist (`docs/VISUAL-WHITELIST.md`)?
+     - Platform-specific access patterns (Windows direct vs Android via MTM Server API)?
 
 ---
 
@@ -69,7 +139,7 @@ When creating this spec from a user prompt:
 
 ### Functional Requirements
 - **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
+- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]
 - **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
 - **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
 - **FR-005**: System MUST [behavior, e.g., "log all security events"]
@@ -81,6 +151,34 @@ When creating this spec from a user prompt:
 ### Key Entities *(include if feature involves data)*
 - **[Entity 1]**: [What it represents, key attributes without implementation]
 - **[Entity 2]**: [What it represents, relationships to other entities]
+
+### Database Schema Changes *(include if feature modifies MAMP MySQL database)*
+
+**IMPORTANT**: Before documenting changes, ALWAYS reference existing schema in `.github/mamp-database/schema-tables.json`
+
+**Tables Modified/Created**:
+- **[TableName]**: [Brief description of purpose]
+  - Columns added/modified: [list columns with types]
+  - Indexes required: [list indexes for performance]
+  - Foreign keys: [relationships to other tables]
+  - Reason: [Why this change is needed]
+
+**Schema Documentation Requirements**:
+- [ ] Read `.github/mamp-database/schema-tables.json` before planning
+- [ ] Document exact table names (case-sensitive: `Users`, not `users`)
+- [ ] Document exact column names (case-sensitive: `UserId`, not `userid`)
+- [ ] Specify data types (VARCHAR(100), INT, DATETIME, BOOLEAN, etc.)
+- [ ] Document nullable vs NOT NULL constraints
+- [ ] Document default values where applicable
+- [ ] List indexes needed for query performance
+- [ ] Update `.github/mamp-database/migrations-history.json` with version increment
+
+**Example**:
+- **UserPreferences**: Stores user-specific application settings
+  - Columns: `PreferenceId` (INT, PK), `UserId` (INT, FK), `PreferenceKey` (VARCHAR(100)), `PreferenceValue` (TEXT), `LastUpdated` (DATETIME)
+  - Indexes: INDEX on `UserId`, INDEX on `PreferenceKey`
+  - Foreign keys: `UserId` → `Users.UserId`
+  - Reason: FR-032 requires persistent user preferences across sessions
 
 ---
 
@@ -95,10 +193,12 @@ When creating this spec from a user prompt:
 
 ### Requirement Completeness
 - [ ] No [NEEDS CLARIFICATION] markers remain
-- [ ] Requirements are testable and unambiguous  
+- [ ] Requirements are testable and unambiguous
 - [ ] Success criteria are measurable
 - [ ] Scope is clearly bounded
 - [ ] Dependencies and assumptions identified
+- [ ] Database schema changes documented (if applicable)
+- [ ] JSON files in `.github/mamp-database/` referenced (if database changes)
 
 ---
 

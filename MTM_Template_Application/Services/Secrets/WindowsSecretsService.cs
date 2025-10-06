@@ -18,6 +18,11 @@ public class WindowsSecretsService : ISecretsService
 {
     private readonly ILogger<WindowsSecretsService> _logger;
 
+    /// <summary>
+    /// Event raised when credential recovery is needed due to encryption errors
+    /// </summary>
+    public event EventHandler<CredentialRecoveryEventArgs>? OnCredentialRecoveryNeeded;
+
     public WindowsSecretsService(ILogger<WindowsSecretsService> logger)
     {
         ArgumentNullException.ThrowIfNull(logger);
@@ -79,6 +84,15 @@ public class WindowsSecretsService : ISecretsService
             if (entry == null)
             {
                 _logger.LogWarning("Secret {Key} not found", key);
+
+                // Raise credential recovery event for missing credentials
+                RaiseCredentialRecoveryNeeded(
+                    key,
+                    null,
+                    CredentialRecoveryFailureType.NotFound,
+                    $"Credential '{key}' not found in secure storage. Please enter your credentials."
+                );
+
                 return Task.FromResult<string?>(null);
             }
 
@@ -97,11 +111,74 @@ public class WindowsSecretsService : ISecretsService
             _logger.LogDebug("Secret {Key} retrieved successfully", key);
             return Task.FromResult<string?>(value);
         }
-        catch (Exception ex)
+        catch (CryptographicException ex)
         {
-            _logger.LogError(ex, "Failed to retrieve secret {Key}", key);
+            // Credentials corrupted or user profile changed
+            _logger.LogError(ex, "Cryptographic error retrieving secret {Key} - credentials may be corrupted", key);
+
+            RaiseCredentialRecoveryNeeded(
+                key,
+                ex,
+                CredentialRecoveryFailureType.CorruptedCredentials,
+                $"Your saved credentials could not be decrypted. This can happen if your Windows user profile changed. Please re-enter your credentials for '{key}'."
+            );
+
             return Task.FromResult<string?>(null);
         }
+        catch (UnauthorizedAccessException ex)
+        {
+            // Permission denied to access secure storage
+            _logger.LogError(ex, "Unauthorized access retrieving secret {Key} - permissions may be revoked", key);
+
+            RaiseCredentialRecoveryNeeded(
+                key,
+                ex,
+                CredentialRecoveryFailureType.AccessDenied,
+                $"Access to secure credential storage was denied. Please check your Windows permissions and re-enter your credentials for '{key}'."
+            );
+
+            return Task.FromResult<string?>(null);
+        }
+        catch (Exception ex)
+        {
+            // Unknown error
+            _logger.LogError(ex, "Unknown error retrieving secret {Key}", key);
+
+            RaiseCredentialRecoveryNeeded(
+                key,
+                ex,
+                CredentialRecoveryFailureType.Unknown,
+                $"An unexpected error occurred while retrieving credentials for '{key}'. Please re-enter your credentials."
+            );
+
+            return Task.FromResult<string?>(null);
+        }
+    }
+
+    /// <summary>
+    /// Raise the credential recovery needed event
+    /// </summary>
+    private void RaiseCredentialRecoveryNeeded(
+        string key,
+        Exception? exception,
+        CredentialRecoveryFailureType failureType,
+        string message)
+    {
+        var eventArgs = new CredentialRecoveryEventArgs
+        {
+            Key = key,
+            Exception = exception,
+            FailureType = failureType,
+            Message = message
+        };
+
+        OnCredentialRecoveryNeeded?.Invoke(this, eventArgs);
+
+        _logger.LogInformation(
+            "Credential recovery event raised for key {Key}, failure type {FailureType}",
+            key,
+            failureType
+        );
     }
 
     public Task DeleteSecretAsync(string key, CancellationToken cancellationToken = default)

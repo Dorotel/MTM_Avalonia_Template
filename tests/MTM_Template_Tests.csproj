@@ -16,6 +16,7 @@
     </PackageReference>
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="NSubstitute" />
+    <PackageReference Include="Serilog.Sinks.InMemory" />
   </ItemGroup>
 
   <ItemGroup>

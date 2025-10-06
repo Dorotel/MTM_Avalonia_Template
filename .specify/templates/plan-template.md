@@ -5,6 +5,7 @@
 **Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
 ## Execution Flow (/plan command scope)
+
 ```
 1. Load feature spec from Input path
    → If not found: ERROR "No feature spec at {path}"
@@ -34,24 +35,100 @@
 [Extract from feature spec: primary requirement + technical approach from research]
 
 ## Technical Context
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
+**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]
+**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]
 **Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
+**Project Type**: [single/web/mobile - determines source structure]
+**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]
+**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]
 **Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+*Based on Constitution v1.3.0*
 
-[Gates determined based on constitution file]
+### I. Cross-Platform First
+- [ ] Phase 1 platforms supported (Windows Desktop + Android)
+- [ ] Deferred platforms documented if applicable
+- [ ] Platform-specific code abstracted through interfaces
+- [ ] Platform differences handled via dependency injection
+- [ ] Unsupported platforms throw `PlatformNotSupportedException`
+
+### II. MVVM Community Toolkit Standard
+- [ ] ViewModels use `[ObservableObject]` + `[ObservableProperty]`
+- [ ] Commands use `[RelayCommand]` with async support
+- [ ] NO ReactiveUI patterns
+- [ ] Constructor dependency injection
+- [ ] `partial` classes for source generation
+
+### III. Test-First Development
+- [ ] Tests written before implementation (TDD)
+- [ ] xUnit as standard testing framework
+- [ ] Contract tests for APIs
+- [ ] Integration tests for workflows
+- [ ] Unit tests for business logic
+- [ ] NSubstitute for mocking
+- [ ] Target >80% code coverage on critical paths
+
+### IV. Theme V2 Semantic Tokens
+- [ ] DynamicResource usage (no hardcoded colors)
+- [ ] FluentTheme or Material.Avalonia base
+- [ ] Manufacturing Design System integration
+- [ ] Light/dark theme switching support
+
+### V. Null Safety and Error Resilience
+- [ ] Nullable reference types enabled
+- [ ] `ArgumentNullException.ThrowIfNull()` for parameters
+- [ ] Error boundaries in ViewModels
+- [ ] Graceful degradation for offline scenarios
+- [ ] Serilog structured logging (no sensitive data)
+
+### VI. Compiled Bindings Only
+- [ ] `x:DataType` on Window/UserControl root
+- [ ] `x:CompileBindings="True"` for validation
+- [ ] `{CompiledBinding}` syntax (NO legacy `{Binding}`)
+- [ ] `Design.DataContext` for previewer
+
+### VII. Dependency Injection via AppBuilder
+- [ ] Services registered in `Program.cs` via `AppBuilder.ConfigureServices()`
+- [ ] ViewModels as `Transient`
+- [ ] Services as `Singleton`/`Scoped` based on lifecycle
+- [ ] NO service locator pattern
+
+### VIII. MAMP MySQL Database Documentation (if applicable)
+- [ ] Reference JSON files in `.github/mamp-database/` before code generation
+- [ ] Update JSON files immediately after database changes
+- [ ] Complete metadata (tables, columns, indexes, foreign keys, procedures, functions, views)
+- [ ] Schema accuracy maintained (single source of truth)
+- [ ] Version tracking in `migrations-history.json`
+
+### IX. Visual ERP Integration Standards (if applicable)
+- [ ] Read-only access only (no write operations)
+- [ ] Infor Visual API Toolkit commands exclusively (NO direct SQL)
+- [ ] Command whitelist in `docs/VISUAL-WHITELIST.md`
+- [ ] Whitelist validation before execution
+- [ ] Citation format: "Reference-{FileName} - {Chapter/Section/Page}"
+- [ ] Credentials in OS-native storage (DPAPI/KeyStore)
+- [ ] Windows: Direct Visual API Toolkit client
+- [ ] Android: MTM Server API → Visual API Toolkit (server-side)
+- [ ] Android two-factor auth (credentials + device certificate)
+
+### Async/Await Patterns
+- [ ] `CancellationToken` parameter on all async methods
+- [ ] Methods suffixed with `Async`
+- [ ] `ConfigureAwait(false)` in library/service code (NOT UI)
+- [ ] `OperationCanceledException` handled gracefully
+
+**Gate Status**: [✅ PASS / ❌ FAIL / ⚠️ WITH JUSTIFICATION]
+
+[If violations exist, document in Complexity Tracking section]
 
 ## Project Structure
 
 ### Documentation (this feature)
+
 ```
 specs/[###-feature]/
 ├── plan.md              # This file (/plan command output)
@@ -115,6 +192,7 @@ directories captured above]
    - For each integration → patterns task
 
 2. **Generate and dispatch research agents**:
+
    ```
    For each unknown in Technical Context:
      Task: "Research {unknown} for {feature context}"
@@ -169,12 +247,12 @@ directories captured above]
 - Load `.specify/templates/tasks-template.md` as base
 - Generate tasks from Phase 1 design docs (contracts, data model, quickstart)
 - Each contract → contract test task [P]
-- Each entity → model creation task [P] 
+- Each entity → model creation task [P]
 - Each user story → integration test task
 - Implementation tasks to make tests pass
 
 **Ordering Strategy**:
-- TDD order: Tests before implementation 
+- TDD order: Tests before implementation
 - Dependency order: Models before services before UI
 - Mark [P] for parallel execution (independent files)
 
@@ -185,18 +263,17 @@ directories captured above]
 ## Phase 3+: Future Implementation
 *These phases are beyond the scope of the /plan command*
 
-**Phase 3**: Task execution (/tasks command creates tasks.md)  
-**Phase 4**: Implementation (execute tasks.md following constitutional principles)  
+**Phase 3**: Task execution (/tasks command creates tasks.md)
+**Phase 4**: Implementation (execute tasks.md following constitutional principles)
 **Phase 5**: Validation (run tests, execute quickstart.md, performance validation)
 
 ## Complexity Tracking
 *Fill ONLY if Constitution Check has violations that must be justified*
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
-
+| Violation                  | Why Needed         | Simpler Alternative Rejected Because |
+| -------------------------- | ------------------ | ------------------------------------ |
+| [e.g., 4th project]        | [current need]     | [why 3 projects insufficient]        |
+| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient]  |
 
 ## Progress Tracking
 *This checklist is updated during execution flow*

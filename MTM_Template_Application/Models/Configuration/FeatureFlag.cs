@@ -31,4 +31,16 @@ public class FeatureFlag
     /// When this flag was last evaluated
     /// </summary>
     public DateTimeOffset EvaluatedAt { get; set; }
+
+    /// <summary>
+    /// Hash value for deterministic user-specific rollout
+    /// Computed from userId + flagName for consistent results across sessions
+    /// </summary>
+    public string? TargetUserIdHash { get; set; }
+
+    /// <summary>
+    /// Application version this flag is tied to (for launcher sync)
+    /// Example: "1.0.0", "1.2.3-beta"
+    /// </summary>
+    public string? AppVersion { get; set; }
 }

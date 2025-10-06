@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "description": "Database indexes and performance optimizations for MAMP MySQL 5.7",
+  "version": "1.0.0",
+  "lastUpdated": "2025-10-05",
+  "database": "mtm_template_dev",
+  "indexes": {
+    "Users": [
+      {
+        "name": "PRIMARY",
+        "type": "PRIMARY KEY",
+        "columns": ["UserId"],
+        "unique": true,
+        "purpose": "Primary key for user identification"
+      },
+      {
+        "name": "UK_Users_Username",
+        "type": "UNIQUE",
+        "columns": ["Username"],
+        "unique": true,
+        "purpose": "Enforce unique usernames and speed up login queries"
+      },
+      {
+        "name": "IDX_Users_IsActive",
+        "type": "INDEX",
+        "columns": ["IsActive"],
+        "unique": false,
+        "purpose": "Filter active vs inactive users quickly"
+      }
+    ],
+    "UserPreferences": [
+      {
+        "name": "PRIMARY",
+        "type": "PRIMARY KEY",
+        "columns": ["PreferenceId"],
+        "unique": true,
+        "purpose": "Primary key for preference records"
+      },
+      {
+        "name": "UK_UserPreferences",
+        "type": "UNIQUE",
+        "columns": ["UserId", "PreferenceKey"],
+        "unique": true,
+        "purpose": "Enforce one value per user per key, speeds up preference lookups"
+      },
+      {
+        "name": "IDX_UserPreferences_UserId",
+        "type": "INDEX",
+        "columns": ["UserId"],
+        "unique": false,
+        "purpose": "Speed up queries retrieving all preferences for a user"
+      },
+      {
+        "name": "IDX_UserPreferences_Category",
+        "type": "INDEX",
+        "columns": ["Category"],
+        "unique": false,
+        "purpose": "Speed up queries filtering by preference category"
+      }
+    ],
+    "FeatureFlags": [
+      {
+        "name": "PRIMARY",
+        "type": "PRIMARY KEY",
+        "columns": ["FlagId"],
+        "unique": true,
+        "purpose": "Primary key for feature flag records"
+      },
+      {
+        "name": "UK_FeatureFlags_FlagName",
+        "type": "UNIQUE",
+        "columns": ["FlagName"],
+        "unique": true,
+        "purpose": "Enforce unique flag names and speed up flag lookups by name"
+      },
+      {
+        "name": "IDX_FeatureFlags_FlagName",
+        "type": "INDEX",
+        "columns": ["FlagName"],
+        "unique": false,
+        "purpose": "Redundant with unique constraint but explicitly documented for clarity"
+      },
+      {
+        "name": "IDX_FeatureFlags_Environment",
+        "type": "INDEX",
+        "columns": ["Environment"],
+        "unique": false,
+        "purpose": "Speed up queries filtering by environment (Development, Staging, Production)"
+      },
+      {
+        "name": "IDX_FeatureFlags_AppVersion",
+        "type": "INDEX",
+        "columns": ["AppVersion"],
+        "unique": false,
+        "purpose": "Speed up queries filtering by application version"
+      }
+    ]
+  },
+  "performanceNotes": [
+    "All indexes are InnoDB B-Tree indexes",
+    "Unique constraints automatically create indexes",
+    "Foreign key columns are indexed automatically by InnoDB",
+    "Consider composite indexes for frequently combined WHERE clauses",
+    "Monitor query performance with EXPLAIN for optimization opportunities"
+  ],
+  "maintenanceRecommendations": [
+    "Run ANALYZE TABLE periodically to update index statistics",
+    "Monitor index usage with SHOW INDEX and sys.schema_unused_indexes",
+    "Consider covering indexes for frequently accessed column combinations",
+    "Remove unused indexes to improve write performance"
+  ]
+}

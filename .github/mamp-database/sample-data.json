@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "description": "Sample and test data used in MAMP MySQL 5.7 development database",
+  "version": "1.0.0",
+  "lastUpdated": "2025-10-05",
+  "database": "mtm_template_dev",
+  "purpose": "Documents test data for development, contract tests, and integration tests",
+  "data": {
+    "Users": [
+      {
+        "UserId": 42,
+        "Username": "testuser",
+        "DisplayName": "Test User",
+        "IsActive": true,
+        "CreatedAt": "2025-10-05 14:00:00",
+        "LastLoginAt": null,
+        "purpose": "General testing and contract tests"
+      },
+      {
+        "UserId": 99,
+        "Username": "integrationtest",
+        "DisplayName": "Integration Test User",
+        "IsActive": true,
+        "CreatedAt": "2025-10-05 14:00:00",
+        "LastLoginAt": null,
+        "purpose": "Integration testing scenarios"
+      }
+    ],
+    "UserPreferences": [
+      {
+        "PreferenceId": 1,
+        "UserId": 42,
+        "PreferenceKey": "Display.Theme",
+        "PreferenceValue": "Dark",
+        "Category": "Display",
+        "LastUpdated": "2025-10-05 14:30:00",
+        "purpose": "Test theme preference storage and retrieval"
+      },
+      {
+        "PreferenceId": 2,
+        "UserId": 42,
+        "PreferenceKey": "Filter.DefaultLocation",
+        "PreferenceValue": "WH-01",
+        "Category": "Filters",
+        "LastUpdated": "2025-10-05 14:35:00",
+        "purpose": "Test filter preference with hierarchical keys"
+      },
+      {
+        "PreferenceId": 3,
+        "UserId": 42,
+        "PreferenceKey": "Sort.OrderBy",
+        "PreferenceValue": "DateDescending",
+        "Category": "Sort",
+        "LastUpdated": "2025-10-05 14:40:00",
+        "purpose": "Test sort preference storage"
+      },
+      {
+        "PreferenceId": 4,
+        "UserId": 99,
+        "PreferenceKey": "Display.Theme",
+        "PreferenceValue": "Dark",
+        "Category": "Display",
+        "LastUpdated": "2025-10-05 14:30:00",
+        "purpose": "Integration test user preferences"
+      },
+      {
+        "PreferenceId": 5,
+        "UserId": 99,
+        "PreferenceKey": "Filter.DefaultLocation",
+        "PreferenceValue": "WH-01",
+        "Category": "Filters",
+        "LastUpdated": "2025-10-05 14:35:00",
+        "purpose": "Integration test user preferences"
+      }
+    ],
+    "FeatureFlags": [
+      {
+        "FlagId": 1,
+        "FlagName": "Visual.UseForItems",
+        "IsEnabled": true,
+        "Environment": "Development",
+        "RolloutPercentage": 100,
+        "AppVersion": "1.0.0",
+        "UpdatedAt": "2025-10-05 14:30:00",
+        "purpose": "Test environment-specific feature flag (Development only)"
+      },
+      {
+        "FlagId": 2,
+        "FlagName": "OfflineModeAllowed",
+        "IsEnabled": true,
+        "Environment": null,
+        "RolloutPercentage": 50,
+        "AppVersion": "1.0.0",
+        "UpdatedAt": "2025-10-05 14:30:00",
+        "purpose": "Test rollout percentage feature (50% of users)"
+      },
+      {
+        "FlagId": 3,
+        "FlagName": "Debug.ShowSqlQueries",
+        "IsEnabled": true,
+        "Environment": "Development",
+        "RolloutPercentage": 100,
+        "AppVersion": "1.0.0",
+        "UpdatedAt": "2025-10-05 14:30:00",
+        "purpose": "Test debug feature flag for development"
+      },
+      {
+        "FlagId": 4,
+        "FlagName": "Production.AdvancedFeature",
+        "IsEnabled": false,
+        "Environment": "Production",
+        "RolloutPercentage": 0,
+        "AppVersion": "1.0.0",
+        "UpdatedAt": "2025-10-05 14:30:00",
+        "purpose": "Test disabled production feature"
+      },
+      {
+        "FlagId": 5,
+        "FlagName": "TestFeature.Rollout50",
+        "IsEnabled": true,
+        "Environment": null,
+        "RolloutPercentage": 50,
+        "AppVersion": "1.0.0",
+        "UpdatedAt": "2025-10-05 14:30:00",
+        "purpose": "Test consistent hash-based rollout algorithm"
+      }
+    ]
+  },
+  "testScenarios": {
+    "contractTests": {
+      "description": "Data required for DatabaseSchemaContractTests",
+      "requiredUsers": [42, 99],
+      "requiredPreferences": [1, 2, 3],
+      "requiredFlags": [1, 2, 3, 4, 5]
+    },
+    "integrationTests": {
+      "description": "Data required for ConfigurationService integration tests",
+      "requiredUsers": [99],
+      "requiredPreferences": [4, 5],
+      "requiredFlags": [2, 5]
+    }
+  },
+  "dataGenerationScripts": {
+    "location": "config/migrations/001_initial_schema.sql",
+    "insertStatements": [
+      "INSERT IGNORE INTO `Users` (UserId, Username, DisplayName, IsActive, CreatedAt)",
+      "INSERT IGNORE INTO `UserPreferences` (UserId, PreferenceKey, PreferenceValue, Category, LastUpdated)",
+      "INSERT IGNORE INTO `FeatureFlags` (FlagName, IsEnabled, Environment, RolloutPercentage, AppVersion, UpdatedAt)"
+    ]
+  },
+  "notes": [
+    "UserId 42 and 99 are reserved for testing - DO NOT USE IN PRODUCTION",
+    "INSERT IGNORE prevents duplicate key errors when running migration multiple times",
+    "Test data should be idempotent and safe to re-insert",
+    "Integration tests may create/delete additional test data during test runs"
+  ]
+}
