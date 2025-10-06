@@ -67,7 +67,10 @@ public static class ServiceCollectionExtensions
         Serilog.Log.Verbose("[DI] Registering IConfigurationService -> ConfigurationService");
         services.AddSingleton<IConfigurationService, ConfigurationService>();
 
-        Serilog.Log.Information("[DI] AddConfigurationServices() - Registered 1 configuration service");
+        Serilog.Log.Verbose("[DI] Registering FeatureFlagEvaluator");
+        services.AddSingleton<FeatureFlagEvaluator>();
+
+        Serilog.Log.Information("[DI] AddConfigurationServices() - Registered 2 configuration services");
         return services;
     }
 
@@ -421,9 +424,11 @@ public static class ServiceCollectionExtensions
 
         Serilog.Log.Verbose("[DI] Registering MainViewModel");
         services.AddTransient<MainViewModel>();
-        // Add other ViewModels as needed
 
-        Serilog.Log.Information("[DI] AddViewModels() - Registered 2 ViewModels");
+        Serilog.Log.Verbose("[DI] Registering DebugTerminalViewModel");
+        services.AddTransient<DebugTerminalViewModel>();
+
+        Serilog.Log.Information("[DI] AddViewModels() - Registered 3 ViewModels");
         return services;
     }
 

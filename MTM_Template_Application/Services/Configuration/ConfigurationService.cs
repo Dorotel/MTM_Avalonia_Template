@@ -55,20 +55,17 @@ public class ConfigurationService : IConfigurationService
         _userFoldersConfigPath = Path.Combine(_configDirectory, "user-folders.json");
         _databaseSchemaConfigPath = Path.Combine(_configDirectory, "database-schema.json");
 
-        // Initialize runtime environment (create directories and files)
-        InitializeRuntimeEnvironmentAsync(CancellationToken.None).GetAwaiter().GetResult();
+        // NOTE: Do NOT call async methods from constructor (causes deadlock)
+        // Initialize runtime environment synchronously (directories only - no I/O blocking)
+        InitializeRuntimeEnvironmentSync();
     }
 
     /// <summary>
-    /// Initialize runtime environment: create directories and configuration files if missing
+    /// Initialize runtime environment synchronously: create directories only (no I/O blocking)
+    /// Config files will be created lazily on first access
     /// </summary>
-    private async Task InitializeRuntimeEnvironmentAsync(CancellationToken cancellationToken)
+    private void InitializeRuntimeEnvironmentSync()
     {
-        if (_isInitialized)
-        {
-            return;
-        }
-
         try
         {
             _logger.LogInformation("Initializing runtime environment...");
@@ -91,6 +88,30 @@ public class ConfigurationService : IConfigurationService
             EnsureDirectoryExists(mtmAppsBase, "MTM_Apps (MyDocuments)");
             EnsureDirectoryExists(mtmUsersBase, "MTM_Apps\\users (MyDocuments)");
 
+            _logger.LogInformation("Runtime environment directories created successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to initialize runtime environment directories");
+            throw; // Fail fast - can't proceed without basic directories
+        }
+    }
+
+    /// <summary>
+    /// Initialize runtime environment asynchronously: load/create configuration files
+    /// Call this explicitly after DI construction to complete initialization
+    /// </summary>
+    public async Task InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        if (_isInitialized)
+        {
+            return;
+        }
+
+        try
+        {
+            _logger.LogInformation("Loading configuration files...");
+
             // Create/validate config files
             await EnsureConfigFileExistsAsync(_userFoldersConfigPath, GetDefaultUserFoldersConfig(), cancellationToken);
             await EnsureConfigFileExistsAsync(_databaseSchemaConfigPath, GetDefaultDatabaseSchemaConfig(), cancellationToken);
@@ -100,12 +121,25 @@ public class ConfigurationService : IConfigurationService
             _databaseSchemaConfig = await LoadJsonConfigAsync<DatabaseSchemaConfig>(_databaseSchemaConfigPath, cancellationToken);
 
             _isInitialized = true;
-            _logger.LogInformation("Runtime environment initialized successfully");
+            _logger.LogInformation("Configuration service initialized successfully");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to initialize runtime environment - continuing with degraded functionality");
+            _logger.LogError(ex, "Failed to initialize configuration service - continuing with degraded functionality");
+            // Don't throw - graceful degradation
         }
+    }
+
+    /// <summary>
+    /// Initialize runtime environment: create directories and configuration files if missing
+    /// DEPRECATED: Use InitializeAsync() instead - this is now just a stub that does nothing
+    /// </summary>
+    [Obsolete("Use InitializeAsync() instead - this method is deprecated and does nothing")]
+    public void InitializeRuntimeEnvironment()
+    {
+        // This method is deprecated and does nothing
+        // Use InitializeAsync() instead for proper async initialization
+        _logger.LogWarning("InitializeRuntimeEnvironment() called - this method is deprecated. Use InitializeAsync() instead.");
     }
 
     private void EnsureDirectoryExists(string path, string description)
@@ -444,7 +478,7 @@ public class ConfigurationService : IConfigurationService
     /// <summary>
     /// Reload configuration from all sources
     /// </summary>
-    public Task ReloadAsync(CancellationToken cancellationToken = default)
+    public async Task ReloadAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -458,9 +492,9 @@ public class ConfigurationService : IConfigurationService
             _cache.Remove($"user_folder_location_*");
             _cache.Remove("database_connection_string");
 
-            // Reload config files
-            _userFoldersConfig = LoadJsonConfigAsync<UserFoldersConfig>(_userFoldersConfigPath, cancellationToken).GetAwaiter().GetResult();
-            _databaseSchemaConfig = LoadJsonConfigAsync<DatabaseSchemaConfig>(_databaseSchemaConfigPath, cancellationToken).GetAwaiter().GetResult();
+            // Reload config files asynchronously
+            _userFoldersConfig = await LoadJsonConfigAsync<UserFoldersConfig>(_userFoldersConfigPath, cancellationToken);
+            _databaseSchemaConfig = await LoadJsonConfigAsync<DatabaseSchemaConfig>(_databaseSchemaConfigPath, cancellationToken);
 
             _logger.LogInformation("Configuration reloaded successfully, {Count} settings active", _settings.Count);
         }
@@ -468,8 +502,6 @@ public class ConfigurationService : IConfigurationService
         {
             _lock.ExitWriteLock();
         }
-
-        return Task.CompletedTask;
     }
 
     /// <summary>

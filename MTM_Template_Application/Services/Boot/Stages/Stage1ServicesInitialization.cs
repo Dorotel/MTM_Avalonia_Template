@@ -185,7 +185,13 @@ public class Stage1ServicesInitialization : IBootStage
     private async Task InitializeConfigurationAsync(CancellationToken cancellationToken)
     {
         _logger.LogDebug("Initializing configuration service");
+
+        // Initialize the configuration service (load config files)
+        await _configurationService.InitializeAsync(cancellationToken);
+
+        // Then reload to ensure all sources are loaded
         await _configurationService.ReloadAsync(cancellationToken);
+
         _logger.LogDebug("Configuration service initialized");
     }
 
@@ -267,7 +273,9 @@ public class Stage1ServicesInitialization : IBootStage
     private async Task InitializeVisualApiAsync(CancellationToken cancellationToken)
     {
         if (_visualApiClient == null)
+        {
             return;
+        }
 
         _logger.LogDebug("Initializing Visual API client");
 

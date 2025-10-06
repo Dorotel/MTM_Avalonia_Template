@@ -52,7 +52,34 @@
                 </StackPanel>
 
                 <!-- Center Space -->
-                <Panel Grid.Column="1" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+                    <Button Command="{CompiledBinding OpenDebugTerminalCommand}"
+                        Background="Transparent"
+                        BorderThickness="1"
+                        BorderBrush="{DynamicResource SystemAccentForegroundColor}"
+                        Foreground="{DynamicResource SystemAccentForegroundColor}"
+                        Padding="12,4"
+                        CornerRadius="4"
+                        FontSize="12"
+                        Cursor="Hand">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="🔧" FontSize="14" VerticalAlignment="Center" />
+                            <TextBlock Text="Debug Terminal" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover">
+                                <Setter Property="Background"
+                                    Value="{DynamicResource SystemAccentForegroundColor}" />
+                                <Setter Property="Foreground"
+                                    Value="{DynamicResource SystemAccentColor}" />
+                            </Style>
+                            <Style Selector="Button:pressed">
+                                <Setter Property="Opacity" Value="0.8" />
+                            </Style>
+                        </Button.Styles>
+                    </Button>
+                </StackPanel>
 
                 <!-- Window Controls -->
                 <StackPanel Grid.Column="2"
