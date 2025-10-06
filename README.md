@@ -336,7 +336,7 @@ See [specs/001-boot-sequence-splash/quickstart.md](specs/001-boot-sequence-splas
 
 ## Documentation
 
-- [Boot Sequence Guide](docs/BOOT-SEQUENCE.md) - Complete startup architecture
+- [Boot Sequence Guide](<docs/BOOT-SEQUENCE (Complete!).md>) - Complete startup architecture
 - [Troubleshooting](docs/TROUBLESHOOTING-CATALOG.md) - Common issues and solutions
 - [Spec-Kit Guides](docs/Specify%20Guides/) - Feature specification workflow
 - [Copilot Instructions](.github/copilot-instructions.md) - AI-assisted development patterns

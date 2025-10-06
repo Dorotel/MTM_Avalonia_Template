@@ -1,7 +1,7 @@
 # Boot Sequence — Splash-First, Services Initialization Order
 
 **Status**: ✅ Implementation Complete (2025-10-04)
-**Specification**: [specs/001-boot-sequence-splash/](../specs/001-boot-sequence-splash/)
+**Specification**: [specs/001-boot-sequence-splash/](../specs/001-boot-sequence-splash)
 
 This document defines the complete startup sequence and service initialization architecture for the application.
 
@@ -13,11 +13,11 @@ This document defines the complete startup sequence and service initialization a
 
 ## Performance Targets
 
-| Metric | Target | Status |
-|--------|--------|--------|
-| Total Boot Time | <10 seconds | ✅ Implemented with performance tests |
-| Stage 1 (Services) | <3 seconds | ✅ Implemented with performance tests |
-| Memory Usage | <100MB | ✅ Implemented with profiling (5-stage breakdown) |
+| Metric             | Target      | Status                                           |
+| ------------------ | ----------- | ------------------------------------------------ |
+| Total Boot Time    | <10 seconds | ✅ Implemented with performance tests             |
+| Stage 1 (Services) | <3 seconds  | ✅ Implemented with performance tests             |
+| Memory Usage       | <100MB      | ✅ Implemented with profiling (5-stage breakdown) |
 
 **Memory Budget Breakdown**:
 - Initial cache population: ~40MB (compressed with LZ4)
