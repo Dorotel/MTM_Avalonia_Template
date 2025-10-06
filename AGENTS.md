@@ -838,7 +838,7 @@ Configuration and secrets operations have strict performance budgets:
 ### Key Documentation Files
 
 - [Copilot Instructions](.github/copilot-instructions.md) - Development patterns & standards
-- [Boot Sequence Guide](docs/BOOT-SEQUENCE.md) - Detailed startup architecture
+- [Boot Sequence Guide](<docs/BOOT-SEQUENCE (Complete!).md>) - Detailed startup architecture
 - [Troubleshooting Catalog](docs/TROUBLESHOOTING-CATALOG.md) - Common issues & solutions
 - [Themes Guide](.github/instructions/Themes.instructions.md) - Theme V2 usage
 - [Spec-Kit Guides](docs/Specify%20Guides/) - Complete spec workflow documentation
