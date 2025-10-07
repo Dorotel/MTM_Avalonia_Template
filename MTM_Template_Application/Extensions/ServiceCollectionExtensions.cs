@@ -138,6 +138,30 @@ public static class ServiceCollectionExtensions
     }
 
     /// <summary>
+    /// Add Debug Terminal diagnostic services (Feature 003).
+    /// </summary>
+    public static IServiceCollection AddDebugTerminalServices(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        Serilog.Log.Debug("[DI] AddDebugTerminalServices() - Entry");
+
+        // Performance monitoring service (singleton - shared across app, maintains circular buffer)
+        Serilog.Log.Verbose("[DI] Registering IPerformanceMonitoringService -> PerformanceMonitoringService");
+        services.AddSingleton<IPerformanceMonitoringService, PerformanceMonitoringService>();
+
+        // Diagnostics service extensions (singleton - provides boot timeline, error history, connection stats)
+        Serilog.Log.Verbose("[DI] Registering IDiagnosticsServiceExtensions -> DiagnosticsServiceExtensions");
+        services.AddSingleton<IDiagnosticsServiceExtensions, DiagnosticsServiceExtensions>();
+
+        // Export service (transient - one instance per export operation)
+        Serilog.Log.Verbose("[DI] Registering IExportService -> ExportService");
+        services.AddTransient<IExportService, ExportService>();
+
+        Serilog.Log.Information("[DI] AddDebugTerminalServices() - Registered 3 Debug Terminal services");
+        return services;
+    }
+
+    /// <summary>
     /// Add data layer services (MySQL, Visual API, HTTP client).
     /// </summary>
     public static IServiceCollection AddDataLayerServices(
@@ -449,6 +473,7 @@ public static class ServiceCollectionExtensions
             .AddSecretsServices(secretsService)
             .AddLoggingServices()
             .AddDiagnosticsServices()
+            .AddDebugTerminalServices()
             .AddDataLayerServices(mySqlConnectionString: null, includeVisualApi: includeVisualApi)
             .AddCachingServices()
             .AddCoreServices()
