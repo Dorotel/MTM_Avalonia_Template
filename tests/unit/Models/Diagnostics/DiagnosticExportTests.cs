@@ -1,4 +1,6 @@
+using FluentAssertions;
 using MTM_Template_Application.Models.Diagnostics;
+using Xunit;
 
 namespace MTM_Template_Tests.unit.Models.Diagnostics;
 
@@ -67,7 +69,7 @@ public class DiagnosticExportTests
         };
 
         // Act & Assert
-        export.Invoking(e => e.Validate())
+        export.Invoking(e => e.IsValid())
             .Should().Throw<ArgumentException>()
             .WithMessage("*Application version*");
     }
@@ -98,7 +100,7 @@ public class DiagnosticExportTests
         };
 
         // Act & Assert
-        export.Invoking(e => e.Validate())
+        export.Invoking(e => e.IsValid())
             .Should().Throw<ArgumentException>()
             .WithMessage("*Platform*");
     }
@@ -133,7 +135,7 @@ public class DiagnosticExportTests
         };
 
         // Act & Assert
-        export.Invoking(e => e.Validate())
+        export.Invoking(e => e.IsValid())
             .Should().Throw<ArgumentException>()
             .WithMessage("*must be 'Windows' or 'Android'*");
     }
@@ -166,7 +168,7 @@ public class DiagnosticExportTests
         };
 
         // Act & Assert
-        export.Invoking(e => e.Validate()).Should().NotThrow();
+        export.Invoking(e => e.IsValid()).Should().NotThrow();
     }
 
     [Fact]
@@ -261,6 +263,6 @@ public class DiagnosticExportTests
         export.ConnectionStats.Should().NotBeNull();
         export.EnvironmentVariables.Should().HaveCount(2);
         export.RecentLogEntries.Should().HaveCount(2);
-        export.Invoking(e => e.Validate()).Should().NotThrow();
+        export.Invoking(e => e.IsValid()).Should().NotThrow();
     }
 }
