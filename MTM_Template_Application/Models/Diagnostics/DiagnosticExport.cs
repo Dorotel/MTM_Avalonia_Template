@@ -52,13 +52,42 @@ public sealed record DiagnosticExport
 
     /// <summary>
     /// Validates the diagnostic export data.
+    /// Throws ArgumentException if validation fails.
     /// </summary>
-    public bool IsValid()
+    /// <exception cref="ArgumentException">Thrown when validation fails.</exception>
+    public void IsValid()
     {
-        return !string.IsNullOrWhiteSpace(ApplicationVersion)
-            && (Platform == "Windows" || Platform == "Android")
-            && RecentErrors != null
-            && EnvironmentVariables != null
-            && RecentLogEntries != null;
+        if (string.IsNullOrWhiteSpace(ApplicationVersion))
+        {
+            throw new ArgumentException("Application version cannot be empty", nameof(ApplicationVersion));
+        }
+
+        if (string.IsNullOrWhiteSpace(Platform))
+        {
+            throw new ArgumentException("Platform cannot be empty", nameof(Platform));
+        }
+
+        if (Platform != "Windows" && Platform != "Android")
+        {
+            throw new ArgumentException(
+                $"Platform must be 'Windows' or 'Android', got '{Platform}'",
+                nameof(Platform)
+            );
+        }
+
+        if (RecentErrors == null)
+        {
+            throw new ArgumentException("RecentErrors cannot be null", nameof(RecentErrors));
+        }
+
+        if (EnvironmentVariables == null)
+        {
+            throw new ArgumentException("EnvironmentVariables cannot be null", nameof(EnvironmentVariables));
+        }
+
+        if (RecentLogEntries == null)
+        {
+            throw new ArgumentException("RecentLogEntries cannot be null", nameof(RecentLogEntries));
+        }
     }
 }
