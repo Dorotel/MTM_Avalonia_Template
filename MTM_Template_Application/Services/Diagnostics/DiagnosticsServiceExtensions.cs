@@ -77,18 +77,21 @@ public sealed class DiagnosticsServiceExtensions : IDiagnosticsServiceExtensions
         int count,
         CancellationToken cancellationToken = default)
     {
-        if (count < 1 || count > 100)
+        if (count < 1)
         {
             throw new ArgumentOutOfRangeException(nameof(count),
-                "Count must be between 1 and 100");
+                "Count must be at least 1");
         }
 
         cancellationToken.ThrowIfCancellationRequested();
 
         await Task.CompletedTask; // Async consistency
 
+        // Clamp count to buffer size (100) per CL-007
+        var effectiveCount = Math.Min(count, 100);
+
         return _errorBuffer
-            .TakeLast(count)
+            .TakeLast(effectiveCount)
             .ToList()
             .AsReadOnly();
     }

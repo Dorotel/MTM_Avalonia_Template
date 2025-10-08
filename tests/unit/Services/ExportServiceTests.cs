@@ -244,8 +244,13 @@ public class ExportServiceTests
             var jsonContent = await File.ReadAllTextAsync(tempFile);
             jsonContent.Should().NotBeNullOrWhiteSpace();
 
-            // Verify it's valid JSON
-            var export = JsonSerializer.Deserialize<DiagnosticExport>(jsonContent);
+            // Verify it's valid JSON - use same options as export
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+            };
+            var export = JsonSerializer.Deserialize<DiagnosticExport>(jsonContent, jsonOptions);
             export.Should().NotBeNull();
         }
         finally

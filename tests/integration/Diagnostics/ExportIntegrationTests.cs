@@ -36,6 +36,19 @@ public class ExportIntegrationTests : IDisposable
 
         // Mock dependencies
         var mockPerformanceService = Substitute.For<IPerformanceMonitoringService>();
+        mockPerformanceService.GetCurrentSnapshotAsync(Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(new PerformanceSnapshot
+            {
+                Timestamp = DateTime.UtcNow,
+                CpuUsagePercent = 8.5,
+                MemoryUsageMB = 92,
+                GcGen0Collections = 15,
+                GcGen1Collections = 3,
+                GcGen2Collections = 1,
+                ThreadCount = 28,
+                Uptime = TimeSpan.FromMinutes(12)
+            }));
+
         mockPerformanceService.GetRecentSnapshotsAsync(Arg.Any<int>(), Arg.Any<CancellationToken>())
             .Returns(Task.FromResult((IReadOnlyList<PerformanceSnapshot>)new List<PerformanceSnapshot>
             {
@@ -157,7 +170,13 @@ public class ExportIntegrationTests : IDisposable
         var jsonContent = await File.ReadAllTextAsync(filePath, cancellationToken);
         jsonContent.Should().NotBeNullOrWhiteSpace();
 
-        var deserializedExport = JsonSerializer.Deserialize<DiagnosticExport>(jsonContent);
+        var jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
+        };
+
+        var deserializedExport = JsonSerializer.Deserialize<DiagnosticExport>(jsonContent, jsonOptions);
         deserializedExport.Should().NotBeNull("JSON should deserialize to DiagnosticExport");
         deserializedExport!.CurrentPerformance.Should().NotBeNull();
         deserializedExport.RecentErrors.Should().NotBeNull();

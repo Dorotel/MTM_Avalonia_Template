@@ -64,7 +64,9 @@ public partial class ExportService : IExportService
                 .Cast<System.Collections.DictionaryEntry>()
                 .ToDictionary(
                     e => e.Key.ToString() ?? string.Empty,
-                    e => SanitizePii(e.Value?.ToString() ?? string.Empty)
+                    e => SanitizeEnvironmentVariable(
+                        e.Key.ToString() ?? string.Empty,
+                        e.Value?.ToString() ?? string.Empty)
                 );
 
             // Collect system information
@@ -75,13 +77,23 @@ public partial class ExportService : IExportService
             // Get application version from assembly
             var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Unknown";
 
-            // Create export package
+            // Create export package - provide default snapshot if current performance is null
             var export = new DiagnosticExport
             {
                 ExportTime = DateTime.UtcNow,
                 ApplicationVersion = version,
                 Platform = platform,
-                CurrentPerformance = currentPerformance,
+                CurrentPerformance = currentPerformance ?? new PerformanceSnapshot
+                {
+                    Timestamp = DateTime.UtcNow,
+                    CpuUsagePercent = 0,
+                    MemoryUsageMB = 0,
+                    GcGen0Collections = 0,
+                    GcGen1Collections = 0,
+                    GcGen2Collections = 0,
+                    ThreadCount = 0,
+                    Uptime = TimeSpan.Zero
+                },
                 BootTimeline = bootTimeline,
                 RecentErrors = recentErrors.ToList(),
                 ConnectionStats = connectionStats,
@@ -409,5 +421,35 @@ public partial class ExportService : IExportService
         });
 
         return sanitized;
+    }
+
+    /// <summary>
+    /// Sanitizes environment variable values based on the key name.
+    /// Redacts values for keys containing sensitive keywords.
+    /// </summary>
+    private string SanitizeEnvironmentVariable(string key, string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return value;
+        }
+
+        // Check if key contains sensitive keywords
+        var lowerKey = key.ToLowerInvariant();
+        var sensitiveKeywords = new[] { "password", "pwd", "token", "key", "secret", "apikey", "api_key" };
+
+        if (sensitiveKeywords.Any(keyword => lowerKey.Contains(keyword)))
+        {
+            return "[REDACTED]";
+        }
+
+        // Check if value looks like an email
+        if (EmailRegex().IsMatch(value))
+        {
+            return "[EMAIL_REDACTED]";
+        }
+
+        // Apply general PII sanitization to the value
+        return SanitizePii(value);
     }
 }

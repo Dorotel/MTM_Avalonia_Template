@@ -68,10 +68,11 @@ public class DiagnosticExportTests
             RecentLogEntries = new List<string>()
         };
 
-        // Act & Assert
-        export.Invoking(e => e.IsValid())
-            .Should().Throw<ArgumentException>()
-            .WithMessage("*Application version*");
+        // Act
+        var isValid = export.IsValid();
+
+        // Assert
+        isValid.Should().BeFalse("Application version cannot be empty");
     }
 
     [Fact]
@@ -99,10 +100,11 @@ public class DiagnosticExportTests
             RecentLogEntries = new List<string>()
         };
 
-        // Act & Assert
-        export.Invoking(e => e.IsValid())
-            .Should().Throw<ArgumentException>()
-            .WithMessage("*Platform*");
+        // Act
+        var isValid = export.IsValid();
+
+        // Assert
+        isValid.Should().BeFalse("Platform cannot be empty");
     }
 
     [Theory]
@@ -134,10 +136,11 @@ public class DiagnosticExportTests
             RecentLogEntries = new List<string>()
         };
 
-        // Act & Assert
-        export.Invoking(e => e.IsValid())
-            .Should().Throw<ArgumentException>()
-            .WithMessage("*must be 'Windows' or 'Android'*");
+        // Act
+        var isValid = export.IsValid();
+
+        // Assert
+        isValid.Should().BeFalse($"Platform '{platform}' must be 'Windows' or 'Android'");
     }
 
     [Theory]
@@ -167,8 +170,11 @@ public class DiagnosticExportTests
             RecentLogEntries = new List<string>()
         };
 
-        // Act & Assert
-        export.Invoking(e => e.IsValid()).Should().NotThrow();
+        // Act
+        var isValid = export.IsValid();
+
+        // Assert
+        isValid.Should().BeTrue($"Platform '{platform}' is valid");
     }
 
     [Fact]

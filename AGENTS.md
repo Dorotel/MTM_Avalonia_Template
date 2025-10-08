@@ -15,11 +15,303 @@
 
 ### Critical Architecture Principles
 
-1. **Spec-Driven Development**: All features follow `.specify/` workflow (SPEC → PLAN → TASKS → Implementation)
+1. **Spec-Driven Development**: All features follow `.specify/` workflow (**Performance Tests**: `tests/integration/PerformanceTests.cs`
+
+## 🔍 Debug Terminal Diagnostic Patterns (Feature 003)
+
+### Overview
+
+The Debug Terminal provides real-time diagnostics for application performance, boot metrics, errors, and system state. AI agents can use Debug Terminal data to:
+- Identify performance bottlenecks (memory leaks, slow boot stages)
+- Diagnose errors and their patterns
+- Validate performance budgets
+- Troubleshoot configuration issues
+
+### Interpreting Performance Snapshots
+
+**Snapshot Structure** (`DiagnosticSnapshot`):
+```csharp
+public record DiagnosticSnapshot(
+    DateTime Timestamp,
+    double TotalMemoryMB,      // Total memory (private + shared)
+    double PrivateMemoryMB,    // Application-exclusive memory
+    long Stage0DurationMs,     // Splash screen stage
+    long Stage1DurationMs,     // Core services stage
+    long Stage2DurationMs,     // Application ready stage
+    int ErrorCount,            // Cumulative errors
+    string ErrorSummary,       // Recent error summary
+    int ConnectionPoolActive,  // Visual API active connections
+    int ConnectionPoolIdle,    // Visual API idle connections
+    Dictionary<string, string> EnvironmentVariables
+);
+```
+
+**Health Indicators**:
+
+| Metric | Healthy Range | Warning | Critical | Action |
+|--------|--------------|---------|----------|--------|
+| Private Memory | <70MB | 70-90MB | >90MB | Check for memory leaks, review object retention |
+| Total Memory | <100MB | 100-120MB | >120MB | Exceeded budget, optimize or increase |
+| Stage 0 Duration | <1000ms | 1000-1500ms | >1500ms | Investigate splash screen initialization |
+| Stage 1 Duration | <3000ms | 3000-4000ms | >4000ms | Profile service initialization (Config, Secrets, DB) |
+| Stage 2 Duration | <1000ms | 1000-1500ms | >1500ms | Check UI initialization, ViewModels |
+| Error Count Trend | 0 | 1-5 | >5 | Review error history, identify error sources |
+| Connection Pool Utilization | 20-80% | 80-95% | 95-100% | Increase pool size or reduce concurrent calls |
+
+### Reading Boot Timeline
+
+**Boot Timeline Entry** (`BootTimelineEntry`):
+```csharp
+public record BootTimelineEntry(
+    int StageNumber,        // 0, 1, or 2
+    string StageName,       // "Splash", "Core Services", "Application Ready"
+    long DurationMs,        // Actual duration
+    long TargetMs,          // Spec target
+    bool MeetsTarget        // true if duration <= target
+);
+```
+
+**Diagnostic Patterns**:
+
+1. **Slow Boot (Total >10s)**:
+   - Identify stage with highest duration
+   - Stage 0 >1000ms: Check splash screen initialization, logging setup
+   - Stage 1 >3000ms: Check service initialization (Config, Secrets, DB migrations)
+   - Stage 2 >1000ms: Check UI initialization, ViewModel construction
+
+2. **Boot Performance Regression**:
+   - Compare current timeline with baseline (exported diagnostics)
+   - Look for stage duration increases >20%
+   - Common causes: New service dependencies, database migrations, network calls
+
+3. **Inconsistent Boot Times**:
+   - If boot time varies significantly between runs:
+     - Check for network-dependent initialization (should be async + timeout)
+     - Review database migrations (should skip if already applied)
+     - Check for non-deterministic initialization order
+
+### Analyzing Error History
+
+**Error Log Entry** (`ErrorLogEntry`):
+```csharp
+public record ErrorLogEntry(
+    DateTime Timestamp,
+    ErrorSeverity Severity,  // Critical, Error, Warning, Info
+    string Message,
+    string? StackTrace
+);
+```
+
+**Error Pattern Recognition**:
+
+1. **Error Frequency Analysis**:
+   - Single error: Likely one-time failure (network timeout, user input)
+   - Repeating errors (same message): Systemic issue (configuration error, missing dependency)
+   - Error bursts: Cascading failure (service down, connection pool exhausted)
+
+2. **Severity Interpretation**:
+   - **Critical**: Application unstable, data loss risk → Immediate attention
+   - **Error**: Operation failed, user impact → Investigation required
+   - **Warning**: Potential issue, operation succeeded → Monitor for patterns
+   - **Info**: Informational only → Review for context
+
+3. **Common Error Patterns**:
+
+| Error Message Pattern | Likely Cause | Diagnostic Steps |
+|----------------------|-------------|------------------|
+| `TimeoutException` | Network call exceeded timeout | Check connection pool, API endpoint availability |
+| `MySqlException: Unable to connect` | Database unavailable | Verify MAMP running, check connection string |
+| `NullReferenceException` | Missing null check | Review stack trace, add null validation |
+| `UnauthorizedException` | Invalid credentials | Check secrets service, verify credential retrieval |
+| `OutOfMemoryException` | Memory budget exceeded | Review snapshot history, check for leaks |
+
+### Connection Pool Diagnostics
+
+**Connection Pool Stats** (`ConnectionPoolStats`):
+```csharp
+public record ConnectionPoolStats(
+    int ActiveConnections,      // Currently in-use
+    int IdleConnections,        // Available in pool
+    int TotalConnections,       // Active + Idle
+    double UtilizationPercentage // Active / Total * 100
+);
+```
+
+**Healthy Pool Indicators**:
+- **Idle > 0**: Always have connections available (prevents queuing)
+- **Utilization 20-80%**: Efficient sizing, room for spikes
+- **No stuck connections**: Active count decreases after operations complete
+
+**Connection Pool Issues**:
+
+1. **Utilization 100% + API Timeouts**:
+   - **Cause**: Pool exhausted, requests queuing
+   - **Fix**: Increase pool size in configuration (`MaxPoolSize` setting)
+   - **Alternative**: Reduce concurrent API calls, add request throttling
+
+2. **Utilization <10% Consistently**:
+   - **Cause**: Over-provisioned pool
+   - **Fix**: Reduce pool size to free resources
+   - **Note**: Minimal impact, but reduces memory footprint
+
+3. **Active Connections Not Returning to Idle**:
+   - **Cause**: Connection leak (not disposed properly)
+   - **Fix**: Review API client code for missing `using` statements or `Dispose()` calls
+   - **Test**: Perform API operation, wait 30s, check if connections return to idle
+
+### Diagnostic Export Analysis
+
+**Export JSON Structure**:
+```json
+{
+  "exportMetadata": {
+    "timestamp": "2025-10-08T14:30:00Z",
+    "appVersion": "1.0.0",
+    "platform": "Windows 11"
+  },
+  "performanceSnapshots": [ /* Array of DiagnosticSnapshot */ ],
+  "errorHistory": [ /* Array of ErrorLogEntry */ ],
+  "bootMetrics": {
+    "stage0DurationMs": 850,
+    "stage1DurationMs": 2400,
+    "stage2DurationMs": 750,
+    "totalBootTimeMs": 4000
+  },
+  "connectionPool": { /* ConnectionPoolStats */ },
+  "environmentVariables": [ /* Filtered list */ ]
+}
+```
+
+**Analysis Workflows**:
+
+1. **Performance Comparison** (Before/After Changes):
+   ```powershell
+   # Export baseline before changes
+   $baseline = Get-Content diagnostics-before.json | ConvertFrom-Json
+   
+   # Export after changes
+   $current = Get-Content diagnostics-after.json | ConvertFrom-Json
+   
+   # Compare boot times
+   $bootDelta = $current.bootMetrics.totalBootTimeMs - $baseline.bootMetrics.totalBootTimeMs
+   Write-Host "Boot time change: $bootDelta ms"
+   
+   # Compare memory usage
+   $memoryBaseline = ($baseline.performanceSnapshots | Measure-Object -Property PrivateMemoryMB -Average).Average
+   $memoryCurrent = ($current.performanceSnapshots | Measure-Object -Property PrivateMemoryMB -Average).Average
+   $memoryDelta = $memoryCurrent - $memoryBaseline
+   Write-Host "Memory change: $memoryDelta MB"
+   ```
+
+2. **Memory Leak Detection** (Trending Analysis):
+   ```powershell
+   $export = Get-Content diagnostics.json | ConvertFrom-Json
+   
+   # Calculate memory trend (should be flat for no leak)
+   $snapshots = $export.performanceSnapshots | Sort-Object Timestamp
+   $firstMemory = $snapshots[0].PrivateMemoryMB
+   $lastMemory = $snapshots[-1].PrivateMemoryMB
+   $memoryGrowth = $lastMemory - $firstMemory
+   
+   if ($memoryGrowth -gt 10) {
+       Write-Host "⚠️ Potential memory leak: $memoryGrowth MB growth over $($snapshots.Count) snapshots"
+   }
+   ```
+
+3. **Error Frequency Analysis**:
+   ```powershell
+   $export = Get-Content diagnostics.json | ConvertFrom-Json
+   
+   # Group errors by message
+   $errorGroups = $export.errorHistory | Group-Object -Property Message
+   
+   # Find most frequent errors
+   $errorGroups | Sort-Object Count -Descending | Select-Object -First 5 | ForEach-Object {
+       Write-Host "Error: $($_.Name) - Count: $($_.Count)"
+   }
+   ```
+
+### Environment Variable Diagnostics
+
+**Security-Filtered Variables**:
+- Variables containing `PASSWORD`, `TOKEN`, `SECRET`, `KEY`, `CONNECTION_STRING` show as `***FILTERED***`
+- If filtered variable is needed for diagnosis, request access from user (never log actual values)
+
+**Common Configuration Issues**:
+
+| Missing Variable | Impact | Solution |
+|-----------------|--------|----------|
+| `VISUAL_API_ENDPOINT` | Visual ERP integration fails | Set in app config or environment |
+| `MYSQL_CONNECTION_STRING` | Database unavailable | Verify MAMP running, check connection details |
+| `ASPNETCORE_ENVIRONMENT` | Wrong configuration loaded | Set to Development/Staging/Production |
+| `SERILOG_MINIMUM_LEVEL` | Log verbosity incorrect | Set to Debug/Information/Warning/Error |
+
+### Quick Actions for AI Agents
+
+When analyzing Debug Terminal data, AI agents can suggest these Quick Actions to users:
+
+1. **Clear Errors**: Before capturing clean diagnostic export
+2. **Force GC**: Establish memory baseline before/after tests
+3. **Reset Timeline**: Clear test data before production boot measurements
+4. **Export Diagnostics**: Capture state for offline analysis or sharing with engineering
+
+### Performance Optimization Checklist
+
+When Debug Terminal shows performance issues:
+
+- [ ] **Memory >90MB**: Review object retention, check for circular references, verify Dispose() calls
+- [ ] **Boot >10s**: Profile service initialization, check for synchronous I/O, review database migrations
+- [ ] **Connection Pool 100%**: Increase pool size or reduce concurrent API calls
+- [ ] **Error Count >5**: Review error history, identify root cause, fix systemic issues
+- [ ] **Stage Duration >Target**: Profile specific stage, identify slow operations, optimize or parallelize
+
+### Related Documentation
+
+- **User Guide**: `docs/USER-GUIDE-DEBUG-TERMINAL.md`
+- **Implementation Details**: `docs/DEBUG-TERMINAL-IMPLEMENTATION.md`
+- **Performance Analysis**: `specs/003-debug-terminal-modernization/PERFORMANCE-OPTIMIZATION.md`
+- **Constitutional Compliance**: `specs/003-debug-terminal-modernization/CONSTITUTIONAL-AUDIT.md`
+
+## 📚 Additional ResourcesC → PLAN → TASKS → Implementation)
 2. **Nullable Reference Types**: Enabled project-wide - use `?` explicitly, avoid `!` operator
 3. **CompiledBinding Required**: Always use `x:DataType` and `{CompiledBinding}` in AXAML files
 4. **Performance Budgets**: <10s boot time, <100MB memory, <3s service initialization
 5. **Error Categorization**: All exceptions use `ErrorCategorizer` for structured recovery
+
+## 🤖 AI Agent Command Execution Pattern
+
+**CRITICAL FOR AI AGENTS**: When you need to run console commands, **ALWAYS create executable scripts** in `.copilot-scripts/` directory instead of requesting user approval for each command. After creating the script run it.
+
+### Script Creation Rules:
+
+1. **Create `.ps1` files** in `.copilot-scripts/` directory
+2. **Use descriptive names**: `build-*.ps1`, `test-*.ps1`, `check-*.ps1`, `fix-*.ps1`
+3. **Run immediately** using: `pwsh -ExecutionPolicy Bypass -File ".copilot-scripts/script-name.ps1"`
+4. **No approval needed** - Scripts execute automatically via Code Runner
+5. **Scripts are git-ignored** - Won't clutter commits
+
+### Example Pattern:
+
+```powershell
+# Instead of requesting approval for multiple commands:
+# ❌ DON'T: Run individual commands requiring approval
+dotnet build
+dotnet test
+git status
+
+# ✅ DO: Create and run a script
+# File: .copilot-scripts/build-and-test.ps1
+Write-Host "Building solution..." -ForegroundColor Cyan
+dotnet build MTM_Template_Application.sln
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "Running tests..." -ForegroundColor Cyan
+    dotnet test
+}
+git status
+
+# Execute script (no approval needed)
+pwsh -ExecutionPolicy Bypass -File ".copilot-scripts/build-and-test.ps1"
+```
 
 ## 🚀 Quick Start Commands
 
