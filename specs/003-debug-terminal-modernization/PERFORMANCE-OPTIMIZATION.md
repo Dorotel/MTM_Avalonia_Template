@@ -1,8 +1,8 @@
 # Performance Optimization Documentation - Feature 003 Debug Terminal
 
-**Feature**: 003-debug-terminal-modernization  
-**Task**: T046 - Document Performance Optimization Strategy  
-**Date**: October 8, 2025  
+**Feature**: 003-debug-terminal-modernization
+**Task**: T046 - Document Performance Optimization Strategy
+**Date**: October 8, 2025
 **Status**: Analysis Complete (No Profiler Required)
 
 ## Executive Summary
@@ -176,13 +176,13 @@ private void StartAutoRefresh()
 
 ## Performance Budget Compliance
 
-| Metric | Requirement | Actual | Status |
-|--------|------------|--------|--------|
-| Memory (100 snapshots) | <100KB | ~65.8KB | ✅ PASS |
-| Memory (1000 snapshots) | <1MB | ~658KB | ✅ PASS |
-| CPU (avg) | <2% | <0.01% | ✅ PASS |
-| Snapshot Add | <1ms | ~1-2μs | ✅ PASS |
-| UI Responsiveness | No blocking | Fully async | ✅ PASS |
+| Metric                  | Requirement | Actual      | Status |
+| ----------------------- | ----------- | ----------- | ------ |
+| Memory (100 snapshots)  | <100KB      | ~65.8KB     | ✅ PASS |
+| Memory (1000 snapshots) | <1MB        | ~658KB      | ✅ PASS |
+| CPU (avg)               | <2%         | <0.01%      | ✅ PASS |
+| Snapshot Add            | <1ms        | ~1-2μs      | ✅ PASS |
+| UI Responsiveness       | No blocking | Fully async | ✅ PASS |
 
 ## Recommendations
 

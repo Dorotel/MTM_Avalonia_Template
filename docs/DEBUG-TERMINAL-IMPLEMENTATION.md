@@ -1,6 +1,6 @@
 # Debug Terminal Implementation Summary
 
-**Date**: October 6, 2025 (Updated: October 8, 2025)  
+**Date**: October 6, 2025 (Updated: October 8, 2025)
 **Features**: Boot Sequence (001), Configuration Management (002), Debug Terminal Modernization (003)
 
 ## Overview
@@ -405,13 +405,13 @@ public record EnvironmentVariable(
 
 ### Performance Benchmarks
 
-| Metric | Requirement | Actual | Status |
-|--------|------------|--------|--------|
-| Memory (100 snapshots) | <100KB | 65.8KB | ✅ 34% of budget |
-| CPU (avg refresh) | <2% | <0.01% | ✅ 0.5% of budget |
-| Snapshot Add | <1ms | ~1-2μs | ✅ 1000x faster |
-| UI Responsiveness | No blocking | Fully async | ✅ Zero blocking |
-| Auto-refresh latency | <100ms | ~20ms | ✅ Real-time |
+| Metric                 | Requirement | Actual      | Status           |
+| ---------------------- | ----------- | ----------- | ---------------- |
+| Memory (100 snapshots) | <100KB      | 65.8KB      | ✅ 34% of budget  |
+| CPU (avg refresh)      | <2%         | <0.01%      | ✅ 0.5% of budget |
+| Snapshot Add           | <1ms        | ~1-2μs      | ✅ 1000x faster   |
+| UI Responsiveness      | No blocking | Fully async | ✅ Zero blocking  |
+| Auto-refresh latency   | <100ms      | ~20ms       | ✅ Real-time      |
 
 See `specs/003-debug-terminal-modernization/PERFORMANCE-OPTIMIZATION.md` for detailed analysis.
 

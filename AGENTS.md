@@ -48,15 +48,15 @@ public record DiagnosticSnapshot(
 
 **Health Indicators**:
 
-| Metric | Healthy Range | Warning | Critical | Action |
-|--------|--------------|---------|----------|--------|
-| Private Memory | <70MB | 70-90MB | >90MB | Check for memory leaks, review object retention |
-| Total Memory | <100MB | 100-120MB | >120MB | Exceeded budget, optimize or increase |
-| Stage 0 Duration | <1000ms | 1000-1500ms | >1500ms | Investigate splash screen initialization |
-| Stage 1 Duration | <3000ms | 3000-4000ms | >4000ms | Profile service initialization (Config, Secrets, DB) |
-| Stage 2 Duration | <1000ms | 1000-1500ms | >1500ms | Check UI initialization, ViewModels |
-| Error Count Trend | 0 | 1-5 | >5 | Review error history, identify error sources |
-| Connection Pool Utilization | 20-80% | 80-95% | 95-100% | Increase pool size or reduce concurrent calls |
+| Metric                      | Healthy Range | Warning     | Critical | Action                                               |
+| --------------------------- | ------------- | ----------- | -------- | ---------------------------------------------------- |
+| Private Memory              | <70MB         | 70-90MB     | >90MB    | Check for memory leaks, review object retention      |
+| Total Memory                | <100MB        | 100-120MB   | >120MB   | Exceeded budget, optimize or increase                |
+| Stage 0 Duration            | <1000ms       | 1000-1500ms | >1500ms  | Investigate splash screen initialization             |
+| Stage 1 Duration            | <3000ms       | 3000-4000ms | >4000ms  | Profile service initialization (Config, Secrets, DB) |
+| Stage 2 Duration            | <1000ms       | 1000-1500ms | >1500ms  | Check UI initialization, ViewModels                  |
+| Error Count Trend           | 0             | 1-5         | >5       | Review error history, identify error sources         |
+| Connection Pool Utilization | 20-80%        | 80-95%      | 95-100%  | Increase pool size or reduce concurrent calls        |
 
 ### Reading Boot Timeline
 
@@ -117,13 +117,13 @@ public record ErrorLogEntry(
 
 3. **Common Error Patterns**:
 
-| Error Message Pattern | Likely Cause | Diagnostic Steps |
-|----------------------|-------------|------------------|
-| `TimeoutException` | Network call exceeded timeout | Check connection pool, API endpoint availability |
-| `MySqlException: Unable to connect` | Database unavailable | Verify MAMP running, check connection string |
-| `NullReferenceException` | Missing null check | Review stack trace, add null validation |
-| `UnauthorizedException` | Invalid credentials | Check secrets service, verify credential retrieval |
-| `OutOfMemoryException` | Memory budget exceeded | Review snapshot history, check for leaks |
+| Error Message Pattern               | Likely Cause                  | Diagnostic Steps                                   |
+| ----------------------------------- | ----------------------------- | -------------------------------------------------- |
+| `TimeoutException`                  | Network call exceeded timeout | Check connection pool, API endpoint availability   |
+| `MySqlException: Unable to connect` | Database unavailable          | Verify MAMP running, check connection string       |
+| `NullReferenceException`            | Missing null check            | Review stack trace, add null validation            |
+| `UnauthorizedException`             | Invalid credentials           | Check secrets service, verify credential retrieval |
+| `OutOfMemoryException`              | Memory budget exceeded        | Review snapshot history, check for leaks           |
 
 ### Connection Pool Diagnostics
 
@@ -188,14 +188,14 @@ public record ConnectionPoolStats(
    ```powershell
    # Export baseline before changes
    $baseline = Get-Content diagnostics-before.json | ConvertFrom-Json
-   
+
    # Export after changes
    $current = Get-Content diagnostics-after.json | ConvertFrom-Json
-   
+
    # Compare boot times
    $bootDelta = $current.bootMetrics.totalBootTimeMs - $baseline.bootMetrics.totalBootTimeMs
    Write-Host "Boot time change: $bootDelta ms"
-   
+
    # Compare memory usage
    $memoryBaseline = ($baseline.performanceSnapshots | Measure-Object -Property PrivateMemoryMB -Average).Average
    $memoryCurrent = ($current.performanceSnapshots | Measure-Object -Property PrivateMemoryMB -Average).Average
@@ -206,13 +206,13 @@ public record ConnectionPoolStats(
 2. **Memory Leak Detection** (Trending Analysis):
    ```powershell
    $export = Get-Content diagnostics.json | ConvertFrom-Json
-   
+
    # Calculate memory trend (should be flat for no leak)
    $snapshots = $export.performanceSnapshots | Sort-Object Timestamp
    $firstMemory = $snapshots[0].PrivateMemoryMB
    $lastMemory = $snapshots[-1].PrivateMemoryMB
    $memoryGrowth = $lastMemory - $firstMemory
-   
+
    if ($memoryGrowth -gt 10) {
        Write-Host "⚠️ Potential memory leak: $memoryGrowth MB growth over $($snapshots.Count) snapshots"
    }
@@ -221,10 +221,10 @@ public record ConnectionPoolStats(
 3. **Error Frequency Analysis**:
    ```powershell
    $export = Get-Content diagnostics.json | ConvertFrom-Json
-   
+
    # Group errors by message
    $errorGroups = $export.errorHistory | Group-Object -Property Message
-   
+
    # Find most frequent errors
    $errorGroups | Sort-Object Count -Descending | Select-Object -First 5 | ForEach-Object {
        Write-Host "Error: $($_.Name) - Count: $($_.Count)"
@@ -239,12 +239,12 @@ public record ConnectionPoolStats(
 
 **Common Configuration Issues**:
 
-| Missing Variable | Impact | Solution |
-|-----------------|--------|----------|
-| `VISUAL_API_ENDPOINT` | Visual ERP integration fails | Set in app config or environment |
-| `MYSQL_CONNECTION_STRING` | Database unavailable | Verify MAMP running, check connection details |
-| `ASPNETCORE_ENVIRONMENT` | Wrong configuration loaded | Set to Development/Staging/Production |
-| `SERILOG_MINIMUM_LEVEL` | Log verbosity incorrect | Set to Debug/Information/Warning/Error |
+| Missing Variable          | Impact                       | Solution                                      |
+| ------------------------- | ---------------------------- | --------------------------------------------- |
+| `VISUAL_API_ENDPOINT`     | Visual ERP integration fails | Set in app config or environment              |
+| `MYSQL_CONNECTION_STRING` | Database unavailable         | Verify MAMP running, check connection details |
+| `ASPNETCORE_ENVIRONMENT`  | Wrong configuration loaded   | Set to Development/Staging/Production         |
+| `SERILOG_MINIMUM_LEVEL`   | Log verbosity incorrect      | Set to Debug/Information/Warning/Error        |
 
 ### Quick Actions for AI Agents
 

@@ -1,8 +1,8 @@
 # Debug Terminal User Guide
 
-**Application**: MTM Avalonia Template  
-**Version**: 1.0.0  
-**Last Updated**: October 8, 2025  
+**Application**: MTM Avalonia Template
+**Version**: 1.0.0
+**Last Updated**: October 8, 2025
 **Audience**: Developers, QA Engineers, Support Teams
 
 ---
@@ -127,11 +127,11 @@ When the Debug Terminal opens, you'll see:
 
 #### Color Indicators
 
-| Color | Memory Range | Meaning |
-|-------|-------------|---------|
-| 🟢 Green | <70MB | Excellent - well below target |
-| 🟡 Yellow | 70-90MB | Good - approaching target |
-| 🔴 Red | >90MB | Warning - exceeds target (<100MB) |
+| Color    | Memory Range | Meaning                           |
+| -------- | ------------ | --------------------------------- |
+| 🟢 Green  | <70MB        | Excellent - well below target     |
+| 🟡 Yellow | 70-90MB      | Good - approaching target         |
+| 🔴 Red    | >90MB        | Warning - exceeds target (<100MB) |
 
 ---
 
@@ -175,12 +175,12 @@ When the Debug Terminal opens, you'll see:
 
 #### Performance Targets
 
-| Stage | Target | Description |
-|-------|--------|-------------|
-| Stage 0 | <1000ms | Splash screen, logging setup |
-| Stage 1 | <3000ms | Core services (Config, Secrets, Database) |
-| Stage 2 | <1000ms | UI initialization, main window |
-| **Total** | **<10000ms** | **Complete boot sequence** |
+| Stage     | Target       | Description                               |
+| --------- | ------------ | ----------------------------------------- |
+| Stage 0   | <1000ms      | Splash screen, logging setup              |
+| Stage 1   | <3000ms      | Core services (Config, Secrets, Database) |
+| Stage 2   | <1000ms      | UI initialization, main window            |
+| **Total** | **<10000ms** | **Complete boot sequence**                |
 
 ---
 
@@ -220,12 +220,12 @@ When the Debug Terminal opens, you'll see:
 
 #### Severity Levels
 
-| Icon | Severity | Meaning | Action |
-|------|----------|---------|--------|
-| 🔴 | Critical | Application unstable, data loss risk | Immediate attention |
-| 🔴 | Error | Operation failed, user impact | Investigation required |
-| 🟡 | Warning | Potential issue, operation succeeded | Monitor for patterns |
-| ℹ️ | Info | Informational, no action needed | Reference only |
+| Icon | Severity | Meaning                              | Action                 |
+| ---- | -------- | ------------------------------------ | ---------------------- |
+| 🔴    | Critical | Application unstable, data loss risk | Immediate attention    |
+| 🔴    | Error    | Operation failed, user impact        | Investigation required |
+| 🟡    | Warning  | Potential issue, operation succeeded | Monitor for patterns   |
+| ℹ️    | Info     | Informational, no action needed      | Reference only         |
 
 ---
 
@@ -457,12 +457,12 @@ Filtered values show as: `***FILTERED FOR SECURITY***`
 
 The Debug Terminal uses consistent color coding across all panels:
 
-| Color | Meaning | Examples |
-|-------|---------|----------|
-| 🟢 **Green** | Meets/beats target | Memory <70MB, boot stage <target |
-| 🟡 **Yellow** | Approaching limit | Memory 70-90MB, warnings |
-| 🔴 **Red** | Exceeds limit or error | Memory >90MB, boot stage >target, errors |
-| ⚪ **Gray** | Neutral/disabled | Disabled feature flags, filtered variables |
+| Color        | Meaning                | Examples                                   |
+| ------------ | ---------------------- | ------------------------------------------ |
+| 🟢 **Green**  | Meets/beats target     | Memory <70MB, boot stage <target           |
+| 🟡 **Yellow** | Approaching limit      | Memory 70-90MB, warnings                   |
+| 🔴 **Red**    | Exceeds limit or error | Memory >90MB, boot stage >target, errors   |
+| ⚪ **Gray**   | Neutral/disabled       | Disabled feature flags, filtered variables |
 
 ### Reading Metrics
 
@@ -675,48 +675,48 @@ The Debug Terminal uses consistent color coding across all panels:
 
 ### General Questions
 
-**Q: Does the Debug Terminal affect application performance?**  
+**Q: Does the Debug Terminal affect application performance?**
 A: Minimal impact (<0.01% CPU). Performance monitoring is lightweight by design. Auto-refresh at 2-second interval adds negligible overhead. For production use, disable auto-refresh to further reduce impact.
 
-**Q: Can I use the Debug Terminal in production builds?**  
+**Q: Can I use the Debug Terminal in production builds?**
 A: Yes, but with caution. Sensitive data is filtered from exports, but the terminal reveals internal metrics. Recommended: Include in Production but hide button (accessible via keyboard shortcut for support staff).
 
-**Q: How much memory does the circular buffer use?**  
+**Q: How much memory does the circular buffer use?**
 A: Approximately 65.8KB for 100 snapshots. Well under the 100KB budget. See `PERFORMANCE-OPTIMIZATION.md` for detailed analysis.
 
-**Q: What happens when the circular buffer fills up?**  
+**Q: What happens when the circular buffer fills up?**
 A: Oldest snapshots are automatically overwritten (circular/ring buffer). You always have the most recent 100 snapshots.
 
 ---
 
 ### Feature-Specific Questions
 
-**Q: Why are some environment variables showing "***FILTERED***"?**  
+**Q: Why are some environment variables showing "***FILTERED***"?**
 A: Security measure. Variables containing PASSWORD, TOKEN, SECRET, KEY, or CONNECTION_STRING are automatically redacted to prevent accidental exposure of sensitive data.
 
-**Q: Can I increase the snapshot buffer size beyond 100?**  
+**Q: Can I increase the snapshot buffer size beyond 100?**
 A: Not via UI. Developers can modify `CircularBufferDiagnosticSnapshot` capacity (constructor parameter). Recommended: Keep at 100 to stay within performance budget.
 
-**Q: Why doesn't the boot timeline show historical data?**  
+**Q: Why doesn't the boot timeline show historical data?**
 A: Boot timeline reflects the current session only. For historical tracking, export diagnostics after each boot and compare JSON files.
 
-**Q: What's the difference between Total Memory and Private Memory?**  
+**Q: What's the difference between Total Memory and Private Memory?**
 A: **Private Memory** = memory exclusively used by this process. **Total Memory** = private + shared memory (libraries, system). Private memory is better for leak detection.
 
 ---
 
 ### Troubleshooting Questions
 
-**Q: Why do some snapshots show higher error counts than others?**  
+**Q: Why do some snapshots show higher error counts than others?**
 A: Error count is cumulative since last "Clear Errors". If errors spike at a specific timestamp, investigate what operation occurred at that time.
 
-**Q: The Debug Terminal shows different metrics than Task Manager. Why?**  
+**Q: The Debug Terminal shows different metrics than Task Manager. Why?**
 A: Different measurement methods. Debug Terminal uses .NET `GC.GetTotalMemory()` (managed memory) while Task Manager shows process working set (includes unmanaged memory). Both are valid metrics for different purposes.
 
-**Q: Can I schedule automatic diagnostic exports?**  
+**Q: Can I schedule automatic diagnostic exports?**
 A: Not currently supported via UI. Developers can implement scheduled export using `DiagnosticService.ExportDiagnostics()` in background service.
 
-**Q: Why doesn't Force GC reduce memory significantly?**  
+**Q: Why doesn't Force GC reduce memory significantly?**
 A: Normal behavior. GC only reclaims memory from unreferenced objects. If memory is in active use (caches, collections, state), GC won't free it. Persistent high memory after GC may indicate necessary working set, not a leak.
 
 ---
@@ -732,21 +732,21 @@ A: Normal behavior. GC only reclaims memory from unreferenced objects. If memory
 
 ### Performance Budgets
 
-| Metric | Budget | Debug Terminal Overhead |
-|--------|--------|-------------------------|
-| Memory | <100MB | +65.8KB (0.065% of budget) |
-| CPU | <2% | <0.01% avg |
-| Disk I/O | Minimal | Only during export (~500KB JSON) |
-| UI Responsiveness | No blocking | Fully async, zero blocking |
+| Metric            | Budget      | Debug Terminal Overhead          |
+| ----------------- | ----------- | -------------------------------- |
+| Memory            | <100MB      | +65.8KB (0.065% of budget)       |
+| CPU               | <2%         | <0.01% avg                       |
+| Disk I/O          | Minimal     | Only during export (~500KB JSON) |
+| UI Responsiveness | No blocking | Fully async, zero blocking       |
 
 ### Keyboard Shortcuts
 
-| Shortcut | Action | Availability |
-|----------|--------|--------------|
-| Ctrl+Shift+D | Open Debug Terminal | (if configured) |
-| Ctrl+Shift+E | Export Diagnostics | (if configured) |
-| Ctrl+R | Manual Refresh | (if configured) |
-| Esc | Close Debug Terminal | Always available |
+| Shortcut     | Action               | Availability     |
+| ------------ | -------------------- | ---------------- |
+| Ctrl+Shift+D | Open Debug Terminal  | (if configured)  |
+| Ctrl+Shift+E | Export Diagnostics   | (if configured)  |
+| Ctrl+R       | Manual Refresh       | (if configured)  |
+| Esc          | Close Debug Terminal | Always available |
 
 ### Related Documentation
 
@@ -771,6 +771,6 @@ A: Normal behavior. GC only reclaims memory from unreferenced objects. If memory
 
 ---
 
-**Document Version**: 1.0.0  
-**Last Reviewed**: October 8, 2025  
+**Document Version**: 1.0.0
+**Last Reviewed**: October 8, 2025
 **Next Review**: January 2026 (or after major feature updates)
