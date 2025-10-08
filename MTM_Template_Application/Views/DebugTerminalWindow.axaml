@@ -42,6 +42,65 @@
             Padding="20">
             <StackPanel Spacing="20">
 
+                <!-- Auto-Refresh Toggle (Feature 003 - Phase 2) -->
+                <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16">
+                    <Grid ColumnDefinitions="Auto,Auto,*" ColumnSpacing="16">
+                        <!-- Toggle Button -->
+                        <ToggleButton Grid.Column="0"
+                            Content="🔄 Auto-Refresh"
+                            Padding="12,6"
+                            MinWidth="140"
+                            FontWeight="SemiBold"
+                            ToolTip.Tip="Enable/disable automatic metric refresh">
+                            <!-- TODO: Bind IsChecked to ViewModel.IsMonitoring property -->
+                            <!-- TODO: Bind Command to Start/Stop monitoring based on toggle
+                            state -->
+                        </ToggleButton>
+
+                        <!-- Interval Selector -->
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="Refresh Interval:"
+                                VerticalAlignment="Center"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                            <ComboBox MinWidth="120"
+                                SelectedIndex="2"
+                                ToolTip.Tip="Update frequency (1-30 seconds, default 5s)">
+                                <ComboBoxItem Content="1 second" Tag="1" />
+                                <ComboBoxItem Content="2 seconds" Tag="2" />
+                                <ComboBoxItem Content="5 seconds" Tag="5" IsSelected="True" />
+                                <ComboBoxItem Content="10 seconds" Tag="10" />
+                                <ComboBoxItem Content="15 seconds" Tag="15" />
+                                <ComboBoxItem Content="30 seconds" Tag="30" />
+                            </ComboBox>
+                            <!-- TODO: Bind SelectedItem to ViewModel monitoring interval
+                            property -->
+                        </StackPanel>
+
+                        <!-- Status Indicator -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8"
+                            HorizontalAlignment="Right">
+                            <TextBlock Text="●"
+                                FontSize="20"
+                                VerticalAlignment="Center"
+                                Foreground="Red">
+                                <!-- TODO: Bind Foreground to Green when IsMonitoring=True -->
+                            </TextBlock>
+                            <TextBlock Text="Auto-refresh disabled"
+                                VerticalAlignment="Center"
+                                FontStyle="Italic"
+                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}">
+                                <!-- TODO: Change text to "Auto-refresh enabled" when
+                                IsMonitoring=True -->
+                            </TextBlock>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
                 <!-- Boot Sequence Section -->
                 <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
                     BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
@@ -212,6 +271,970 @@
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Real-Time Performance Monitoring Panel (Feature 003) -->
+                <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="⚡ Real-Time Performance Monitoring (Feature 003)"
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+
+                        <!-- Monitoring Controls -->
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button Content="▶ Start Monitoring"
+                                Command="{CompiledBinding StartMonitoringCommand}"
+                                IsEnabled="{CompiledBinding !IsMonitoring}"
+                                Padding="12,6"
+                                Background="{DynamicResource SystemAccentColor}"
+                                Foreground="{DynamicResource SystemAccentForegroundColor}" />
+                            <Button Content="⏹ Stop Monitoring"
+                                Command="{CompiledBinding StopMonitoringCommand}"
+                                IsEnabled="{CompiledBinding IsMonitoring}"
+                                Padding="12,6" />
+                            <TextBlock Text="Status:"
+                                VerticalAlignment="Center"
+                                Margin="20,0,5,0"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                            <TextBlock VerticalAlignment="Center"
+                                FontWeight="Bold"
+                                Foreground="Green"
+                                IsVisible="{CompiledBinding IsMonitoring}"
+                                Text="● Monitoring" />
+                            <TextBlock VerticalAlignment="Center"
+                                FontWeight="Bold"
+                                Foreground="Red"
+                                IsVisible="{CompiledBinding !IsMonitoring}"
+                                Text="● Stopped" />
+                        </StackPanel>
+
+                        <!-- Current Performance Metrics -->
+                        <Border Background="{DynamicResource SystemChromeHighColor}"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="16"
+                            IsVisible="{CompiledBinding CurrentPerformance, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <Grid ColumnDefinitions="200,*,150"
+                                RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                                <!-- CPU Usage -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="CPU Usage:"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="0" Grid.Column="1"
+                                    FontWeight="Bold"
+                                    FontFamily="Consolas"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}">
+                                    <Run
+                                        Text="{CompiledBinding CurrentPerformance.CpuUsagePercent, StringFormat={}{0:F2}}" />
+                                    <Run Text="%" />
+                                </TextBlock>
+                                <TextBlock Grid.Row="0" Grid.Column="2" Text="(Target: &lt;10%)"
+                                    FontSize="11"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+
+                                <!-- Memory Usage (Color-coded) -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Memory Usage:"
+                                    FontWeight="SemiBold" Margin="0,8,0,0"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1"
+                                    FontWeight="Bold"
+                                    FontFamily="Consolas"
+                                    Foreground="Green"
+                                    Margin="0,8,0,0">
+                                    <Run Text="{CompiledBinding CurrentPerformance.MemoryUsageMB}" />
+                                    <Run Text="MB" />
+                                </TextBlock>
+                                <TextBlock Grid.Row="1" Grid.Column="2" Text="(Target: &lt;100MB)"
+                                    FontSize="11"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                    Margin="0,8,0,0" />
+
+                                <!-- GC Gen 0 Collections -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="GC Gen 0 Collections:"
+                                    FontWeight="SemiBold" Margin="0,8,0,0"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="2" Grid.Column="1"
+                                    Text="{CompiledBinding CurrentPerformance.GcGen0Collections}"
+                                    FontFamily="Consolas"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                    Margin="0,8,0,0" />
+
+                                <!-- GC Gen 1 Collections -->
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="GC Gen 1 Collections:"
+                                    FontWeight="SemiBold" Margin="0,8,0,0"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="3" Grid.Column="1"
+                                    Text="{CompiledBinding CurrentPerformance.GcGen1Collections}"
+                                    FontFamily="Consolas"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                    Margin="0,8,0,0" />
+
+                                <!-- GC Gen 2 Collections -->
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="GC Gen 2 Collections:"
+                                    FontWeight="SemiBold" Margin="0,8,0,0"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="4" Grid.Column="1"
+                                    Text="{CompiledBinding CurrentPerformance.GcGen2Collections}"
+                                    FontFamily="Consolas"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                    Margin="0,8,0,0" />
+
+                                <!-- Thread Count -->
+                                <TextBlock Grid.Row="5" Grid.Column="0" Text="Thread Count:"
+                                    FontWeight="SemiBold" Margin="0,8,0,0"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="5" Grid.Column="1"
+                                    Text="{CompiledBinding CurrentPerformance.ThreadCount}"
+                                    FontFamily="Consolas"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                    Margin="0,8,0,0" />
+
+                                <!-- Uptime -->
+                                <TextBlock Grid.Row="6" Grid.Column="0" Text="Uptime:"
+                                    FontWeight="SemiBold" Margin="0,8,0,0"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="6" Grid.Column="1"
+                                    FontFamily="Consolas"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                    Margin="0,8,0,0">
+                                    <Run
+                                        Text="{CompiledBinding CurrentPerformance.Uptime, StringFormat={}{0:hh\\:mm\\:ss}}" />
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+
+                        <!-- Performance History Chart (Placeholder) -->
+                        <Border Background="{DynamicResource SystemChromeHighColor}"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="16"
+                            IsVisible="{CompiledBinding PerformanceHistory.Count, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Performance History (Last 100 snapshots)"
+                                    FontSize="14"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                <TextBlock
+                                    FontSize="12"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}">
+                                    <Run Text="Snapshots captured: " />
+                                    <Run Text="{CompiledBinding PerformanceHistory.Count}"
+                                        FontWeight="Bold" />
+                                </TextBlock>
+                                <!-- TODO: Add chart visualization in future phase -->
+                            </StackPanel>
+                        </Border>
+
+                        <!-- No Data Message -->
+                        <Border Background="{DynamicResource SystemChromeHighColor}"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="16"
+                            IsVisible="{CompiledBinding CurrentPerformance, Converter={x:Static ObjectConverters.IsNull}}">
+                            <TextBlock
+                                Text="⏸ No performance data available. Click 'Start Monitoring' to begin."
+                                FontStyle="Italic"
+                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                TextAlignment="Center" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Boot Timeline Visualization Panel (Feature 003) -->
+                <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20">
+                    <StackPanel Spacing="16">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="📊 Boot Timeline Visualization (Feature 003)"
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                            <Button Content="🔄 Refresh"
+                                Command="{CompiledBinding RefreshBootTimelineCommand}"
+                                Padding="8,4"
+                                VerticalAlignment="Center" />
+                        </StackPanel>
+
+                        <!-- Summary Stats -->
+                        <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Total Boot Time:"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                            <TextBlock Grid.Row="0" Grid.Column="1"
+                                FontWeight="Bold"
+                                FontFamily="Consolas">
+                                <Run
+                                    Text="{CompiledBinding TotalBootTime, StringFormat={}{0:hh\\:mm\\:ss\\.fff}}" />
+                                <TextBlock.Foreground>
+                                    <SolidColorBrush Color="Green" />
+                                </TextBlock.Foreground>
+                            </TextBlock>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Slowest Stage:"
+                                FontWeight="SemiBold" Margin="0,8,0,0"
+                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                            <TextBlock Grid.Row="1" Grid.Column="1"
+                                Text="{CompiledBinding SlowestStage}"
+                                FontFamily="Consolas"
+                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                Margin="0,8,0,0" />
+                        </Grid>
+
+                        <!-- Boot Timeline Bar Chart -->
+                        <Border Background="{DynamicResource SystemChromeHighColor}"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="16"
+                            IsVisible="{CompiledBinding CurrentBootTimeline, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Stage Breakdown (Proportional)"
+                                    FontSize="14"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+
+                                <!-- Stage 0 Bar -->
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnDefinitions="150,*,100">
+                                        <TextBlock Grid.Column="0" Text="Stage 0 (Splash)"
+                                            FontWeight="SemiBold"
+                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                        <TextBlock Grid.Column="2" Text="Target: &lt;1000ms"
+                                            FontSize="11"
+                                            HorizontalAlignment="Right"
+                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*">
+                                        <Border Background="Green"
+                                            Height="30"
+                                            CornerRadius="4"
+                                            HorizontalAlignment="Left"
+                                            Width="100">
+                                            <TextBlock
+                                                Text="{CompiledBinding CurrentBootTimeline.Stage0.Duration, StringFormat={}{0:fff}ms}"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                Foreground="White"
+                                                FontWeight="Bold"
+                                                FontSize="12" />
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- Stage 1 Bar with Expander -->
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnDefinitions="150,*,100">
+                                        <TextBlock Grid.Column="0" Text="Stage 1 (Services)"
+                                            FontWeight="SemiBold"
+                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                        <TextBlock Grid.Column="2" Text="Target: &lt;3000ms"
+                                            FontSize="11"
+                                            HorizontalAlignment="Right"
+                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*">
+                                        <Border Background="Green"
+                                            Height="30"
+                                            CornerRadius="4"
+                                            HorizontalAlignment="Left"
+                                            Width="200">
+                                            <TextBlock
+                                                Text="{CompiledBinding CurrentBootTimeline.Stage1.Duration, StringFormat={}{0:fff}ms}"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                Foreground="White"
+                                                FontWeight="Bold"
+                                                FontSize="12" />
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Expandable Service Details -->
+                                    <Expander Header="📋 Service Initialization Details"
+                                        Margin="0,8,0,0">
+                                        <Border Background="{DynamicResource SystemChromeHighColor}"
+                                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="4"
+                                            Padding="12"
+                                            MaxHeight="200">
+                                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                <ItemsControl
+                                                    ItemsSource="{CompiledBinding CurrentBootTimeline.Stage1.ServiceTimings}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Border
+                                                                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                                                                BorderThickness="0,0,0,1"
+                                                                Padding="8,6">
+                                                                <Grid ColumnDefinitions="300,*">
+                                                                    <TextBlock Grid.Column="0"
+                                                                        Text="{CompiledBinding ServiceName}"
+                                                                        FontFamily="Consolas"
+                                                                        FontSize="11"
+                                                                        Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                                                    <TextBlock Grid.Column="1"
+                                                                        FontFamily="Consolas"
+                                                                        FontSize="11">
+                                                                        <Run
+                                                                            Text="{CompiledBinding Duration, StringFormat={}{0:fff}}" />
+                                                                        <Run Text="ms" />
+                                                                        <TextBlock.Foreground>
+                                                                            <SolidColorBrush
+                                                                                Color="Green" />
+                                                                        </TextBlock.Foreground>
+                                                                    </TextBlock>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </ScrollViewer>
+                                        </Border>
+                                    </Expander>
+                                </StackPanel>
+
+                                <!-- Stage 2 Bar -->
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnDefinitions="150,*,100">
+                                        <TextBlock Grid.Column="0" Text="Stage 2 (Application)"
+                                            FontWeight="SemiBold"
+                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                        <TextBlock Grid.Column="2" Text="Target: &lt;1000ms"
+                                            FontSize="11"
+                                            HorizontalAlignment="Right"
+                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*">
+                                        <Border Background="Green"
+                                            Height="30"
+                                            CornerRadius="4"
+                                            HorizontalAlignment="Left"
+                                            Width="80">
+                                            <TextBlock
+                                                Text="{CompiledBinding CurrentBootTimeline.Stage2.Duration, StringFormat={}{0:fff}ms}"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                Foreground="White"
+                                                FontWeight="Bold"
+                                                FontSize="12" />
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- No Boot Timeline Data Message -->
+                        <Border Background="{DynamicResource SystemChromeHighColor}"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="16"
+                            IsVisible="{CompiledBinding CurrentBootTimeline, Converter={x:Static ObjectConverters.IsNull}}">
+                            <TextBlock
+                                Text="⏸ No boot timeline data available. Click 'Refresh' to load."
+                                FontStyle="Italic"
+                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                TextAlignment="Center" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Quick Actions Panel (Feature 003) -->
+                <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="⚡ Quick Actions (Feature 003)"
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+
+                        <!-- Action Buttons Grid -->
+                        <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto"
+                            ColumnSpacing="12" RowSpacing="12">
+                            <!-- Row 1 -->
+                            <Button Grid.Row="0" Grid.Column="0"
+                                Content="🗑️ Clear Cache"
+                                Command="{CompiledBinding ClearCacheCommand}"
+                                Padding="12,8"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                ToolTip.Tip="Clear all cached data (requires confirmation)" />
+
+                            <Button Grid.Row="0" Grid.Column="1"
+                                Content="🔄 Reload Configuration"
+                                Command="{CompiledBinding ReloadConfigurationCommand}"
+                                Padding="12,8"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                ToolTip.Tip="Reload all configuration settings from sources" />
+
+                            <Button Grid.Row="0" Grid.Column="2"
+                                Content="🗄️ Test Database"
+                                Command="{CompiledBinding TestDatabaseConnectionCommand}"
+                                Padding="12,8"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                ToolTip.Tip="Test MySQL database connectivity" />
+
+                            <!-- Row 2 -->
+                            <Button Grid.Row="1" Grid.Column="0"
+                                Content="🧹 Force GC"
+                                Command="{CompiledBinding ForceGarbageCollectionCommand}"
+                                Padding="12,8"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                ToolTip.Tip="Force garbage collection (all generations)" />
+
+                            <Button Grid.Row="1" Grid.Column="1"
+                                Content="🔄 Refresh All Data"
+                                Command="{CompiledBinding RefreshAllDataCommand}"
+                                Padding="12,8"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                ToolTip.Tip="Refresh all diagnostic metrics" />
+
+                            <Button Grid.Row="1" Grid.Column="2"
+                                Content="📤 Export Report"
+                                Command="{CompiledBinding ExportDiagnosticsCommand}"
+                                Padding="12,8"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left"
+                                ToolTip.Tip="Export full diagnostic report as JSON" />
+
+                            <!-- Row 3 (Centered) -->
+                            <!-- TODO: Add Copy to Clipboard button when
+                            CopyDiagnosticsToClipboardCommand is implemented -->
+                        </Grid>
+
+                        <!-- TODO: Add loading indicator and result message in future phase -->
+                        <!-- <Border Background="{DynamicResource SystemChromeHighColor}"
+                            IsVisible="{CompiledBinding IsExecutingQuickAction}">
+                            <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                                <TextBlock Text="⏳" FontSize="20" />
+                                <TextBlock Text="Executing action..." FontSize="14" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Border> -->
+                    </StackPanel>
+                </Border>
+
+                <!-- Error History Panel (Feature 003) -->
+                <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20">
+                    <StackPanel Spacing="16">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="🚨 Error History (Feature 003)"
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                            <Button Content="🗑️ Clear"
+                                Command="{CompiledBinding ClearErrorHistoryCommand}"
+                                Padding="8,4"
+                                VerticalAlignment="Center"
+                                ToolTip.Tip="Clear all error history" />
+                        </StackPanel>
+
+                        <!-- Severity Filter and Error Count -->
+                        <Grid ColumnDefinitions="150,*,Auto" RowDefinitions="Auto">
+                            <TextBlock Grid.Column="0" Text="Filter by Severity:"
+                                FontWeight="SemiBold"
+                                VerticalAlignment="Center"
+                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                            <ComboBox Grid.Column="1"
+                                SelectedIndex="2"
+                                MinWidth="150"
+                                HorizontalAlignment="Left"
+                                ToolTip.Tip="Filter errors by severity level">
+                                <ComboBoxItem Content="Info" Tag="Info" />
+                                <ComboBoxItem Content="Warning" Tag="Warning" />
+                                <ComboBoxItem Content="Error" Tag="Error" IsSelected="True" />
+                                <ComboBoxItem Content="Critical" Tag="Critical" />
+                            </ComboBox>
+                            <TextBlock Grid.Column="2"
+                                VerticalAlignment="Center"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}">
+                                <Run Text="Total Errors: " />
+                                <Run Text="{CompiledBinding ErrorCount}"
+                                    Foreground="Red"
+                                    FontWeight="Bold" />
+                            </TextBlock>
+                        </Grid>
+
+                        <!-- Error List (Last 10) -->
+                        <Border Background="{DynamicResource SystemChromeHighColor}"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            MaxHeight="400"
+                            IsVisible="{CompiledBinding RecentErrors.Count, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <ItemsControl ItemsSource="{CompiledBinding RecentErrors}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border
+                                                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                                                BorderThickness="0,0,0,1"
+                                                Padding="12,10"
+                                                Background="{DynamicResource SystemControlBackgroundBaseLowBrush}">
+                                                <Expander Header="{CompiledBinding Message}">
+                                                    <Expander.Header>
+                                                        <Grid ColumnDefinitions="100,Auto,*,150">
+                                                            <!-- Timestamp -->
+                                                            <TextBlock Grid.Column="0"
+                                                                Text="{CompiledBinding Timestamp, StringFormat={}{0:HH:mm:ss.fff}}"
+                                                                FontFamily="Consolas"
+                                                                FontSize="11"
+                                                                VerticalAlignment="Center"
+                                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+
+                                                            <!-- Severity Icon (simplified - TODO:
+                                                            use converter in T047) -->
+                                                            <TextBlock Grid.Column="1"
+                                                                Text="🔴"
+                                                                VerticalAlignment="Center"
+                                                                Margin="10,0"
+                                                                FontSize="16"
+                                                                ToolTip.Tip="{CompiledBinding Severity}" />
+
+                                                            <!-- Category -->
+                                                            <TextBlock Grid.Column="2"
+                                                                Text="{CompiledBinding Category}"
+                                                                FontWeight="SemiBold"
+                                                                FontSize="11"
+                                                                VerticalAlignment="Center"
+                                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+
+                                                            <!-- Message Preview (First 100 chars) -->
+                                                            <TextBlock Grid.Column="3"
+                                                                FontSize="12"
+                                                                VerticalAlignment="Center"
+                                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                                                TextTrimming="CharacterEllipsis"
+                                                                MaxWidth="300">
+                                                                <Run
+                                                                    Text="{CompiledBinding Message}" />
+                                                            </TextBlock>
+                                                        </Grid>
+                                                    </Expander.Header>
+
+                                                    <!-- Expandable Details -->
+                                                    <Border
+                                                        Background="{DynamicResource SystemChromeHighColor}"
+                                                        BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                                                        BorderThickness="1"
+                                                        CornerRadius="4"
+                                                        Padding="12"
+                                                        Margin="0,8,0,0">
+                                                        <StackPanel Spacing="8">
+                                                            <!-- Full Error Message -->
+                                                            <TextBlock
+                                                                Text="{CompiledBinding Message}"
+                                                                FontWeight="SemiBold"
+                                                                TextWrapping="Wrap"
+                                                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+
+                                                            <!-- Stack Trace (if available) -->
+                                                            <Border
+                                                                Background="{DynamicResource SystemChromeLowColor}"
+                                                                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="4"
+                                                                Padding="10"
+                                                                MaxHeight="200"
+                                                                IsVisible="{CompiledBinding StackTrace, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                                                <ScrollViewer
+                                                                    VerticalScrollBarVisibility="Auto">
+                                                                    <TextBlock
+                                                                        Text="{CompiledBinding StackTrace}"
+                                                                        FontFamily="Consolas"
+                                                                        FontSize="10"
+                                                                        TextWrapping="Wrap"
+                                                                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                                                </ScrollViewer>
+                                                            </Border>
+
+                                                            <!-- Recovery Suggestion (if available) -->
+                                                            <Border
+                                                                Background="{DynamicResource SystemAccentColorLight1}"
+                                                                BorderBrush="{DynamicResource SystemAccentColor}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="4"
+                                                                Padding="10"
+                                                                IsVisible="{CompiledBinding RecoverySuggestion, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                                                <StackPanel Spacing="4">
+                                                                    <TextBlock
+                                                                        Text="💡 Recovery Suggestion:"
+                                                                        FontWeight="SemiBold"
+                                                                        FontSize="12"
+                                                                        Foreground="{DynamicResource SystemAccentColor}" />
+                                                                    <TextBlock
+                                                                        Text="{CompiledBinding RecoverySuggestion}"
+                                                                        TextWrapping="Wrap"
+                                                                        FontSize="11"
+                                                                        Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                                                                </StackPanel>
+                                                            </Border>
+
+                                                            <!-- Context Data (if available) -->
+                                                            <Expander Header="📋 Context Data"
+                                                                IsVisible="{CompiledBinding ContextData.Count, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                                                <Border
+                                                                    Background="{DynamicResource SystemChromeLowColor}"
+                                                                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                                                                    BorderThickness="1"
+                                                                    CornerRadius="4"
+                                                                    Padding="10"
+                                                                    MaxHeight="150">
+                                                                    <ScrollViewer
+                                                                        VerticalScrollBarVisibility="Auto">
+                                                                        <ItemsControl
+                                                                            ItemsSource="{CompiledBinding ContextData}">
+                                                                            <ItemsControl.ItemTemplate>
+                                                                                <DataTemplate>
+                                                                                    <Grid
+                                                                                        ColumnDefinitions="150,*"
+                                                                                        Margin="0,2">
+                                                                                        <TextBlock
+                                                                                            Grid.Column="0"
+                                                                                            Text="{CompiledBinding Key}"
+                                                                                            FontFamily="Consolas"
+                                                                                            FontSize="10"
+                                                                                            FontWeight="SemiBold"
+                                                                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                                                                        <TextBlock
+                                                                                            Grid.Column="1"
+                                                                                            Text="{CompiledBinding Value}"
+                                                                                            FontFamily="Consolas"
+                                                                                            FontSize="10"
+                                                                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                                                                                    </Grid>
+                                                                                </DataTemplate>
+                                                                            </ItemsControl.ItemTemplate>
+                                                                        </ItemsControl>
+                                                                    </ScrollViewer>
+                                                                </Border>
+                                                            </Expander>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </Expander>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+
+                        <!-- No Errors Message -->
+                        <Border Background="{DynamicResource SystemChromeHighColor}"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="16"
+                            IsVisible="{CompiledBinding RecentErrors.Count, Converter={x:Static ObjectConverters.IsNull}}">
+                            <TextBlock Text="✅ No errors recorded. System running smoothly."
+                                FontStyle="Italic"
+                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                TextAlignment="Center" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Connection Pool Statistics Panel (Feature 003 - Phase 2) -->
+                <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="🔌 Connection Pool Statistics (Feature 003 - Phase 2)"
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+
+                        <!-- MySQL Connection Pool Stats -->
+                        <TextBlock Text="MySQL Connection Pool"
+                            FontSize="16"
+                            FontWeight="SemiBold"
+                            Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+
+                        <Border Background="{DynamicResource SystemChromeHighColor}"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="16">
+                            <Grid ColumnDefinitions="200,*,150"
+                                RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                                <!-- Active Connections -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Active Connections:"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="0" Grid.Column="1"
+                                    FontFamily="Consolas"
+                                    FontWeight="Bold"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}">
+                                    <Run Text="0" />
+                                    <Run Text=" / " />
+                                    <Run Text="10" />
+                                </TextBlock>
+                                <TextBlock Grid.Row="0" Grid.Column="2" Text="(Pool Size: 10)"
+                                    FontSize="11"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+
+                                <!-- Idle Connections -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Idle Connections:"
+                                    FontWeight="SemiBold" Margin="0,8,0,0"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1"
+                                    Text="10"
+                                    FontFamily="Consolas"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                    Margin="0,8,0,0" />
+
+                                <!-- Average Wait Time -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Avg Wait Time:"
+                                    FontWeight="SemiBold" Margin="0,8,0,0"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="2" Grid.Column="1"
+                                    FontFamily="Consolas"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                    Margin="0,8,0,0">
+                                    <Run Text="0" />
+                                    <Run Text="ms" />
+                                </TextBlock>
+
+                                <!-- Connection Failures (Session) -->
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Connection Failures:"
+                                    FontWeight="SemiBold" Margin="0,8,0,0"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="3" Grid.Column="1"
+                                    Text="0"
+                                    FontFamily="Consolas"
+                                    Foreground="Green"
+                                    FontWeight="Bold"
+                                    Margin="0,8,0,0" />
+                                <TextBlock Grid.Row="3" Grid.Column="2" Text="(This Session)"
+                                    FontSize="11"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                    Margin="0,8,0,0" />
+
+                                <!-- Platform Note (Android Graceful Degradation) -->
+                                <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"
+                                    Text="⚠️ Not Available on Android Platform"
+                                    FontStyle="Italic"
+                                    FontSize="12"
+                                    Foreground="Orange"
+                                    Margin="0,16,0,0"
+                                    IsVisible="False" />
+                                <!-- TODO: Bind IsVisible to platform detection logic -->
+                            </Grid>
+                        </Border>
+
+                        <!-- HTTP Client Connection Stats -->
+                        <TextBlock Text="HTTP Client Connection Pool"
+                            FontSize="16"
+                            FontWeight="SemiBold"
+                            Margin="0,16,0,0"
+                            Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+
+                        <Border Background="{DynamicResource SystemChromeHighColor}"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="16">
+                            <Grid ColumnDefinitions="200,*,150"
+                                RowDefinitions="Auto,Auto,Auto,Auto">
+                                <!-- Active Requests -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Active Requests:"
+                                    FontWeight="SemiBold"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="0" Grid.Column="1"
+                                    Text="0"
+                                    FontFamily="Consolas"
+                                    FontWeight="Bold"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+
+                                <!-- Reused Connections -->
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Reused Connections:"
+                                    FontWeight="SemiBold" Margin="0,8,0,0"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="1" Grid.Column="1"
+                                    Text="15"
+                                    FontFamily="Consolas"
+                                    Foreground="Green"
+                                    FontWeight="Bold"
+                                    Margin="0,8,0,0" />
+                                <TextBlock Grid.Row="1" Grid.Column="2" Text="(Good)"
+                                    FontSize="11"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                    Margin="0,8,0,0" />
+
+                                <!-- DNS Lookup Average Time -->
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Avg DNS Lookup:"
+                                    FontWeight="SemiBold" Margin="0,8,0,0"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="2" Grid.Column="1"
+                                    FontFamily="Consolas"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                    Margin="0,8,0,0">
+                                    <Run Text="12" />
+                                    <Run Text="ms" />
+                                </TextBlock>
+
+                                <!-- Average Response Time -->
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Avg Response Time:"
+                                    FontWeight="SemiBold" Margin="0,8,0,0"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                <TextBlock Grid.Row="3" Grid.Column="1"
+                                    FontFamily="Consolas"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                    Margin="0,8,0,0">
+                                    <Run Text="245" />
+                                    <Run Text="ms" />
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <!-- Environment Variables Display Panel (Feature 003 - Phase 2) -->
+                <Border Background="{DynamicResource SystemControlBackgroundBaseLowBrush}"
+                    BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="20">
+                    <StackPanel Spacing="16">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="🌍 Environment Variables (Feature 003 - Phase 2)"
+                                FontSize="18"
+                                FontWeight="SemiBold"
+                                Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                            <Button Content="📋 Copy All"
+                                Padding="8,4"
+                                VerticalAlignment="Center"
+                                ToolTip.Tip="Copy all MTM_* environment variables to clipboard">
+                                <!-- TODO: Bind Command when implemented in ViewModel -->
+                            </Button>
+                        </StackPanel>
+
+                        <TextBlock Text="Showing all MTM_* prefixed environment variables"
+                            FontSize="12"
+                            FontStyle="Italic"
+                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+
+                        <!-- Environment Variables List -->
+                        <Border Background="{DynamicResource SystemChromeHighColor}"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            MaxHeight="300">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <Border Padding="12">
+                                    <StackPanel Spacing="8">
+                                        <!-- Sample MTM_ variables (TODO: Bind to actual
+                                        environment variables from ViewModel) -->
+                                        <Grid ColumnDefinitions="250,*" Margin="0,4">
+                                            <TextBlock Grid.Column="0" Text="MTM_ENVIRONMENT"
+                                                FontFamily="Consolas"
+                                                FontSize="11"
+                                                FontWeight="SemiBold"
+                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                            <TextBlock Grid.Column="1" Text="Development"
+                                                FontFamily="Consolas"
+                                                FontSize="11"
+                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                        </Grid>
+
+                                        <Separator
+                                            Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                                            Height="1" />
+
+                                        <Grid ColumnDefinitions="250,*" Margin="0,4">
+                                            <TextBlock Grid.Column="0" Text="MTM_DATABASE_SERVER"
+                                                FontFamily="Consolas"
+                                                FontSize="11"
+                                                FontWeight="SemiBold"
+                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                            <TextBlock Grid.Column="1" Text="127.0.0.1"
+                                                FontFamily="Consolas"
+                                                FontSize="11"
+                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                        </Grid>
+
+                                        <Separator
+                                            Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                                            Height="1" />
+
+                                        <Grid ColumnDefinitions="250,*" Margin="0,4">
+                                            <TextBlock Grid.Column="0"
+                                                Text="MTM_VISUAL_API_BASE_URL"
+                                                FontFamily="Consolas"
+                                                FontSize="11"
+                                                FontWeight="SemiBold"
+                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                            <TextBlock Grid.Column="1"
+                                                Text="https://api.example.com"
+                                                FontFamily="Consolas"
+                                                FontSize="11"
+                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                        </Grid>
+
+                                        <Separator
+                                            Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                                            Height="1" />
+
+                                        <Grid ColumnDefinitions="250,*" Margin="0,4">
+                                            <TextBlock Grid.Column="0"
+                                                Text="MTM_FEATURE_FLAG_OFFLINE_MODE"
+                                                FontFamily="Consolas"
+                                                FontSize="11"
+                                                FontWeight="SemiBold"
+                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                            <TextBlock Grid.Column="1" Text="false"
+                                                FontFamily="Consolas"
+                                                FontSize="11"
+                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}" />
+                                        </Grid>
+
+                                        <!-- TODO: Replace with ItemsControl bound to
+                                    ViewModel.EnvironmentVariables collection -->
+                                    </StackPanel>
+                                </Border>
+                            </ScrollViewer>
+                        </Border>
+
+                        <!-- No Environment Variables Message -->
+                        <Border Background="{DynamicResource SystemChromeHighColor}"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="16"
+                            IsVisible="False">
+                            <!-- TODO: Bind IsVisible to check if no MTM_* variables exist -->
+                            <TextBlock
+                                Text="ℹ️ No MTM_* environment variables configured."
+                                FontStyle="Italic"
+                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                TextAlignment="Center" />
                         </Border>
                     </StackPanel>
                 </Border>
