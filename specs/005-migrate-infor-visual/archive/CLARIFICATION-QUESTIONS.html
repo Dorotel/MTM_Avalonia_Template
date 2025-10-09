@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature 005 Restart - Clarification Questions</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            font-size: 1.2em;
+        }
+
+        .question {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .options {
+            margin: 15px 0;
+        }
+
+        .option {
+            display: block;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            padding-left: 45px;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateX(5px);
+        }
+
+        .option input[type="radio"] {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .option.selected {
+            border-color: #667eea;
+            background: #e8eeff;
+        }
+
+        .option.recommended {
+            border-color: #27ae60;
+            background: #e8f8f0;
+        }
+
+        .recommendation {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff9e6;
+            border-left: 4px solid #f39c12;
+            border-radius: 4px;
+        }
+
+        .recommendation-badge {
+            display: inline-block;
+            background: #f39c12;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .reasoning {
+            margin-top: 10px;
+            padding: 12px;
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+
+        .reasoning-title {
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+
+        .progress-container {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .alert.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .warning-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .progress-bar, .button-container {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar">
+        <div class="progress-container">
+            <div class="progress-fill" id="progressBar">0% Complete</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Feature 005 Restart - Clarification Questions</h1>
+            <p>Comprehensive Planning for Infor VISUAL Migration + Settings UI + Custom Controls + Debug Terminal Refactor</p>
+            <p style="font-size: 0.9em; margin-top: 10px; opacity: 0.8;">Date: October 8, 2025</p>
+        </div>
+
+        <div class="content">
+            <div class="alert info">
+                <strong>📋 Instructions:</strong> Please answer all questions below. Your selections will help define the scope and approach for restarting Feature 005. Click "Copy Answers to Clipboard" when complete to paste your responses back into the chat.
+            </div>
+
+            <!-- Section 1: Settings Screen Scope -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">⚙️</span>
+                    Section 1: Settings Screen Scope
+                </h2>
+
+                <div class="question">
+                    <span class="question-number">Q1</span>
+                    <div class="question-text">What settings should be included in the new Settings screen?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q1" value="all-configurable">
+                            <strong>All configurable settings</strong> - Include every setting from IConfigurationService (API endpoints, timeouts, database connections, UI themes, logging levels, cache settings, folder paths, feature flags)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q1" value="user-facing-only">
+                            <strong>User-facing only</strong> - Only settings a typical user would change (Theme, Language, Auto-refresh intervals, Default views)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q1" value="critical-only">
+                            <strong>Critical settings only</strong> - Just the most important settings (Database connection, VISUAL ERP endpoint, Credentials)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q1" value="custom-selection">
+                            <strong>Custom selection</strong> - Let me specify which specific settings to include
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>All configurable settings</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Provides complete control over application behavior</li>
+                            <li>✅ Reduces need for manual configuration file editing</li>
+                            <li>✅ Aligns with Debug Terminal philosophy (expose everything)</li>
+                            <li>✅ Can organize settings into tabs/categories (Basic, Advanced, Developer)</li>
+                            <li>✅ Settings can be marked as "Advanced" to hide complexity from typical users</li>
+                            <li>⚠️ Will require more UI design work but pays off long-term</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Q2</span>
+                    <div class="question-text">How should settings be organized in the UI?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q2" value="tabbed-categories">
+                            <strong>Tabbed categories</strong> - Multiple tabs like "General", "Database", "VISUAL ERP", "Advanced", "Developer"
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q2" value="single-scrolling">
+                            <strong>Single scrolling page</strong> - All settings on one page with section headers
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q2" value="tree-view">
+                            <strong>Tree view navigation</strong> - Hierarchical tree on left, settings panel on right (like VS Code settings)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q2" value="accordion">
+                            <strong>Accordion sections</strong> - Expandable/collapsible sections for each category
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Tabbed categories</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Familiar pattern for users (browser settings, Windows Settings)</li>
+                            <li>✅ Reduces cognitive load (see only one category at a time)</li>
+                            <li>✅ Easy to add new categories later without UI redesign</li>
+                            <li>✅ Works well with Avalonia's TabControl (built-in control)</li>
+                            <li>✅ Clear visual hierarchy and navigation</li>
+                            <li>⚠️ VS Code tree view is powerful but more complex to implement</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Q3</span>
+                    <div class="question-text">Should settings changes take effect immediately or require "Save" button?</div>
+
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q3" value="immediate">
+                            <strong>Immediate effect</strong> - Changes apply instantly as user types/clicks (auto-save)
+                        </label>
+                        <label class="option recommended">
+                            <input type="radio" name="q3" value="save-button">
+                            <strong>Save button required</strong> - Changes staged until "Save" is clicked, with "Cancel" to discard
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q3" value="hybrid">
+                            <strong>Hybrid approach</strong> - Some settings immediate (theme), others require save (database connection)
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Save button required</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Prevents accidental changes from being persisted</li>
+                            <li>✅ Allows users to experiment and revert with "Cancel"</li>
+                            <li>✅ Clear transaction boundaries (user knows when changes are saved)</li>
+                            <li>✅ Can validate all settings before saving (prevent invalid configurations)</li>
+                            <li>✅ Matches user expectation for "settings dialogs"</li>
+                            <li>⚠️ Immediate saves feel modern but can be dangerous for critical settings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Custom Controls Strategy -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">🎨</span>
+                    Section 2: Custom Controls Strategy
+                </h2>
+
+                <div class="question">
+                    <span class="question-number">Q4</span>
+                    <div class="question-text">How aggressively should we extract custom controls from existing XAML?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q4" value="aggressive-3plus">
+                            <strong>Aggressive (3+ occurrences)</strong> - Extract any pattern that appears 3 or more times (Constitution default)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q4" value="moderate-5plus">
+                            <strong>Moderate (5+ occurrences)</strong> - Only extract patterns appearing 5+ times (less churn)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q4" value="conservative-obvious">
+                            <strong>Conservative (obvious only)</strong> - Only extract very clear patterns like "status cards" or "metric displays"
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q4" value="manual-review">
+                            <strong>Manual review</strong> - Identify all candidates first, then decide which to extract
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Aggressive (3+ occurrences)</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Matches Constitution Principle XI requirement (3+ usage threshold)</li>
+                            <li>✅ Prevents technical debt from accumulating further</li>
+                            <li>✅ DebugTerminalWindow has MANY repeated patterns (borders, grids, cards)</li>
+                            <li>✅ Up-front work now saves 40-60% development time on future features</li>
+                            <li>✅ Creates reusable components for Feature 005 VISUAL UI</li>
+                            <li>⚠️ Will cause significant XAML refactoring but is necessary per Constitution</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Q5</span>
+                    <div class="question-text">What naming convention should custom controls follow?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q5" value="purpose-type">
+                            <strong>PurposeType format</strong> - StatusCard, MetricDisplay, ErrorListPanel, ConnectionHealthBadge
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q5" value="mtm-prefix">
+                            <strong>MTM prefix</strong> - MtmStatusCard, MtmMetricDisplay (avoid namespace conflicts)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q5" value="domain-prefix">
+                            <strong>Domain prefix</strong> - DiagStatusCard, DiagMetricDisplay (group by feature)
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>PurposeType format</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Matches Constitution example: "ManufacturingField", "BarcodeInput", "StatusBadge"</li>
+                            <li>✅ Clear, concise names (no unnecessary prefixes)</li>
+                            <li>✅ Namespace already provides disambiguation (MTM_Template_Application.Controls)</li>
+                            <li>✅ Standard Avalonia/WPF convention</li>
+                            <li>✅ Easy to read in XAML: `<StatusCard>` vs `<MtmStatusCard>`</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Q6</span>
+                    <div class="question-text">Should we create a custom controls catalog document as part of this feature?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q6" value="yes-comprehensive">
+                            <strong>Yes, comprehensive catalog</strong> - Create docs/UI-CUSTOM-CONTROLS-CATALOG.md with examples, properties, usage
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q6" value="yes-basic">
+                            <strong>Yes, basic catalog</strong> - Simple list with one-line descriptions (expand later)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q6" value="defer">
+                            <strong>Defer to later</strong> - Focus on creating controls, document them later
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Yes, comprehensive catalog</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Constitution TODO explicitly requires this (Follow-up TODOs section)</li>
+                            <li>✅ Helps AI agents understand what controls are available</li>
+                            <li>✅ Prevents reinventing controls that already exist</li>
+                            <li>✅ Good documentation = easier maintenance and onboarding</li>
+                            <li>✅ Can include XAML examples for copy-paste usage</li>
+                            <li>⚠️ Takes time but is required deliverable per Constitution</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 3: Debug Terminal Refactoring -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">🔧</span>
+                    Section 3: Debug Terminal Refactoring
+                </h2>
+
+                <div class="question">
+                    <span class="question-number">Q7</span>
+                    <div class="question-text">How should the Debug Terminal side panel navigation be organized?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q7" value="feature-based">
+                            <strong>Feature-based navigation</strong> - "Feature 001: Boot", "Feature 002: Config", "Feature 003: Diagnostics", "Feature 005: VISUAL"
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q7" value="functional">
+                            <strong>Functional categories</strong> - "Performance", "Configuration", "Errors", "Connections", "Environment"
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q7" value="role-based">
+                            <strong>Role-based</strong> - "Overview", "Developer Tools", "Admin Tools", "Troubleshooting"
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q7" value="hybrid">
+                            <strong>Hybrid</strong> - Top-level functional, sub-items by feature
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Feature-based navigation</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Aligns with how the codebase is organized (specs/001, specs/002, etc.)</li>
+                            <li>✅ Makes it clear what each feature contributes to diagnostics</li>
+                            <li>✅ Easy to add new features as menu items (Feature 006, 007, etc.)</li>
+                            <li>✅ Matches user's request ("menus for each feature 001, 002, 003, 004")</li>
+                            <li>✅ Provides traceability between specs and UI</li>
+                            <li>⚠️ May feel developer-centric but that's the Debug Terminal audience</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Q8</span>
+                    <div class="question-text">What UI framework should the side panel use?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q8" value="splitview">
+                            <strong>Avalonia SplitView</strong> - Collapsible side panel with hamburger menu (like mobile apps)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q8" value="grid-splitter">
+                            <strong>Grid with GridSplitter</strong> - Resizable columns with draggable splitter (like VS Code)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q8" value="tabstrip-left">
+                            <strong>Vertical TabStrip</strong> - Tabs oriented vertically on left side
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Avalonia SplitView</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Modern, familiar UX (matches Windows Settings, mobile apps)</li>
+                            <li>✅ Provides more screen space when panel is collapsed</li>
+                            <li>✅ Built-in Avalonia control (less custom code)</li>
+                            <li>✅ Supports both overlay and inline display modes</li>
+                            <li>✅ Touch-friendly for potential tablet deployment</li>
+                            <li>⚠️ GridSplitter is also good but less modern-looking</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Q9</span>
+                    <div class="question-text">Should existing Debug Terminal content be kept during refactor or rewritten?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q9" value="keep-refactor">
+                            <strong>Keep and refactor</strong> - Move existing content into new structure, extract custom controls
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q9" value="rewrite-clean">
+                            <strong>Rewrite from scratch</strong> - Use this as opportunity to redesign everything cleanly
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q9" value="hybrid-incremental">
+                            <strong>Hybrid incremental</strong> - Keep what works, rewrite what's problematic
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Keep and refactor</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Existing content is working and meeting requirements</li>
+                            <li>✅ Preserves functionality while improving structure</li>
+                            <li>✅ Lower risk than full rewrite</li>
+                            <li>✅ Focuses effort on extracting custom controls (main goal)</li>
+                            <li>✅ Can improve layout/styling incrementally as needed</li>
+                            <li>⚠️ Full rewrite is risky and time-consuming for working code</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 4: TODOs from Previous Features -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">📋</span>
+                    Section 4: TODOs from Previous Features
+                </h2>
+
+                <div class="question">
+                    <span class="question-number">Q10</span>
+                    <div class="question-text">Feature 003 has TODOs for ViewModel bindings (Copy to Clipboard, IsMonitoring toggle, environment variables). Should these be completed?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q10" value="yes-complete">
+                            <strong>Yes, complete all</strong> - Wire up all pending ViewModel bindings as part of refactor
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q10" value="selective">
+                            <strong>Selective completion</strong> - Only complete TODOs that don't conflict with Feature 005 work
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q10" value="defer">
+                            <strong>Defer for now</strong> - Focus on Feature 005, come back to these later
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Yes, complete all</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ You're already refactoring DebugTerminalWindow - perfect time to finish these</li>
+                            <li>✅ TODOs in code indicate incomplete features (not good for production)</li>
+                            <li>✅ Wiring up ViewModels is quick work compared to full refactor</li>
+                            <li>✅ Clean slate for Feature 005 (no lingering TODOs)</li>
+                            <li>✅ Won't conflict with Feature 005 VISUAL work</li>
+                            <li>⚠️ Adds a bit more work but provides cleaner foundation</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Q11</span>
+                    <div class="question-text">The Constitution has a TODO: "Create custom control catalog". When should this be completed?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q11" value="part-of-005">
+                            <strong>Part of Feature 005</strong> - Create catalog as a deliverable of this feature
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q11" value="after-005">
+                            <strong>After Feature 005</strong> - Wait until all controls are created, then document
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q11" value="separate-feature">
+                            <strong>Separate feature</strong> - Make this Feature 006 (documentation-focused)
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Part of Feature 005</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ You're creating many custom controls in Feature 005 - document as you go</li>
+                            <li>✅ Constitutional requirement should be satisfied promptly</li>
+                            <li>✅ Documentation is easier while design is fresh in mind</li>
+                            <li>✅ Makes controls immediately usable by other features</li>
+                            <li>✅ Good documentation prevents confusion and duplicate work</li>
+                            <li>⚠️ Waiting until "after" often means it never gets done</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Q12</span>
+                    <div class="question-text">MainWindow.axaml has TODO: "Show ConfigurationErrorDialog with error details". Should this be implemented?</div>
+
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q12" value="yes-now">
+                            <strong>Yes, implement now</strong> - Complete this as part of Feature 005
+                        </label>
+                        <label class="option recommended">
+                            <input type="radio" name="q12" value="defer-separate">
+                            <strong>Defer to separate task</strong> - This is error handling work, separate from Feature 005 scope
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q12" value="remove-todo">
+                            <strong>Remove TODO</strong> - Error handling is already working via IErrorNotificationService
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Defer to separate task</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Error handling is not blocking Feature 005 work</li>
+                            <li>✅ Keeps Feature 005 focused on VISUAL integration + Settings + Custom Controls</li>
+                            <li>✅ Can be addressed in Feature 006 or as bug fix</li>
+                            <li>✅ Application works without this (graceful degradation in place)</li>
+                            <li>⚠️ Should be documented as known TODO in Feature 005 tasks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 5: Feature 005 Scope Definition -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">🎯</span>
+                    Section 5: Feature 005 Scope Definition
+                </h2>
+
+                <div class="question">
+                    <span class="question-number">Q13</span>
+                    <div class="question-text">Should Feature 005 focus on Infor VISUAL API integration or should it be split into multiple features?</div>
+
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q13" value="all-in-one">
+                            <strong>All-in-one mega-feature</strong> - Settings UI + Custom Controls + Debug Terminal Refactor + VISUAL Integration in one feature
+                        </label>
+                        <label class="option recommended">
+                            <input type="radio" name="q13" value="split-foundational">
+                            <strong>Split: 005 = Foundational, 006 = VISUAL</strong> - Feature 005 focuses on Settings + Custom Controls + Debug Refactor. Feature 006 tackles VISUAL integration with new controls
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q13" value="split-granular">
+                            <strong>Split into 3 features</strong> - 005=Settings, 006=Custom Controls, 007=VISUAL Integration
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Split: 005 = Foundational, 006 = VISUAL</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Feature 005 creates infrastructure (Settings, Custom Controls) needed for Feature 006</li>
+                            <li>✅ VISUAL integration is complex enough to deserve its own feature</li>
+                            <li>✅ Allows incremental delivery (Settings usable immediately)</li>
+                            <li>✅ Follows Spec-Driven Development principle (each feature independently testable)</li>
+                            <li>✅ Prevents Feature 005 from becoming unwieldy (already has 3 major components)</li>
+                            <li>⚠️ All-in-one would be too large and risky</li>
+                            <li>⚠️ Splitting into 3 creates too much overhead for related work</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Q14</span>
+                    <div class="question-text">What should be the priority order for Feature 005 tasks?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q14" value="controls-settings-debug">
+                            <strong>Custom Controls → Settings UI → Debug Terminal</strong> - Build reusable components first, then use them
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q14" value="settings-controls-debug">
+                            <strong>Settings UI → Custom Controls → Debug Terminal</strong> - Deliver user value first
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q14" value="debug-controls-settings">
+                            <strong>Debug Terminal → Custom Controls → Settings UI</strong> - Refactor existing, extract patterns, build new
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q14" value="parallel">
+                            <strong>Parallel development</strong> - Work on all three simultaneously (different AI agents)
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Custom Controls → Settings UI → Debug Terminal</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Create reusable components first (StatusCard, MetricDisplay, etc.)</li>
+                            <li>✅ Use those components in Settings UI (consistent look)</li>
+                            <li>✅ Finally refactor Debug Terminal to use same components</li>
+                            <li>✅ Reduces duplication from the start</li>
+                            <li>✅ Each phase builds on previous (clear dependency chain)</li>
+                            <li>⚠️ Settings-first seems appealing but would create UI without reusable components</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Q15</span>
+                    <div class="question-text">How should Settings persistence work?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q15" value="database-per-user">
+                            <strong>Database (per-user)</strong> - Store in UserPreferences table (existing pattern from Feature 002)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q15" value="json-file">
+                            <strong>JSON file</strong> - Store in config/user-settings.json (simpler, no DB required)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q15" value="hybrid">
+                            <strong>Hybrid</strong> - User preferences in DB, system settings in JSON
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Database (per-user)</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Already implemented in Feature 002 (LoadUserPreferencesAsync, SaveUserPreferenceAsync)</li>
+                            <li>✅ Supports multi-user scenarios (each user gets their own settings)</li>
+                            <li>✅ Database provides transaction safety (atomic saves)</li>
+                            <li>✅ Consistent with existing architecture</li>
+                            <li>✅ Easy to add settings versioning later</li>
+                            <li>⚠️ JSON file works but doesn't support per-user isolation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 6: Testing & Validation -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">✅</span>
+                    Section 6: Testing & Validation
+                </h2>
+
+                <div class="question">
+                    <span class="question-number">Q16</span>
+                    <div class="question-text">What testing approach should Feature 005 use?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q16" value="test-first-tdd">
+                            <strong>Test-first (TDD)</strong> - Write unit tests for ViewModels/Services before implementation (Constitution requirement)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q16" value="test-after">
+                            <strong>Test after implementation</strong> - Build features first, write tests after to verify
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q16" value="manual-only">
+                            <strong>Manual testing only</strong> - Test by running the application (no automated tests)
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Test-first (TDD)</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Constitution Principle IV mandates Test-First Development (NON-NEGOTIABLE)</li>
+                            <li>✅ Prevents regressions in Settings/Configuration logic</li>
+                            <li>✅ ViewModels are easy to unit test (no UI dependencies)</li>
+                            <li>✅ Custom control properties can be tested in isolation</li>
+                            <li>✅ Catches edge cases early (invalid settings, null values)</li>
+                            <li>⚠️ Manual-only testing is risky for configuration changes</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Q17</span>
+                    <div class="question-text">Should custom controls have dedicated unit tests?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q17" value="yes-property-tests">
+                            <strong>Yes, test properties</strong> - Test StyledProperty defaults, validation, change notifications
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q17" value="integration-only">
+                            <strong>Integration tests only</strong> - Test controls as part of full views (no isolated tests)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q17" value="visual-tests">
+                            <strong>Visual tests only</strong> - Manual verification in Avalonia previewer
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Yes, test properties</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ StyledProperty behavior is testable (default values, validation)</li>
+                            <li>✅ Prevents bugs in reusable components (affects multiple views)</li>
+                            <li>✅ Tests serve as documentation for property usage</li>
+                            <li>✅ Quick to run (no UI rendering needed)</li>
+                            <li>⚠️ Visual appearance still needs manual verification but logic is tested</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Q18</span>
+                    <div class="question-text">What is acceptable for Feature 005 test coverage?</div>
+
+                    <div class="options">
+                        <label class="option">
+                            <input type="radio" name="q18" value="high-90plus">
+                            <strong>High (90%+)</strong> - Comprehensive coverage of all ViewModels, Services, Custom Controls
+                        </label>
+                        <label class="option recommended">
+                            <input type="radio" name="q18" value="good-80plus">
+                            <strong>Good (80%+)</strong> - Cover critical paths, ViewModels, service methods (Constitution target)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q18" value="basic-50plus">
+                            <strong>Basic (50%+)</strong> - Cover happy path scenarios, defer edge cases
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Good (80%+)</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Constitution specifies ">80% coverage target on critical paths"</li>
+                            <li>✅ Balances thoroughness with development speed</li>
+                            <li>✅ Focuses testing effort where it matters most</li>
+                            <li>✅ Allows some UI-only code to remain untested (XAML bindings)</li>
+                            <li>⚠️ 90%+ is ideal but can be time-prohibitive for large features</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 7: Implementation Approach -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">⚡</span>
+                    Section 7: Implementation Approach
+                </h2>
+
+                <div class="question">
+                    <span class="question-number">Q19</span>
+                    <div class="question-text">Should Feature 005 implementation use Radio Silence Mode (Agent Protocol)?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q19" value="yes-radio-silence">
+                            <strong>Yes, use Radio Silence</strong> - AI works through entire feature with minimal interaction
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q19" value="checkpoints">
+                            <strong>Checkpoint-based</strong> - AI presents work at milestones for review/approval
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q19" value="interactive">
+                            <strong>Interactive collaboration</strong> - AI asks questions and gets guidance throughout
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Yes, use Radio Silence</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Feature 005 is well-scoped after these clarifications</li>
+                            <li>✅ Radio Silence Mode is designed for this (large refactors, complex features)</li>
+                            <li>✅ Faster completion (no back-and-forth delays)</li>
+                            <li>✅ Produces concrete deliverables (PATCH, NEW FILE, TEST, COMMIT)</li>
+                            <li>✅ You can review all changes at end before merging</li>
+                            <li>⚠️ Requires trust in AI's understanding of requirements (hence these clarifications)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="question">
+                    <span class="question-number">Q20</span>
+                    <div class="question-text">What deliverable format do you prefer for Feature 005 implementation?</div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q20" value="patch-files">
+                            <strong>Patch files (diffs)</strong> - Unified diffs for each file change (Radio Silence format)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q20" value="full-files">
+                            <strong>Full file contents</strong> - Complete updated files (easier to review)
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q20" value="direct-edits">
+                            <strong>Direct edits</strong> - AI makes changes directly using tools (live changes)
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Patch files (diffs)</strong> is recommended for these reasons:</p>
+                    </div>
+
+                    <div class="reasoning">
+                        <div class="reasoning-title">Why this approach:</div>
+                        <ul style="margin-left: 20px; margin-top: 5px;">
+                            <li>✅ Radio Silence protocol outputs unified diffs (standard format)</li>
+                            <li>✅ Easy to apply with `git apply` or patch tools</li>
+                            <li>✅ Shows exactly what changed (better for review)</li>
+                            <li>✅ Works well with large refactors (many file changes)</li>
+                            <li>✅ Can cherry-pick changes if needed</li>
+                            <li>⚠️ Full files are bulky for large files, harder to see changes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final Summary Section -->
+            <div class="section">
+                <h2 class="section-title">
+                    <span class="section-icon">📝</span>
+                    Final Confirmation
+                </h2>
+
+                <div class="question">
+                    <span class="question-number">Q21</span>
+                    <div class="question-text">Based on all answers above, do you agree with this proposed Feature 005 scope?</div>
+
+                    <div class="warning-box">
+                        <div class="warning-title">📋 Proposed Feature 005 Scope:</div>
+                        <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+                            <li><strong>Phase 1: Custom Controls Foundation</strong>
+                                <ul style="margin-left: 20px;">
+                                    <li>Extract 10-15 custom controls from DebugTerminalWindow (StatusCard, MetricDisplay, etc.)</li>
+                                    <li>Create Controls/ directory structure</li>
+                                    <li>Document each control with XML comments</li>
+                                    <li>Unit test StyledProperty behavior</li>
+                                </ul>
+                            </li>
+                            <li><strong>Phase 2: Settings Screen</strong>
+                                <ul style="margin-left: 20px;">
+                                    <li>Build comprehensive Settings window with tabbed categories</li>
+                                    <li>Include all IConfigurationService settings (organized by category)</li>
+                                    <li>Use custom controls for consistent UI</li>
+                                    <li>Persist to UserPreferences table</li>
+                                    <li>Save/Cancel button pattern</li>
+                                </ul>
+                            </li>
+                            <li><strong>Phase 3: Debug Terminal Refactor</strong>
+                                <ul style="margin-left: 20px;">
+                                    <li>Add SplitView side panel navigation</li>
+                                    <li>Organize by feature (001, 002, 003, future 006)</li>
+                                    <li>Replace repeated XAML with custom controls</li>
+                                    <li>Complete pending ViewModel TODOs</li>
+                                </ul>
+                            </li>
+                            <li><strong>Phase 4: Documentation</strong>
+                                <ul style="margin-left: 20px;">
+                                    <li>Create docs/UI-CUSTOM-CONTROLS-CATALOG.md</li>
+                                    <li>Include usage examples for each control</li>
+                                    <li>Update .github/copilot-instructions.md with custom control patterns</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>OUT OF SCOPE (Deferred to Feature 006):</strong></p>
+                        <ul style="margin-left: 20px;">
+                            <li>Infor VISUAL API integration</li>
+                            <li>Manufacturing UI screens (work orders, parts, inventory)</li>
+                            <li>Barcode scanning integration</li>
+                        </ul>
+                    </div>
+
+                    <div class="options">
+                        <label class="option recommended">
+                            <input type="radio" name="q21" value="agree">
+                            <strong>Yes, I agree</strong> - Proceed with this scope using my selected answers
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q21" value="modify">
+                            <strong>Need modifications</strong> - I'll provide changes in chat after copying answers
+                        </label>
+                        <label class="option">
+                            <input type="radio" name="q21" value="reconsider">
+                            <strong>Reconsider scope</strong> - This is too large/small, let's discuss alternatives
+                        </label>
+                    </div>
+
+                    <div class="recommendation">
+                        <span class="recommendation-badge">💡 RECOMMENDED</span>
+                        <p><strong>Yes, I agree</strong> is recommended if the above scope matches your vision.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="completionAlert" class="alert success" style="display:none;">
+                <strong>✅ All questions answered!</strong> Click "Copy Answers to Clipboard" below to get your responses.
+            </div>
+
+            <div class="button-container">
+                <button id="copyButton" class="btn" disabled>
+                    📋 Copy Answers to Clipboard
+                </button>
+                <p style="margin-top: 15px; color: #666; font-size: 0.9em;">
+                    Answer all 21 questions to enable the copy button
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Track answered questions
+        const totalQuestions = 21;
+        let answeredQuestions = new Set();
+
+        // Update progress bar
+        function updateProgress() {
+            const progress = (answeredQuestions.size / totalQuestions) * 100;
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = Math.round(progress) + '% Complete';
+
+            // Enable copy button when all answered
+            const copyButton = document.getElementById('copyButton');
+            if (answeredQuestions.size === totalQuestions) {
+                copyButton.disabled = false;
+                document.getElementById('completionAlert').style.display = 'block';
+            } else {
+                copyButton.disabled = true;
+                document.getElementById('completionAlert').style.display = 'none';
+            }
+        }
+
+        // Handle radio button selection
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const questionName = this.name;
+                answeredQuestions.add(questionName);
+
+                // Highlight selected option
+                const parent = this.closest('.options');
+                parent.querySelectorAll('.option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                this.closest('.option').classList.add('selected');
+
+                updateProgress();
+            });
+        });
+
+        // Copy answers to clipboard
+        document.getElementById('copyButton').addEventListener('click', function() {
+            let answers = '='.repeat(80) + '\n';
+            answers += 'FEATURE 005 CLARIFICATION ANSWERS\n';
+            answers += 'Date: ' + new Date().toLocaleDateString() + '\n';
+            answers += '='.repeat(80) + '\n\n';
+
+            // Collect all answers
+            for (let i = 1; i <= totalQuestions; i++) {
+                const questionNum = 'q' + i;
+                const selected = document.querySelector(`input[name="${questionNum}"]:checked`);
+
+                if (selected) {
+                    const questionText = document.querySelector(`input[name="${questionNum}"]`)
+                        .closest('.question')
+                        .querySelector('.question-text').textContent;
+                    const answerText = selected.closest('.option').textContent.trim();
+
+                    answers += `Q${i}: ${questionText}\n`;
+                    answers += `ANSWER: ${answerText}\n\n`;
+                }
+            }
+
+            answers += '='.repeat(80) + '\n';
+            answers += 'END OF ANSWERS - Paste this into chat to proceed with Feature 005\n';
+            answers += '='.repeat(80) + '\n';
+
+            // Copy to clipboard
+            navigator.clipboard.writeText(answers).then(() => {
+                const button = this;
+                const originalText = button.textContent;
+                button.textContent = '✅ Copied to Clipboard!';
+                button.style.background = '#27ae60';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 3000);
+            }).catch(err => {
+                alert('Failed to copy to clipboard. Please copy the text manually from the alert.');
+                alert(answers);
+            });
+        });
+
+        // Initialize progress
+        updateProgress();
+    </script>
+</body>
+</html>
