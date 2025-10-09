@@ -20,7 +20,8 @@ Refactor the MTM Avalonia application so that every interaction with the Infor V
    - Retrieve identifiers through toolkit services (`AutoNumber`, `ServiceUnitCost`, `GeneralQuery`, etc.)
    - Respect transaction boundaries via `BusinessTransaction.Prepare()` and `BusinessTransaction.Save()`.
 4. **Security & Authentication**
-   - Store VISUAL credentials in the existing secrets service and hydrate `Dbms` open calls with runtime values.
+   - Store VISUAL credentials in the existing secrets service and retrieve them only when opening a toolkit session inside the app.
+   - Only check out a VISUAL license for the duration of an active operation and release it immediately afterward.
    - Do not log connection strings or passwords; log success/failure with correlation IDs only.
 5. **Architecture Alignment**
    - Keep DI-driven service structure and MVVM separation intact.
@@ -40,6 +41,7 @@ Refactor the MTM Avalonia application so that every interaction with the Infor V
    - Map each endpoint to corresponding toolkit class/method.
 2. **Create Toolkit Interop Module**
    - New project: `MTM_Template_Application.Integration.VisualToolkit` (target net48, x86).
+   - Load the toolkit directly into the desktop process (Prefer32Bit) and expose strongly typed facades consumable by the Avalonia ViewModels.
    - Reference all required toolkit assemblies and encapsulate `DbmsFactory`, session pooling, and authentication.
    - Implement adapters for frequently used business documents (e.g., Part, Customer, WorkOrder).
 3. **Session & Transaction Management**
@@ -53,14 +55,22 @@ Refactor the MTM Avalonia application so that every interaction with the Infor V
    - Surface actionable messages to UI while preserving stack traces in logs.
 6. **Configuration & Secrets**
    - Extend configuration service to capture VISUAL server, database instance, site, and licensing mode.
-   - Integrate with secrets service for username/password or SSO tokens.
+   - Integrate with secrets service for username/password or SSO tokens so the desktop app can establish toolkit sessions when required.
 7. **Testing Strategy**
    - Unit-test adapters with mocks that emulate toolkit interfaces.
-   - Add integration tests guarded by `[SkippableFact]` that run against a VISUAL test database (use environment variable to gate execution).
-   - Provide smoke-test harness enabling QA to validate core transactions (part query, work order issue, shipment booking).
+   - Exercise VISUAL-backed flows manually against the shared test database during development milestones, capturing reproducible scripts for QA.
+   - Provide a lightweight smoke checklist so developers and QA can validate part lookup, work order inquiry, and other read-only scenarios before release.
 8. **Deployment Adjustments**
-   - Update installers or CI packaging to include toolkit binaries.
+   - Bundle the toolkit binaries and `Database.config` inside the Windows desktop installer under a dedicated `/visual-toolkit` directory.
    - Document prerequisites: Visual client runtime, OLE DB providers, 32-bit dependency requirements.
+9. **Documentation Refresh**
+   - Update all affected guidance in `.github`, `docs`, and `.specify` to reflect toolkit integration changes, ensuring specs, onboarding notes, and operational runbooks stay accurate.
+10. **UI Alignment**
+- Update every impacted Avalonia view, style, and ViewModel in the Windows desktop launcher to route through the new toolkit-backed services, keeping compiled bindings and platform conventions intact.
+- Present a blocking message whenever a toolkit call fails, explain what happened, and guide the user to retry; keep the VISUAL integration in read-only mode.
+
+## Platform Scope
+This refactor focuses exclusively on the Windows desktop application. Android and other non-Windows clients must disable toolkit-backed workflows and direct users to the Windows desktop for VISUAL interactions.
 
 ## Acceptance Criteria
 - No remaining HTTP calls to VISUAL endpoints; all replaced with toolkit integration.
