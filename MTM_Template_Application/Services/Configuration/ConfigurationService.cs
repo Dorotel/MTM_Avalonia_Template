@@ -17,11 +17,12 @@ namespace MTM_Template_Application.Services.Configuration;
 /// Configuration service with layered precedence: env vars > user config > app config > defaults
 /// Enhanced with MySQL persistence, dynamic location detection, and runtime initialization
 /// </summary>
-public class ConfigurationService : IConfigurationService
+public class ConfigurationService : IConfigurationService, IDisposable
 {
     private readonly ILogger<ConfigurationService> _logger;
     private readonly Dictionary<string, ConfigurationSetting> _settings = new();
     private readonly ReaderWriterLockSlim _lock = new(LockRecursionPolicy.NoRecursion);
+    private readonly SemaphoreSlim _asyncLock = new(1, 1); // For async operations
     private readonly IMemoryCache _cache;
     private readonly HttpClient _httpClient;
     private readonly string _repositoryRoot;
@@ -32,6 +33,7 @@ public class ConfigurationService : IConfigurationService
     private UserFoldersConfig? _userFoldersConfig;
     private DatabaseSchemaConfig? _databaseSchemaConfig;
     private bool _isInitialized;
+    private bool _disposed;
 
     public event EventHandler<ConfigurationChangedEventArgs>? OnConfigurationChanged;
 
@@ -482,7 +484,7 @@ public class ConfigurationService : IConfigurationService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        _lock.EnterWriteLock();
+        await _asyncLock.WaitAsync(cancellationToken);
         try
         {
             _logger.LogInformation("Reloading configuration from all sources");
@@ -500,7 +502,7 @@ public class ConfigurationService : IConfigurationService
         }
         finally
         {
-            _lock.ExitWriteLock();
+            _asyncLock.Release();
         }
     }
 
@@ -527,7 +529,7 @@ public class ConfigurationService : IConfigurationService
             await using var reader = await command.ExecuteReaderAsync(cancellationToken);
 
             var loadedCount = 0;
-            _lock.EnterWriteLock();
+            await _asyncLock.WaitAsync(cancellationToken);
             try
             {
                 while (await reader.ReadAsync(cancellationToken))
@@ -552,7 +554,7 @@ public class ConfigurationService : IConfigurationService
             }
             finally
             {
-                _lock.ExitWriteLock();
+                _asyncLock.Release();
             }
 
             _logger.LogInformation("Loaded {Count} user preferences for user {UserId}", loadedCount, userId);
@@ -902,6 +904,21 @@ public class ConfigurationService : IConfigurationService
     {
         var sensitiveKeywords = new[] { "password", "secret", "key", "token", "credential" };
         return sensitiveKeywords.Any(keyword => key.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Dispose of resources
+    /// </summary>
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _lock?.Dispose();
+        _asyncLock?.Dispose();
+        _disposed = true;
     }
 }
 

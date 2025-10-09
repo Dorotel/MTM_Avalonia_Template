@@ -272,7 +272,7 @@ public class PerformanceMonitoringServiceTests
     }
 
     [Fact]
-    public async Task Multiple_Dispose_Calls_Should_Be_Safe()
+    public void Multiple_Dispose_Calls_Should_Be_Safe()
     {
         // Arrange
         var service = new PerformanceMonitoringService(_logger);

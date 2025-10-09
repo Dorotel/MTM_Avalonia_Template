@@ -15,7 +15,6 @@ public sealed class PerformanceMonitoringService : IPerformanceMonitoringService
     private readonly object _bufferLock = new();
     private readonly int _maxBufferSize = 100;
 
-    private Timer? _monitoringTimer;
     private Process? _currentProcess;
     private DateTime? _lastCpuTime;
     private TimeSpan? _lastTotalProcessorTime;
@@ -138,14 +137,27 @@ public sealed class PerformanceMonitoringService : IPerformanceMonitoringService
         _logger.LogInformation("Starting performance monitoring with {Interval}s interval",
             interval.TotalSeconds);
 
-        // Create timer for periodic snapshots
-        _monitoringTimer = new Timer(
-            async _ => await CaptureSnapshotAsync(cancellationToken),
-            null,
-            TimeSpan.Zero, // Start immediately
-            interval);
-
-        await Task.CompletedTask;
+        try
+        {
+            // Monitor until cancellation
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                await CaptureSnapshotAsync(cancellationToken);
+                await Task.Delay(interval, cancellationToken);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation("Performance monitoring cancelled");
+            throw; // Re-throw to satisfy test expectations
+        }
+        finally
+        {
+            lock (_bufferLock)
+            {
+                _isMonitoring = false;
+            }
+        }
     }
 
     /// <inheritdoc/>
@@ -163,11 +175,7 @@ public sealed class PerformanceMonitoringService : IPerformanceMonitoringService
 
         _logger.LogInformation("Stopping performance monitoring");
 
-        if (_monitoringTimer != null)
-        {
-            await _monitoringTimer.DisposeAsync();
-            _monitoringTimer = null;
-        }
+        await Task.CompletedTask;
     }
 
     private async Task CaptureSnapshotAsync(CancellationToken cancellationToken)
@@ -242,7 +250,12 @@ public sealed class PerformanceMonitoringService : IPerformanceMonitoringService
             return;
         }
 
-        _monitoringTimer?.Dispose();
+        // Stop monitoring if active
+        lock (_bufferLock)
+        {
+            _isMonitoring = false;
+        }
+
         _currentProcess?.Dispose();
 
         _disposed = true;

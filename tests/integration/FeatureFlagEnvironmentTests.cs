@@ -33,7 +33,7 @@ public class FeatureFlagEnvironmentTests
     /// Verifies FR-025: Environment detection follows documented precedence order
     /// </summary>
     [Fact]
-    public async Task T027_FlagEnvironment_PrecedenceOrderCorrect()
+    public void T027_FlagEnvironment_PrecedenceOrderCorrect()
     {
         // Arrange
         var logger = Substitute.For<ILogger<FeatureFlagEvaluator>>();
@@ -133,7 +133,7 @@ public class FeatureFlagEnvironmentTests
     /// Verifies FR-025: Environment-specific flags respect environment boundaries
     /// </summary>
     [Fact]
-    public async Task T027_FlagEnvironment_StagingFlagsOnlyInStaging()
+    public void T027_FlagEnvironment_StagingFlagsOnlyInStaging()
     {
         // Arrange
         var logger = Substitute.For<ILogger<FeatureFlagEvaluator>>();
@@ -165,7 +165,7 @@ public class FeatureFlagEnvironmentTests
     /// Verifies FR-025: Environment names are case-insensitive
     /// </summary>
     [Fact]
-    public async Task T027_FlagEnvironment_CaseInsensitiveMatching()
+    public void T027_FlagEnvironment_CaseInsensitiveMatching()
     {
         // Arrange
         var logger = Substitute.For<ILogger<FeatureFlagEvaluator>>();
@@ -205,7 +205,7 @@ public class FeatureFlagEnvironmentTests
     /// Verifies FR-025: Fallback to build configuration when no environment variables set
     /// </summary>
     [Fact]
-    public async Task T027_FlagEnvironment_FallbackToBuildConfiguration()
+    public void T027_FlagEnvironment_FallbackToBuildConfiguration()
     {
         // Arrange
         var logger = Substitute.For<ILogger<FeatureFlagEvaluator>>();
@@ -239,7 +239,7 @@ public class FeatureFlagEnvironmentTests
     /// Verifies FR-025: Flags can target multiple environments
     /// </summary>
     [Fact]
-    public async Task T027_FlagEnvironment_MultiEnvironmentSupport()
+    public void T027_FlagEnvironment_MultiEnvironmentSupport()
     {
         // Arrange
         var logger = Substitute.For<ILogger<FeatureFlagEvaluator>>();
@@ -295,7 +295,7 @@ public class FeatureFlagEnvironmentTests
     /// Verifies FR-025: System detects environment changes and re-evaluates flags
     /// </summary>
     [Fact]
-    public async Task T027_FlagEnvironment_DetectsEnvironmentChanges()
+    public void T027_FlagEnvironment_DetectsEnvironmentChanges()
     {
         // Arrange
         var logger = Substitute.For<ILogger<FeatureFlagEvaluator>>();
@@ -328,7 +328,7 @@ public class FeatureFlagEnvironmentTests
     /// Verifies FR-025: Rollout percentages apply within each environment independently
     /// </summary>
     [Fact]
-    public async Task T027_FlagEnvironment_IndependentRolloutPerEnvironment()
+    public void T027_FlagEnvironment_IndependentRolloutPerEnvironment()
     {
         // Arrange
         var logger = Substitute.For<ILogger<FeatureFlagEvaluator>>();

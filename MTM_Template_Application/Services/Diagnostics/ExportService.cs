@@ -48,6 +48,8 @@ public partial class ExportService : IExportService
     /// <inheritdoc/>
     public async Task<DiagnosticExport> CreateExportAsync(CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+
         _logger.LogInformation("Creating diagnostic export package");
 
         try

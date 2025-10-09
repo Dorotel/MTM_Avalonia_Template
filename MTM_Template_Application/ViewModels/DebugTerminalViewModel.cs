@@ -1131,6 +1131,33 @@ public partial class DebugTerminalViewModel : ViewModelBase
             _logger.LogError(ex, "Failed to load user folder data");
         }
     }
+
+    // Partial method to recalculate TotalBootTime and SlowestStage when CurrentBootTimeline changes
+    partial void OnCurrentBootTimelineChanged(BootTimeline? value)
+    {
+        if (value == null)
+        {
+            TotalBootTime = TimeSpan.Zero;
+            SlowestStage = null;
+            return;
+        }
+
+        // Calculate total boot time
+        TotalBootTime = value.Stage0.Duration + value.Stage1.Duration + value.Stage2.Duration;
+
+        // Determine slowest stage
+        var stages = new[]
+        {
+            ("Stage 0", value.Stage0.Duration),
+            ("Stage 1", value.Stage1.Duration),
+            ("Stage 2", value.Stage2.Duration)
+        };
+        var slowest = stages.OrderByDescending(s => s.Item2).First();
+        SlowestStage = $"{slowest.Item1} ({slowest.Item2.TotalMilliseconds:F0}ms)";
+
+        _logger.LogDebug("Boot timeline recalculated: {TotalMs}ms total, slowest: {Slowest}",
+            TotalBootTime.TotalMilliseconds, SlowestStage);
+    }
 }
 
 /// <summary>
