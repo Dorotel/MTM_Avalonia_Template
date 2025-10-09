@@ -1,3 +1,0 @@
-  Determining projects to restore...
-  All projects are up-to-date for restore.
-C:\Users\johnk\source\repos\MTM_Avalonia_Template\MTM_Template_Application\Services\Diagnostics\ExportService.cs(93,17): error CS0023: Operator '!' cannot be applied to operand of type 'void' [C:\Users\johnk\source\repos\MTM_Avalonia_Template\MTM_Template_Application\MTM_Template_Application.csproj]
