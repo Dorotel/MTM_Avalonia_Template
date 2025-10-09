@@ -67,7 +67,10 @@ public static class ServiceCollectionExtensions
         Serilog.Log.Verbose("[DI] Registering IConfigurationService -> ConfigurationService");
         services.AddSingleton<IConfigurationService, ConfigurationService>();
 
-        Serilog.Log.Information("[DI] AddConfigurationServices() - Registered 1 configuration service");
+        Serilog.Log.Verbose("[DI] Registering FeatureFlagEvaluator");
+        services.AddSingleton<FeatureFlagEvaluator>();
+
+        Serilog.Log.Information("[DI] AddConfigurationServices() - Registered 2 configuration services");
         return services;
     }
 
@@ -131,6 +134,30 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IDiagnosticsService, DiagnosticsService>();
 
         Serilog.Log.Information("[DI] AddDiagnosticsServices() - Registered 5 diagnostic services");
+        return services;
+    }
+
+    /// <summary>
+    /// Add Debug Terminal diagnostic services (Feature 003).
+    /// </summary>
+    public static IServiceCollection AddDebugTerminalServices(this IServiceCollection services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+        Serilog.Log.Debug("[DI] AddDebugTerminalServices() - Entry");
+
+        // Performance monitoring service (singleton - shared across app, maintains circular buffer)
+        Serilog.Log.Verbose("[DI] Registering IPerformanceMonitoringService -> PerformanceMonitoringService");
+        services.AddSingleton<IPerformanceMonitoringService, PerformanceMonitoringService>();
+
+        // Diagnostics service extensions (singleton - provides boot timeline, error history, connection stats)
+        Serilog.Log.Verbose("[DI] Registering IDiagnosticsServiceExtensions -> DiagnosticsServiceExtensions");
+        services.AddSingleton<IDiagnosticsServiceExtensions, DiagnosticsServiceExtensions>();
+
+        // Export service (transient - one instance per export operation)
+        Serilog.Log.Verbose("[DI] Registering IExportService -> ExportService");
+        services.AddTransient<IExportService, ExportService>();
+
+        Serilog.Log.Information("[DI] AddDebugTerminalServices() - Registered 3 Debug Terminal services");
         return services;
     }
 
@@ -421,9 +448,11 @@ public static class ServiceCollectionExtensions
 
         Serilog.Log.Verbose("[DI] Registering MainViewModel");
         services.AddTransient<MainViewModel>();
-        // Add other ViewModels as needed
 
-        Serilog.Log.Information("[DI] AddViewModels() - Registered 2 ViewModels");
+        Serilog.Log.Verbose("[DI] Registering DebugTerminalViewModel");
+        services.AddTransient<DebugTerminalViewModel>();
+
+        Serilog.Log.Information("[DI] AddViewModels() - Registered 3 ViewModels");
         return services;
     }
 
@@ -444,6 +473,7 @@ public static class ServiceCollectionExtensions
             .AddSecretsServices(secretsService)
             .AddLoggingServices()
             .AddDiagnosticsServices()
+            .AddDebugTerminalServices()
             .AddDataLayerServices(mySqlConnectionString: null, includeVisualApi: includeVisualApi)
             .AddCachingServices()
             .AddCoreServices()

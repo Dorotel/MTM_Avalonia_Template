@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MTM_Template_Application.Models.Configuration;
 using MTM_Template_Application.Services.Configuration;
+using MTM_Template_Application.Views;
 
 namespace MTM_Template_Application.ViewModels;
 
@@ -470,5 +474,75 @@ public partial class MainViewModel : ViewModelBase
         AddTestOutput("=== Test Results Exported ===");
         AddTestOutput($"Export Path: {Environment.GetFolderPath(Environment.SpecialFolder.Desktop)}/test-results.json");
         // In real implementation, this would export to file
+    }
+
+    /// <summary>
+    /// Open the debug terminal window to show boot sequence and configuration diagnostics
+    /// </summary>
+    [RelayCommand]
+    private void OpenDebugTerminal()
+    {
+        try
+        {
+            // Get the service provider from Program using reflection (same approach as App.axaml.cs)
+            if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                var serviceProvider = GetServiceProvider();
+
+                if (serviceProvider != null)
+                {
+                    // Resolve DebugTerminalViewModel from DI container
+                    var debugViewModel = serviceProvider.GetRequiredService<DebugTerminalViewModel>();
+
+                    // Create and show the debug terminal window
+                    var debugWindow = new DebugTerminalWindow
+                    {
+                        DataContext = debugViewModel
+                    };
+
+                    debugWindow.Show();
+                    _logger?.LogInformation("Debug terminal window opened");
+                }
+                else
+                {
+                    _logger?.LogWarning("Cannot open debug terminal - service provider not available");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Failed to open debug terminal window");
+        }
+    }
+
+    /// <summary>
+    /// Get service provider using reflection (same pattern as App.axaml.cs)
+    /// </summary>
+    private IServiceProvider? GetServiceProvider()
+    {
+        try
+        {
+            // Use reflection to get the static method from Program class
+            var programType = Type.GetType("MTM_Template_Application.Desktop.Program, MTM_Template_Application.Desktop");
+
+            if (programType == null)
+            {
+                return null;
+            }
+
+            var method = programType.GetMethod("GetServiceProvider", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+
+            if (method == null)
+            {
+                return null;
+            }
+
+            return method.Invoke(null, null) as IServiceProvider;
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Failed to get service provider via reflection");
+            return null;
+        }
     }
 }

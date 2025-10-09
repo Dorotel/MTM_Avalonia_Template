@@ -10,6 +10,12 @@ namespace MTM_Template_Application.Services.Configuration;
 public interface IConfigurationService
 {
     /// <summary>
+    /// Initialize the configuration service asynchronously
+    /// Must be called after DI construction before using other methods
+    /// </summary>
+    Task InitializeAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Get a configuration value
     /// </summary>
     T? GetValue<T>(string key, T? defaultValue = default);
